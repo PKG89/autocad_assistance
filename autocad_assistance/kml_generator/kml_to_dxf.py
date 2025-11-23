@@ -86,17 +86,19 @@ def kml_to_dxf(
                 z_val = float(alt)
                 
                 # Создаем слой для точек, если его нет
-                points_layer = ensure_layer_exists("Points")
+                point_layer = ensure_layer_exists("Point")
+                # Создаем слой для имен точек, если его нет
+                name_layer = ensure_layer_exists("Name")
                 
-                # Добавляем точку в DXF
-                msp.add_point((x_val, y_val, z_val), dxfattribs={"layer": points_layer})
+                # Добавляем точку в DXF в слой Point
+                msp.add_point((x_val, y_val, z_val), dxfattribs={"layer": point_layer})
                 
-                # Добавляем текст с именем точки, если оно есть
+                # Добавляем текст с именем точки в слой Name, если оно есть
                 if name:
                     msp.add_text(
                         name,
                         dxfattribs={
-                            "layer": points_layer,
+                            "layer": name_layer,
                             "height": 1.0,
                         }
                     ).set_placement((x_val, y_val))

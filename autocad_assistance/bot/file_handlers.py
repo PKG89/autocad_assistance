@@ -306,11 +306,16 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
             return STATE_FILE
 
     with open(file_path, "rb") as source:
-        raw_data = source.read(10000)
-    result_encoding = chardet.detect(raw_data) or {}
-    encoding = result_encoding.get("encoding") or "utf-8"
-    if isinstance(encoding, str) and encoding.lower() == "ascii":
-        encoding = "cp1251"
+        raw_data = source.read()
+    # Prefer UTF-8 (including BOM) and only fall back to chardet if decoding fails.
+    try:
+        raw_data.decode("utf-8-sig")
+        encoding = "utf-8-sig"
+    except UnicodeDecodeError:
+        result_encoding = chardet.detect(raw_data) or {}
+        encoding = result_encoding.get("encoding") or "utf-8"
+        if isinstance(encoding, str) and encoding.lower() == "ascii":
+            encoding = "cp1251"
     context.user_data["encoding"] = encoding
 
     delimiter = " "

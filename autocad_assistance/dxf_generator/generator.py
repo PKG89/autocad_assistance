@@ -101,15 +101,30 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
         comment = str(row.get("Coments", "")).strip()
         pt_code = code.strip().lower()
 
-        # Добавляем номера точек только если включено в настройках
+        # Слой для точек
+        point_layer = "Point" if settings.get("layer_separation", True) else "0"
+        # Слой для имен точек
+        name_layer = "Name" if settings.get("layer_separation", True) else "0"
+
+        # Add a DXF point entity so the point is visible on the plan.
+        if settings.get("show_points", True):
+            msp.add_point(
+                (x, y, z),
+                dxfattribs={
+                    "layer": point_layer,
+                    "color": label_colors.get("Numbers", 7),
+                },
+            )
+
+        # Добавляем текст с именем точки в отдельный слой Name
         if settings.get("show_points", True):
             number_text = msp.add_mtext(
                 point_name,
                 dxfattribs={
-                    "layer": "Points" if settings.get("layer_separation", True) else "0",
-                    "char_height": 0.5,  # Фиксированная высота для номеров точек
+                    "layer": name_layer,
+                    "char_height": 0.5,  # Фиксированная высота для имен точек
                     "style": "Simplex",
-                    "color": label_colors.get("Points", 7),
+                    "color": label_colors.get("Numbers", 7),
                 },
             )
             number_text.set_location((x + offsets["number"][0], y + offsets["number"][1], z))

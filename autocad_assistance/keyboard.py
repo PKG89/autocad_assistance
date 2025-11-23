@@ -56,13 +56,13 @@ MAIN_MENU_FILTER = filters.TEXT & filters.Regex(MAIN_MENU_PATTERN)
 TIN_CODES_PAGE_SIZE = 8
 
 
+
+
+
 def build_workflow_keyboard(
     mapping_ready: bool,
     scale_value: int,
     mapping_type: str | None = None,
-    tin_codes_count: int = 0,
-    tin_enabled: bool = False,
-    refine_enabled: bool = False,
 ) -> InlineKeyboardMarkup:
     scale_label = f"1:{scale_value}"
 
@@ -75,17 +75,10 @@ def build_workflow_keyboard(
         mapping_label = "1️⃣ Порядок координат ⚪"
 
     scale_button = f"2️⃣ Масштаб ({scale_label})"
-    tin_suffix = f"{tin_codes_count}" if tin_codes_count else "выкл"
-    tin_state_icon = "🟢" if tin_enabled else "⚪"
-    tin_button = f"3️⃣ {tin_state_icon} TIN-коды ({tin_suffix})"
-    refine_state_icon = "🔴" if refine_enabled else "⚪"
-    refine_button = f"4️⃣ {refine_state_icon} Уточнение рельефа"
 
     buttons = [
         [InlineKeyboardButton(mapping_label, callback_data="workflow_mapping")],
         [InlineKeyboardButton(scale_button, callback_data="workflow_scale")],
-        [InlineKeyboardButton(tin_button, callback_data="workflow_tin")],
-        [InlineKeyboardButton(refine_button, callback_data="workflow_refine")],
         [InlineKeyboardButton("✅ Сформировать DXF", callback_data="workflow_generate")],
         [InlineKeyboardButton("📤 Новый файл", callback_data="workflow_newfile")],
     ]

@@ -33,7 +33,7 @@ def get_scale_factor(context: ContextTypes.DEFAULT_TYPE) -> float:
 
 
 def _build_workflow_text(context: ContextTypes.DEFAULT_TYPE, notice: str | None = None) -> str:
-    filename = context.user_data.get("original_filename", "(нет файла)")
+    filename = context.user_data.get("original_filename", "(файл не выбран)")
     data_initial = context.user_data.get("data_initial")
     if pd is not None and isinstance(data_initial, pd.DataFrame):
         total_rows = len(data_initial)
@@ -41,33 +41,22 @@ def _build_workflow_text(context: ContextTypes.DEFAULT_TYPE, notice: str | None 
         total_rows = context.user_data.get("data_initial_count", 0)
     mapping_ready = bool(context.user_data.get("mapping_ready"))
     scale_value = get_scale_value(context)
-    mapping_status = "🧩 Соответствие колонок готово" if mapping_ready else "🧩 Нужно выбрать соответствие колонок"
-    scale_status = f"📐 Текущий масштаб: 1:{scale_value}"
-    tin_codes = context.user_data.get("tin_codes") or []
-    tin_status = (
-        f"🌄 Поверхность: выбрано кодов {len(tin_codes)}"
-        if tin_codes
-        else "🌄 Поверхность: коды не выбраны"
+    mapping_status = (
+        "Координаты точек определены."
+        if mapping_ready
+        else "Требуется указать столбцы с координатами точек."
     )
-    refine_enabled = bool(context.user_data.get("tin_refine"))
-    refine_status = (
-        "🛠 Уточнение рельефа: включено"
-        if refine_enabled
-        else "🛠 Уточнение рельефа: выключено"
-    )
+    scale_status = f"Выбран масштаб: 1:{scale_value}"
     summary = (
-        f"📄 Текущий файл: {filename}\n"
-        f"📊 Строк: {total_rows}\n"
+        f"Файл для обработки: {filename}\n"
+        f"Всего точек: {total_rows}\n"
         f"{mapping_status}\n"
         f"{scale_status}\n"
-        f"{tin_status}\n"
-        f"{refine_status}\n"
-        "ℹ️ После подготовки данных можно качать DXF."
+        "Когда все готово, нажмите \"Сгенерировать DXF\"."
     )
     if notice:
         summary = f"{notice}\n\n{summary}"
     return summary
-
 
 async def delete_previous_workflow_message(context: ContextTypes.DEFAULT_TYPE, chat_id: int) -> None:
     message_id = context.user_data.pop("workflow_message_id", None)
@@ -86,25 +75,22 @@ async def show_workflow_menu(update: Update | None, context: ContextTypes.DEFAUL
     text = _build_workflow_text(context, notice)
     mapping_ready = bool(context.user_data.get("mapping_ready"))
     scale_value = get_scale_value(context)
-    
-    # Получаем тип маппинга для отображения
+
+    # Determine mapping type for display if coordinates are already selected
     mapping_type = None
     if mapping_ready:
         mapping = context.user_data.get("mapping", {})
-        if mapping.get("X") == 1:  # Стандартное соответствие
+        if mapping.get("X") == 1:  # Standard mapping
             mapping_type = "1"
-        elif mapping.get("Y") == 1:  # Перестановка X и Y
+        elif mapping.get("Y") == 1:  # Swapped X and Y
             mapping_type = "2"
-    
+
     message = await chat.send_message(
         text,
         reply_markup=build_workflow_keyboard(
             mapping_ready=mapping_ready,
             scale_value=scale_value,
             mapping_type=mapping_type,
-            tin_codes_count=len(context.user_data.get("tin_codes") or []),
-            tin_enabled=bool(context.user_data.get("tin_codes")),
-            refine_enabled=bool(context.user_data.get("tin_refine")),
         ),
     )
     context.user_data["workflow_message_id"] = message.message_id
@@ -151,5 +137,4 @@ def reset_workflow_state(context: ContextTypes.DEFAULT_TYPE) -> None:
     for key in _WORKFLOW_STATE_KEYS:
         context.user_data.pop(key, None)
     reset_kml_context(context)
-
 
