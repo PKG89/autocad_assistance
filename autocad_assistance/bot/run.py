@@ -8,6 +8,7 @@ from pathlib import Path
 
 from telegram.ext import ApplicationBuilder, CommandHandler
 from autocad_assistance.config import BOT_TOKEN
+from autocad_assistance import db
 from autocad_assistance.bot.start import register_basic_handlers, start, cancel
 from autocad_assistance.bot.file_handlers import (
     handle_file,
@@ -110,6 +111,12 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
     dummy token will be used so the Application object can be constructed
     for tests that don't actually call network operations.
     """
+    # Ensure SQLite schema is ready before we start handling updates.
+    try:
+        db.init_db()
+    except Exception:
+        logger.exception("Failed to initialize DB schema; usage logging may fail")
+
     use_token = token if token is not None else BOT_TOKEN
     if not use_token and allow_missing_token:
         use_token = "TEST:000"
