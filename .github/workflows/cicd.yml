@@ -1,0 +1,117 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: pkg89/autocad_assistance
+
+jobs:
+  build-and-push:
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build-and-push
+    # Run only on main/master; secret presence is checked inside steps
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+      GHCR_READ_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required secrets
+        id: check
+        shell: bash
+        run: |
+          missing=0
+          for v in SSH_HOST SSH_USER SSH_KEY; do
+            if [ -z "${!v}" ]; then
+              echo "::notice title=Deploy skipped::Missing $v"
+              missing=1
+            fi
+          done
+          if [ $missing -eq 0 ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "ok=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Ensure remote directory and .env exist
+        if: ${{ steps.check.outputs.ok == 'true' }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT || 22 }}
+          envs: REMOTE_PATH
+          script: |
+            set -euo pipefail
+            DIR="${REMOTE_PATH:-$HOME/autocad_assistance}"
+            mkdir -p "$DIR"
+            if [ ! -f "$DIR/.env" ]; then
+              echo "Missing $DIR/.env. Create it with BOT_TOKEN, ADMIN_IDS, DB_PATH and rerun." >&2
+              exit 1
+            fi
+
+      - name: Copy docker-compose and env to server
+        if: ${{ steps.check.outputs.ok == 'true' }}
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT || 22 }}
+          source: |
+            docker-compose.yml
+          # Use a sane default path if REMOTE_PATH is not provided
+          target: ~/autocad_assistance
+
+      - name: Deploy over SSH
+        if: ${{ steps.check.outputs.ok == 'true' }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT || 22 }}
+          envs: REGISTRY,IMAGE_NAME,REMOTE_PATH,GHCR_READ_TOKEN
+          script: |
+            set -euo pipefail
+            cd "${REMOTE_PATH:-$HOME/autocad_assistance}"
+            export DOCKER_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p "$GHCR_READ_TOKEN"
+            docker pull $DOCKER_IMAGE
+            docker compose up -d

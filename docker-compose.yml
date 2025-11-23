@@ -1,0 +1,18 @@
+services:
+  bot:
+    container_name: autocad_assistance
+    # Use a short local alias by default; CI sets DOCKER_IMAGE to GHCR
+    image: ${DOCKER_IMAGE:-autocad_assistance:latest}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Ensure DB is stored on mounted host volume
+      DB_PATH: /data/usage_stats.db
+      DATA_DIR: /data
+    volumes:
+      - ./data:/data
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"

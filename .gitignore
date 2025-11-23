@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.log
+.vscode/
+.idea/
+.DS_Store
+env/
+venv/
+.venv/
+.env
+*.db
+autocad_assistance/bot_debug.log
+autocad_assistance/__pycache__/
+autocad_assistance/usage_stats.db
+usage_stats.db
+data/

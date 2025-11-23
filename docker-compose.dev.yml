@@ -1,0 +1,6 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: autocad_assistance:dev
