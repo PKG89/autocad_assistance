@@ -73,12 +73,108 @@ def _add_points_to_layer(msp, points: Sequence[Tuple[float, float, float]], laye
             logger.debug("Failed to add point (%s, %s, %s) to layer %s: %s", x, y, z, layer, exc)
 
 
+def _is_degenerate_triangle(v1: Tuple[float, float, float], v2: Tuple[float, float, float], v3: Tuple[float, float, float], tolerance: float = 1e-6) -> bool:
+    """
+    Проверяет, является ли треугольник вырожденным (коллинеарные точки).
+    
+    Args:
+        v1, v2, v3: Вершины треугольника
+        tolerance: Допустимая погрешность для проверки
+    
+    Returns:
+        True если треугольник вырожденный
+    """
+    import math
+    
+    # Вычисляем векторы сторон
+    dx1 = v2[0] - v1[0]
+    dy1 = v2[1] - v1[1]
+    dz1 = v2[2] - v1[2]
+    
+    dx2 = v3[0] - v1[0]
+    dy2 = v3[1] - v1[1]
+    dz2 = v3[2] - v1[2]
+    
+    # Вычисляем векторное произведение (площадь параллелограмма)
+    cross_x = dy1 * dz2 - dz1 * dy2
+    cross_y = dz1 * dx2 - dx1 * dz2
+    cross_z = dx1 * dy2 - dy1 * dx2
+    
+    # Вычисляем длину вектора нормали (удвоенная площадь треугольника)
+    area = math.sqrt(cross_x * cross_x + cross_y * cross_y + cross_z * cross_z)
+    
+    return area < tolerance
+
+
+def _ensure_counterclockwise(v1: Tuple[float, float, float], v2: Tuple[float, float, float], v3: Tuple[float, float, float]) -> Tuple[Tuple[float, float, float], Tuple[float, float, float], Tuple[float, float, float]]:
+    """
+    Обеспечивает ориентацию вершин треугольника против часовой стрелки (для правильной нормали).
+    В DXF нормаль определяется по правилу правой руки.
+    
+    Args:
+        v1, v2, v3: Вершины треугольника
+    
+    Returns:
+        Кортеж вершин с правильной ориентацией
+    """
+    import math
+    
+    # Вычисляем векторное произведение для определения ориентации (в 2D проекции)
+    dx1 = v2[0] - v1[0]
+    dy1 = v2[1] - v1[1]
+    
+    dx2 = v3[0] - v1[0]
+    dy2 = v3[1] - v1[1]
+    
+    # Z-компонента векторного произведения (для 2D проекции)
+    # Если cross_z < 0, точки по часовой стрелке - меняем порядок
+    cross_z = dx1 * dy2 - dy1 * dx2
+    
+    # Если cross_z < 0, точки по часовой стрелке - меняем порядок
+    if cross_z < 0:
+        return (v1, v3, v2)
+    
+    return (v1, v2, v3)
+
+
 def _add_triangles(msp, triangles: Sequence[Tuple[Tuple[float, float, float], ...]], layer: str, color: int) -> None:
+    """
+    Добавляет треугольники в DXF как 3DFACE объекты.
+    
+    В DXF формате 3DFACE требует 4 точки, но для треугольника последняя точка дублируется.
+    Вершины должны быть ориентированы против часовой стрелки для правильной нормали.
+    
+    Args:
+        msp: ModelSpace объект ezdxf
+        triangles: Последовательность треугольников, каждый как кортеж из 3 вершин
+        layer: Имя слоя
+        color: Цвет (код цвета DXF)
+    """
+    added_count = 0
+    skipped_count = 0
+    
     for v1, v2, v3 in triangles:
         try:
-            msp.add_3dface([v1, v2, v3, v3], dxfattribs={"layer": layer, "color": color})
+            # Проверяем на вырожденный треугольник
+            if _is_degenerate_triangle(v1, v2, v3):
+                skipped_count += 1
+                logger.debug("Skipping degenerate triangle: (%s, %s, %s) -> (%s, %s, %s) -> (%s, %s, %s)", 
+                           v1[0], v1[1], v1[2], v2[0], v2[1], v2[2], v3[0], v3[1], v3[2])
+                continue
+            
+            # Обеспечиваем правильную ориентацию вершин
+            v1_ccw, v2_ccw, v3_ccw = _ensure_counterclockwise(v1, v2, v3)
+            
+            # В DXF 3DFACE требует 4 точки, для треугольника последняя дублируется
+            # Формат: [v1, v2, v3, v3] где v3 дублируется
+            msp.add_3dface([v1_ccw, v2_ccw, v3_ccw, v3_ccw], dxfattribs={"layer": layer, "color": color})
+            added_count += 1
         except Exception as exc:
+            skipped_count += 1
             logger.debug("Failed to add triangle on layer %s: %s", layer, exc)
+    
+    if skipped_count > 0:
+        logger.debug("Skipped %d triangles (degenerate or errors), added %d triangles", skipped_count, added_count)
 
 
 def _triangulate(points: Sequence[Tuple[float, float, float]]) -> List[Tuple[Tuple[float, float, float], Tuple[float, float, float], Tuple[float, float, float]]]:
