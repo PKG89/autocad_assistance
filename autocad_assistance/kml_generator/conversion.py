@@ -52,18 +52,21 @@ def lines_to_kml(
     output_path: str,
 ) -> None:
     """
-    Конвертирует линии из DXF в KML формат.
+    Конвертирует линии, круги и блоки из DXF в KML формат.
     
     Args:
-        lines_data: Список кортежей (координаты точек линии, имя слоя)
+        lines_data: Список кортежей (координаты точек линии/круга/блока, имя слоя)
         transformer: Трансформер для конвертации координат из проекции DXF в WGS84
         output_path: Путь для сохранения KML файла
     """
     kml = simplekml.Kml()
     
     for line_idx, (coords, layer_name) in enumerate(lines_data):
-        if len(coords) < 2:
+        if len(coords) < 1:
             continue
+        
+        # Проверяем, является ли это точкой (блоком) - две одинаковые координаты
+        is_point = len(coords) == 2 and coords[0] == coords[1]
         
         # Трансформируем координаты в WGS84
         x_values = [coord[0] for coord in coords]
@@ -72,21 +75,30 @@ def lines_to_kml(
         try:
             lon_values, lat_values = transformer.transform(x_values, y_values)
         except Exception as e:
-            # Если трансформация не удалась, пропускаем линию
+            # Если трансформация не удалась, пропускаем объект
             continue
         
-        # Создаем координаты для KML (lon, lat, altitude)
-        kml_coords = []
-        for i, (lon, lat) in enumerate(zip(lon_values, lat_values)):
-            alt = coords[i][2] if len(coords[i]) > 2 else 0.0
-            kml_coords.append((lon, lat, alt))
-        
-        # Создаем линию в KML
-        linestring = kml.newlinestring(
-            name=f"Line_{line_idx + 1}_{layer_name}",
-            description=f"<b>Layer:</b> {layer_name}<br/><b>Points:</b> {len(kml_coords)}",
-            coords=kml_coords
-        )
-        linestring.altitudemode = simplekml.AltitudeMode.clamptoground
+        if is_point:
+            # Создаем точку для блока или маленького круга
+            alt = coords[0][2] if len(coords[0]) > 2 else 0.0
+            point = kml.newpoint(
+                name=f"Point_{line_idx + 1}_{layer_name}",
+                description=f"<b>Layer:</b> {layer_name}<br/><b>Type:</b> Point (Block/Circle)",
+                coords=[(lon_values[0], lat_values[0], alt)]
+            )
+        else:
+            # Создаем координаты для KML (lon, lat, altitude)
+            kml_coords = []
+            for i, (lon, lat) in enumerate(zip(lon_values, lat_values)):
+                alt = coords[i][2] if len(coords[i]) > 2 else 0.0
+                kml_coords.append((lon, lat, alt))
+            
+            # Создаем линию в KML
+            linestring = kml.newlinestring(
+                name=f"Line_{line_idx + 1}_{layer_name}",
+                description=f"<b>Layer:</b> {layer_name}<br/><b>Points:</b> {len(kml_coords)}",
+                coords=kml_coords
+            )
+            linestring.altitudemode = simplekml.AltitudeMode.clamptoground
     
     kml.save(output_path)

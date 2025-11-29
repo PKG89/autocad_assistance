@@ -116,7 +116,7 @@ async def start_kml_flow(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         "2. Дождитесь подтверждения проекции.\n"
         "3. Отправьте файл:\n"
         "   • Текстовый файл (TXT/CSV/Excel) с колонками Point, X, Y, Z[, Comment] - для точек\n"
-        "   • DXF файл с линиями (LINE, POLYLINE, LWPOLYLINE) - для линий\n"
+        "   • DXF файл с линиями (LINE, POLYLINE, LWPOLYLINE), кругами (CIRCLE) или блоками (INSERT) - для линий и точек\n"
         "4. Получите KML файл с координатами в формате WGS84.\n\n"
         "Если нужно, опишите проекцию (WKT/PROJ4/EPSG). Если передумали — /cancel."
     )
@@ -203,7 +203,7 @@ async def handle_kml_points(
     document = update.message.document
     if not document:
         await update.message.reply_text(
-            "Отправьте TXT/CSV/Excel файл с точками или DXF файл с линиями.",
+            "Отправьте TXT/CSV/Excel файл с точками или DXF файл с линиями, кругами или блоками.",
             reply_markup=MAIN_MENU_KEYBOARD,
         )
         return STATE_KML_POINTS
@@ -222,7 +222,7 @@ async def handle_kml_points(
             lines_data = load_dxf_lines(file_path)
             if not lines_data:
                 await update.message.reply_text(
-                    "Не удалось найти линии в DXF файле. Убедитесь, что файл содержит LINE, POLYLINE или LWPOLYLINE.",
+                    "Не удалось найти объекты в DXF файле. Убедитесь, что файл содержит LINE, POLYLINE, LWPOLYLINE, CIRCLE или INSERT (блоки).",
                     reply_markup=MAIN_MENU_KEYBOARD,
                 )
                 return STATE_KML_POINTS
@@ -370,7 +370,7 @@ async def handle_wrong_input_in_kml_points(
     context: ContextTypes.DEFAULT_TYPE,
 ) -> int:
     await update.message.reply_text(
-        "Отправьте файл с точками (TXT/CSV/Excel) или DXF файл с линиями. Для выхода выполните /cancel.",
+        "Отправьте файл с точками (TXT/CSV/Excel) или DXF файл с линиями, кругами или блоками. Для выхода выполните /cancel.",
         reply_markup=MAIN_MENU_KEYBOARD,
     )
     return STATE_KML_POINTS

@@ -1,16 +1,61 @@
+# Python
 __pycache__/
 *.py[cod]
-*.log
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# Cursor
+.cursor/
+
+# OS
 .DS_Store
-env/
-venv/
-.venv/
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# DXF files (опционально, если не хотите коммитить)
+# *.dxf
+
+# Environment variables
 .env
-*.db
-autocad_assistance/bot_debug.log
-autocad_assistance/__pycache__/
-autocad_assistance/usage_stats.db
-usage_stats.db
-data/
+.env.local
