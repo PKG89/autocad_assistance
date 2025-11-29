@@ -45,7 +45,8 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
     }
     
     tin_settings = tin_settings or {}
-    selected_tin_codes = tin_settings.get("codes") or []
+    tin_enabled = bool(tin_settings.get("enabled", False))
+    
     tin_scale_value = tin_settings.get("scale_value")
     if isinstance(tin_scale_value, str):
         try:
@@ -241,15 +242,21 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
     else:
         breaklines = extract_structural_breaklines(final_data)
 
-    if selected_tin_codes:
+    # Строим TIN если включено - используем все точки из файла
+    if tin_enabled:
         try:
+            logger.info("TIN: построение поверхности из всех точек файла")
+            
+            contour_interval = float(tin_settings.get("contour_interval", 1.0))
+            
             tin_result = build_tin_surface(
                 final_data=final_data,
                 msp=msp,
-                selected_codes=selected_tin_codes,
+                selected_codes=None,  # None = использовать все точки
                 scale_value=tin_scale_value,
                 refine_enabled=refine_tin,
                 breaklines=breaklines,
+                contour_interval=contour_interval,
             )
             logger.info(
                 "TIN: points=%d triangles=%d refined_points=%d refined_triangles=%d",
@@ -260,8 +267,6 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
             )
         except Exception as exc:
             logger.exception("Ошибка при построении TIN-поверхности: %s", exc)
-    elif refine_tin:
-        logger.info("TIN refinement requested, но коды не выбраны — пропуск построения поверхности.")
 
     # Добавляем башни/вышки только если включено в настройках
     if settings.get("show_towers", True):
@@ -290,15 +295,48 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
         vertices = list(vertices_attr()) if callable(vertices_attr) else list(vertices_attr)
         if not vertices:
             continue
-        unique = [vertices[0]]
-        for vertex in vertices[1:]:
-            if vertex.dxf.location != unique[-1].dxf.location:
-                unique.append(vertex)
-        if len(unique) != len(vertices):
-            polyline.delete()
+        
+        # Получаем координаты вершин
+        def get_vertex_location(vertex):
+            """Получает координаты вершины полилинии."""
+            try:
+                if hasattr(vertex, 'dxf') and hasattr(vertex.dxf, 'location'):
+                    loc = vertex.dxf.location
+                    return (loc.x, loc.y, loc.z if hasattr(loc, 'z') else 0.0)
+                elif hasattr(vertex, 'location'):
+                    loc = vertex.location
+                    return (loc.x, loc.y, loc.z if hasattr(loc, 'z') else 0.0)
+                else:
+                    # Если это уже кортеж координат
+                    return tuple(vertex) if isinstance(vertex, (tuple, list)) else None
+            except Exception:
+                return None
+        
+        vertex_locations = []
+        for vertex in vertices:
+            loc = get_vertex_location(vertex)
+            if loc is not None:
+                vertex_locations.append(loc)
+        
+        if not vertex_locations:
+            continue
+        
+        # Удаляем дубликаты соседних вершин
+        unique = [vertex_locations[0]]
+        for loc in vertex_locations[1:]:
+            prev_loc = unique[-1]
+            # Проверяем, что координаты отличаются (с небольшой погрешностью)
+            if abs(loc[0] - prev_loc[0]) > 0.001 or abs(loc[1] - prev_loc[1]) > 0.001:
+                unique.append(loc)
+        
+        if len(unique) != len(vertex_locations):
+            # Сохраняем атрибуты перед удалением
+            attribs = polyline.dxfattribs()
+            # Удаляем полилинию через modelspace
+            msp.delete_entity(polyline)
             msp.add_polyline3d(
-                [v.dxf.location for v in unique],
-                dxfattribs=polyline.dxfattribs(),
+                unique,
+                dxfattribs=attribs,
             )
 
     doc.header["$ACADVER"] = "AC1032"

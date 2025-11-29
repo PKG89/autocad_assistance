@@ -17,6 +17,13 @@ SCALE_OPTIONS = {
     "scale_5000": {"label": "1:5000", "scale": 5000},
 }
 
+CONTOUR_INTERVAL_OPTIONS = {
+    "contour_0.5": {"label": "0.5 м", "interval": 0.5},
+    "contour_1.0": {"label": "1.0 м", "interval": 1.0},
+    "contour_2.0": {"label": "2.0 м", "interval": 2.0},
+    "contour_5.0": {"label": "5.0 м", "interval": 5.0},
+}
+
 SCALE_TEXT_MAP = {
     "1:500": 500,
     "500": 500,
@@ -63,6 +70,9 @@ def build_workflow_keyboard(
     mapping_ready: bool,
     scale_value: int,
     mapping_type: str | None = None,
+    tin_enabled: bool = False,
+    tin_refine: bool = False,
+    contour_interval: float = 1.0,
 ) -> InlineKeyboardMarkup:
     scale_label = f"1:{scale_value}"
 
@@ -75,13 +85,30 @@ def build_workflow_keyboard(
         mapping_label = "1️⃣ Порядок координат ⚪"
 
     scale_button = f"2️⃣ Масштаб ({scale_label})"
+    
+    # Кнопка TIN (треугольники) - просто включено/выключено
+    if tin_enabled:
+        refine_text = " (уточнение)" if tin_refine else ""
+        tin_label = f"3️⃣ TIN: Включено{refine_text} ✅"
+    else:
+        tin_label = "3️⃣ TIN: Выключено ⚪"
 
     buttons = [
         [InlineKeyboardButton(mapping_label, callback_data="workflow_mapping")],
         [InlineKeyboardButton(scale_button, callback_data="workflow_scale")],
+        [InlineKeyboardButton(tin_label, callback_data="workflow_tin")],
+    ]
+    
+    # Если TIN включен, добавляем кнопку для настройки интервала горизонталей
+    if tin_enabled:
+        contour_label = f"4️⃣ Интервал горизонталей: {contour_interval:.1f}м"
+        buttons.append([InlineKeyboardButton(contour_label, callback_data="workflow_contour_interval")])
+    
+    buttons.extend([
         [InlineKeyboardButton("✅ Сформировать DXF", callback_data="workflow_generate")],
         [InlineKeyboardButton("📤 Новый файл", callback_data="workflow_newfile")],
-    ]
+    ])
+    
     return InlineKeyboardMarkup(buttons)
 
 
@@ -136,3 +163,12 @@ def build_mapping_keyboard() -> InlineKeyboardMarkup:
             [InlineKeyboardButton("2 — Перестановка X и Y", callback_data="2")],
         ]
     )
+
+
+def build_contour_interval_keyboard() -> InlineKeyboardMarkup:
+    """Создает клавиатуру для выбора интервала горизонталей."""
+    buttons = [
+        [InlineKeyboardButton(option["label"], callback_data=key)]
+        for key, option in CONTOUR_INTERVAL_OPTIONS.items()
+    ]
+    return InlineKeyboardMarkup(buttons)

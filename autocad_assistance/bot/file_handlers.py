@@ -18,8 +18,10 @@ from autocad_assistance.keyboard import (
     MAIN_MENU_KEYBOARD,
     SCALE_OPTIONS,
     SCALE_TEXT_MAP,
+    CONTOUR_INTERVAL_OPTIONS,
     build_mapping_keyboard,
     build_scale_keyboard,
+    build_contour_interval_keyboard,
     build_tin_codes_keyboard,
 )
 from autocad_assistance.state import (
@@ -471,113 +473,22 @@ async def handle_mapping_text(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def handle_tin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Простое переключение TIN включено/выключено."""
     query = update.callback_query
     data = query.data
-    final_data = context.user_data.get("final_data")
-
-    def _cleanup_selection_state() -> None:
-        for key in ("tin_selection_message_id", "tin_selection_indexes", "tin_all_codes", "tin_selection_page"):
-            context.user_data.pop(key, None)
-
+    
     if data == "workflow_tin":
-        if final_data is None or final_data.empty:
-            await query.answer("Сначала загрузите файл и настройте соответствие.", show_alert=True)
-            return STATE_WORKFLOW
-        codes = _collect_available_codes(final_data)
-        if not codes:
-            await query.answer("В исходных данных нет кодов для выбора.", show_alert=True)
-            return STATE_WORKFLOW
-
-        selected_codes = set(context.user_data.get("tin_codes") or [])
-        selected_indexes = {idx for idx, code in enumerate(codes) if code in selected_codes}
-        context.user_data["tin_all_codes"] = codes
-        context.user_data["tin_selection_indexes"] = selected_indexes
-        context.user_data["tin_selection_page"] = 0
-
-        text = f"{TIN_SELECTION_TEXT}\n\n{_format_selected_codes(codes, selected_indexes)}"
-        keyboard = build_tin_codes_keyboard(codes, selected_indexes, page=0)
-
-        previous_message_id = context.user_data.get("tin_selection_message_id")
-        if previous_message_id:
-            try:
-                await context.bot.delete_message(chat_id=query.message.chat_id, message_id=previous_message_id)
-            except Exception:
-                pass
-
-        message = await query.message.reply_text(text, reply_markup=keyboard)
-        context.user_data["tin_selection_message_id"] = message.message_id
-        await query.answer()
-        return STATE_WORKFLOW
-
-    if data.startswith("tin_toggle:"):
-        await query.answer()
-        try:
-            index = int(data.split(":", 1)[1])
-        except (ValueError, IndexError):
-            return STATE_WORKFLOW
-        codes = context.user_data.get("tin_all_codes") or []
-        if not codes:
-            await query.edit_message_text("Не удалось найти список кодов.", reply_markup=None)
-            _cleanup_selection_state()
-            return STATE_WORKFLOW
-        if not 0 <= index < len(codes):
-            return STATE_WORKFLOW
-        selected_indexes = set(context.user_data.get("tin_selection_indexes") or set())
-        if index in selected_indexes:
-            selected_indexes.remove(index)
-        else:
-            selected_indexes.add(index)
-        context.user_data["tin_selection_indexes"] = selected_indexes
-        page = context.user_data.get("tin_selection_page", 0)
-        text = f"{TIN_SELECTION_TEXT}\n\n{_format_selected_codes(codes, selected_indexes)}"
-        keyboard = build_tin_codes_keyboard(codes, selected_indexes, page=page)
-        await query.edit_message_text(text, reply_markup=keyboard)
-        return STATE_WORKFLOW
-
-    if data.startswith("tin_page:"):
-        await query.answer()
-        try:
-            page = int(data.split(":", 1)[1])
-        except (ValueError, IndexError):
-            return STATE_WORKFLOW
-        codes = context.user_data.get("tin_all_codes") or []
-        if not codes:
-            await query.edit_message_text("Не удалось найти список кодов.", reply_markup=None)
-            _cleanup_selection_state()
-            return STATE_WORKFLOW
-        context.user_data["tin_selection_page"] = max(page, 0)
-        selected_indexes = set(context.user_data.get("tin_selection_indexes") or set())
-        text = f"{TIN_SELECTION_TEXT}\n\n{_format_selected_codes(codes, selected_indexes)}"
-        keyboard = build_tin_codes_keyboard(codes, selected_indexes, page=context.user_data["tin_selection_page"])
-        await query.edit_message_text(text, reply_markup=keyboard)
-        return STATE_WORKFLOW
-
-    if data == "tin_done":
-        codes = context.user_data.get("tin_all_codes") or []
-        selected_indexes = set(context.user_data.get("tin_selection_indexes") or set())
-        selected_codes = [codes[idx] for idx in sorted(selected_indexes) if 0 <= idx < len(codes)]
-        context.user_data["tin_codes"] = selected_codes
-        summary = "TIN-коды не выбраны."
-        if selected_codes:
-            preview = ", ".join(selected_codes[:TIN_CODES_PREVIEW_LIMIT])
-            if len(selected_codes) > TIN_CODES_PREVIEW_LIMIT:
-                preview += f" … (+{len(selected_codes) - TIN_CODES_PREVIEW_LIMIT})"
-            summary = f"Выбрано кодов: {len(selected_codes)}\n{preview}"
-        try:
-            await query.edit_message_text(f"Настройка TIN завершена.\n\n{summary}")
-        except Exception:
-            pass
-        _cleanup_selection_state()
-        await show_workflow_menu(update, context, notice="Настройки TIN обновлены.")
-        return STATE_WORKFLOW
-
-    if data == "tin_cancel":
-        try:
-            await query.edit_message_text("Настройка TIN отменена.")
-        except Exception:
-            pass
-        _cleanup_selection_state()
-        await query.answer()
+        # Просто переключаем включено/выключено
+        tin_enabled = bool(context.user_data.get("tin_enabled"))
+        context.user_data["tin_enabled"] = not tin_enabled
+        
+        # Если выключаем, также выключаем refine
+        if not context.user_data["tin_enabled"]:
+            context.user_data["tin_refine"] = False
+        
+        status = "включено" if context.user_data["tin_enabled"] else "выключено"
+        await query.answer(f"TIN {status}")
+        await show_workflow_menu(update, context, notice=f"TIN {status}")
         return STATE_WORKFLOW
 
     await query.answer()
@@ -585,12 +496,55 @@ async def handle_tin_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def handle_tin_refine_toggle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Переключение уточнения TIN (refine). Работает только если TIN включен."""
     query = update.callback_query
+    
+    # Проверяем что TIN включен
+    tin_enabled = bool(context.user_data.get("tin_enabled"))
+    if not tin_enabled:
+        await query.answer("Сначала включите TIN", show_alert=True)
+        return STATE_WORKFLOW
+    
     new_value = not bool(context.user_data.get("tin_refine"))
     context.user_data["tin_refine"] = new_value
     status_text = "Уточнение рельефа включено" if new_value else "Уточнение рельефа выключено"
     await query.answer(status_text, show_alert=False)
     await show_workflow_menu(update, context, notice=status_text)
+    return STATE_WORKFLOW
+
+
+async def handle_contour_interval_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Обработка выбора интервала горизонталей."""
+    query = update.callback_query
+    data = query.data
+    await query.answer()
+    
+    # Проверяем что TIN включен
+    tin_enabled = bool(context.user_data.get("tin_enabled"))
+    if not tin_enabled:
+        await query.edit_message_text("Сначала включите TIN", reply_markup=None)
+        await show_workflow_menu(update, context)
+        return STATE_WORKFLOW
+    
+    # Если нажата кнопка "workflow_contour_interval", показываем меню выбора
+    if data == "workflow_contour_interval":
+        current_interval = float(context.user_data.get("contour_interval", 1.0))
+        text = f"Выберите интервал горизонталей.\nТекущий интервал: {current_interval:.1f} м"
+        await query.edit_message_text(text, reply_markup=build_contour_interval_keyboard())
+        return STATE_WORKFLOW
+    
+    # Если выбран конкретный интервал (contour_0.5, contour_1.0 и т.д.)
+    option = CONTOUR_INTERVAL_OPTIONS.get(data)
+    if not option:
+        await query.edit_message_text("Неизвестный вариант интервала.", reply_markup=build_contour_interval_keyboard())
+        return STATE_WORKFLOW
+    
+    interval = option.get("interval", 1.0)
+    label = option.get("label", f"{interval:.1f} м")
+    context.user_data["contour_interval"] = interval
+    
+    await query.edit_message_text(f"Интервал горизонталей {label} выбран.")
+    await show_workflow_menu(update, context, notice=f"Интервал горизонталей обновлён на {label}.")
     return STATE_WORKFLOW
 
 

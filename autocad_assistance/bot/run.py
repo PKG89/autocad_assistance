@@ -3,10 +3,12 @@ import atexit
 import signal
 import traceback
 import os
+import asyncio
 from datetime import datetime
 from pathlib import Path
 
 from telegram.ext import ApplicationBuilder, CommandHandler
+from telegram.error import TimedOut, NetworkError
 from autocad_assistance.config import BOT_TOKEN
 from autocad_assistance import db
 from autocad_assistance.bot.start import register_basic_handlers, start, cancel
@@ -22,6 +24,7 @@ from autocad_assistance.bot.file_handlers import (
     handle_kml_points,
     handle_tin_callback,
     handle_tin_refine_toggle,
+    handle_contour_interval_callback,
 )
 # start_kml_flow is available via kml_handlers but not needed here
 from autocad_assistance.keyboard import MAIN_MENU_FILTER
@@ -93,15 +96,69 @@ async def _noop(update, context):
     return None
 
 
+async def _run_app(app) -> None:
+    """Async function to properly initialize and run the application."""
+    stop_event = asyncio.Event()
+    
+    # Set up signal handlers
+    def signal_handler(signum, frame):
+        logger.info(f"Получен сигнал {signum}, завершение работы...")
+        stop_event.set()
+    
+    # Register signal handlers (works on Unix, Windows uses different approach)
+    if hasattr(signal, 'SIGINT'):
+        signal.signal(signal.SIGINT, signal_handler)
+    if hasattr(signal, 'SIGTERM'):
+        signal.signal(signal.SIGTERM, signal_handler)
+    
+    app_started = False
+    try:
+        await app.initialize()
+        await app.start()
+        app_started = True
+        await app.updater.start_polling(drop_pending_updates=True, allowed_updates=None)
+        
+        # Keep running until stop event is set
+        await stop_event.wait()
+    except TimedOut:
+        logger.error("Таймаут при подключении к Telegram API. Проверьте интернет-соединение и токен бота.")
+        raise
+    except asyncio.CancelledError:
+        logger.info("Приложение отменено")
+    except KeyboardInterrupt:
+        logger.info("Получен KeyboardInterrupt, завершение работы...")
+    finally:
+        # Останавливаем приложение только если оно было запущено
+        if app_started:
+            try:
+                await app.stop()
+            except RuntimeError as exc:
+                # Игнорируем ошибку "Application is not running" если приложение уже остановлено
+                if "not running" not in str(exc).lower():
+                    logger.warning("Ошибка при остановке приложения: %s", exc)
+            except Exception as exc:
+                logger.warning("Ошибка при остановке приложения: %s", exc)
+        
+        try:
+            await app.shutdown()
+        except Exception as exc:
+            logger.warning("Ошибка при завершении работы приложения: %s", exc)
+
+
 def main() -> None:
     # Build app and run. `build_app` registers handlers (ConversationHandler,
     # basic handlers, etc.) so we only need to start polling here.
+    import asyncio
+    
     app = build_app()
 
     try:
-        app.run_polling()
+        asyncio.run(_run_app(app))
+    except KeyboardInterrupt:
+        logger.info("Получен сигнал прерывания, завершение работы...")
     except Exception as exc:
         logger.exception("Ошибка при запуске polling: %s", exc)
+        raise
 
 
 def build_app(token: str | None = None, allow_missing_token: bool = False):
@@ -123,6 +180,8 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
     if not use_token:
         raise RuntimeError("BOT_TOKEN is not configured; pass token or set allow_missing_token=True for tests")
 
+    # Build application - in python-telegram-bot 20.x+ run_polling() handles initialization
+    # but we need to ensure the bot is properly configured
     app = ApplicationBuilder().token(use_token).build()
 
     conv_handler = ConversationHandler(
@@ -198,6 +257,7 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
         app.add_handler(CallbackQueryHandler(handle_scale_callback, pattern="^workflow_scale$"))
         app.add_handler(CallbackQueryHandler(handle_tin_callback, pattern="^workflow_tin$"))
         app.add_handler(CallbackQueryHandler(handle_tin_refine_toggle, pattern="^workflow_refine$"))
+        app.add_handler(CallbackQueryHandler(handle_contour_interval_callback, pattern="^workflow_contour_interval$|^contour_"))
         # For generate and newfile, we provide lightweight handlers that
         # currently call the no-op placeholder (application logic lives in
         # other modules like dxf_generator). Keep them logged so clicks are visible.
@@ -235,25 +295,66 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
                 
                 # Импортируем и вызываем генератор DXF
                 from autocad_assistance.dxf_generator import generate_dxf_ezdxf
+                
+                # Простая логика: если TIN включен - строим треугольники из всех точек
+                tin_enabled = bool(context.user_data.get("tin_enabled"))
+                
+                contour_interval = float(context.user_data.get("contour_interval", 1.0))
+                
                 tin_settings = {
-                    "codes": list(context.user_data.get("tin_codes") or []),
+                    "enabled": tin_enabled,  # Просто флаг включено/выключено
                     "scale_value": context.user_data.get("scale_value"),
                     "refine": bool(context.user_data.get("tin_refine")),
+                    "contour_interval": contour_interval,  # Интервал горизонталей
                 }
                 generate_dxf_ezdxf(final_data, output_path, scale_factor, tin_settings=tin_settings)
                 
-                # Отправляем файл пользователю
-                with open(output_path, 'rb') as dxf_file:
-                    await context.bot.send_document(
-                        chat_id=update.effective_chat.id,
-                        document=dxf_file,
-                        filename=output_filename,
-                        caption=f"✅ DXF файл создан (масштаб {scale_label})\n📊 Обработано точек: {len(final_data)}"
-                    )
-                
-                # Показываем меню workflow
-                from autocad_assistance.state import show_workflow_menu
-                await show_workflow_menu(update, context, notice="✅ DXF файл успешно создан и отправлен!")
+                # Отправляем файл пользователю с обработкой таймаутов
+                try:
+                    file_size = os.path.getsize(output_path)
+                    file_size_mb = file_size / (1024 * 1024)
+                    
+                    with open(output_path, 'rb') as dxf_file:
+                        await context.bot.send_document(
+                            chat_id=update.effective_chat.id,
+                            document=dxf_file,
+                            filename=output_filename,
+                            caption=f"✅ DXF файл создан (масштаб {scale_label})\n📊 Обработано точек: {len(final_data)}\n📦 Размер: {file_size_mb:.2f} МБ"
+                        )
+                    
+                    # Показываем меню workflow
+                    from autocad_assistance.state import show_workflow_menu
+                    await show_workflow_menu(update, context, notice="✅ DXF файл успешно создан и отправлен!")
+                    
+                except TimedOut:
+                    logger.warning("Таймаут при отправке файла (размер: %.2f МБ)", file_size_mb)
+                    # Пытаемся отправить сообщение об ошибке, но если и это не получится - не критично
+                    try:
+                        await context.bot.send_message(
+                            chat_id=update.effective_chat.id,
+                            text=f"⚠️ Файл DXF создан успешно ({file_size_mb:.2f} МБ), но не удалось отправить из-за таймаута.\n"
+                                 f"Попробуйте скачать файл вручную или уменьшите размер данных.\n"
+                                 f"Файл сохранен во временной директории."
+                        )
+                    except Exception:
+                        pass  # Если не удалось отправить сообщение - не критично
+                    
+                    # Показываем меню workflow с предупреждением
+                    from autocad_assistance.state import show_workflow_menu
+                    try:
+                        await show_workflow_menu(update, context, notice="⚠️ Файл создан, но отправка не удалась из-за таймаута")
+                    except Exception:
+                        pass
+                        
+                except NetworkError as net_err:
+                    logger.warning("Ошибка сети при отправке файла: %s", net_err)
+                    try:
+                        await context.bot.send_message(
+                            chat_id=update.effective_chat.id,
+                            text="⚠️ Ошибка сети при отправке файла. Попробуйте позже."
+                        )
+                    except Exception:
+                        pass
                 
                 # Очищаем временный файл
                 try:
@@ -262,12 +363,31 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
                 except Exception:
                     pass
                     
+            except TimedOut as timeout_err:
+                logger.exception("Таймаут при генерации DXF: %s", timeout_err)
+                try:
+                    await context.bot.send_message(
+                        chat_id=update.effective_chat.id,
+                        text="⏱️ Превышено время ожидания при генерации DXF. Попробуйте уменьшить количество данных или повторите попытку."
+                    )
+                except Exception:
+                    pass
             except Exception as exc:
                 logger.exception("Ошибка при генерации DXF: %s", exc)
-                await update.callback_query.edit_message_text(
-                    f"❌ Ошибка при генерации DXF: {str(exc)}",
-                    reply_markup=None
-                )
+                try:
+                    await context.bot.send_message(
+                        chat_id=update.effective_chat.id,
+                        text=f"❌ Ошибка при генерации DXF: {str(exc)[:200]}"
+                    )
+                except Exception:
+                    # Если не удалось отправить сообщение, пытаемся отредактировать исходное
+                    try:
+                        await update.callback_query.edit_message_text(
+                            f"❌ Ошибка при генерации DXF: {str(exc)[:200]}",
+                            reply_markup=None
+                        )
+                    except Exception:
+                        pass  # Если и это не получилось - просто логируем
 
         async def _workflow_newfile(update, context):
             logger.info("workflow_newfile pressed: %s", update.callback_query.data)

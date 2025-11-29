@@ -47,11 +47,24 @@ def _build_workflow_text(context: ContextTypes.DEFAULT_TYPE, notice: str | None 
         else "Требуется указать столбцы с координатами точек."
     )
     scale_status = f"Выбран масштаб: 1:{scale_value}"
+    
+    # TIN статус
+    tin_enabled = bool(context.user_data.get("tin_enabled"))
+    tin_refine = bool(context.user_data.get("tin_refine"))
+    contour_interval = float(context.user_data.get("contour_interval", 1.0))
+    if tin_enabled:
+        refine_text = " (с уточнением)" if tin_refine else ""
+        contour_text = f", интервал горизонталей: {contour_interval:.1f}м"
+        tin_status = f"TIN: включено{refine_text}{contour_text}"
+    else:
+        tin_status = "TIN: выключено"
+    
     summary = (
         f"Файл для обработки: {filename}\n"
         f"Всего точек: {total_rows}\n"
         f"{mapping_status}\n"
         f"{scale_status}\n"
+        f"{tin_status}\n"
         "Когда все готово, нажмите \"Сгенерировать DXF\"."
     )
     if notice:
@@ -84,6 +97,11 @@ async def show_workflow_menu(update: Update | None, context: ContextTypes.DEFAUL
             mapping_type = "1"
         elif mapping.get("Y") == 1:  # Swapped X and Y
             mapping_type = "2"
+    
+    # Get TIN settings for display
+    tin_enabled = bool(context.user_data.get("tin_enabled"))
+    tin_refine = bool(context.user_data.get("tin_refine"))
+    contour_interval = float(context.user_data.get("contour_interval", 1.0))
 
     message = await chat.send_message(
         text,
@@ -91,6 +109,9 @@ async def show_workflow_menu(update: Update | None, context: ContextTypes.DEFAUL
             mapping_ready=mapping_ready,
             scale_value=scale_value,
             mapping_type=mapping_type,
+            tin_enabled=tin_enabled,
+            tin_refine=tin_refine,
+            contour_interval=contour_interval,
         ),
     )
     context.user_data["workflow_message_id"] = message.message_id
@@ -126,6 +147,8 @@ _WORKFLOW_STATE_KEYS: Iterable[str] = (
     "workflow_message_id",
     "tin_codes",
     "tin_refine",
+    "tin_enabled",
+    "contour_interval",
     "tin_all_codes",
     "tin_selection_page",
     "tin_selection_message_id",
