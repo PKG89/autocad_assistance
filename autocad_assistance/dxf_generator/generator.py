@@ -15,7 +15,7 @@ from ..config import (
 )
 
 from .blocks import build_tower_blocks, get_block_properties
-from .polylines import build_polyline_by_code, extract_structural_breaklines
+from .polylines import build_polyline_by_code, extract_structural_breaklines, build_vegetation_contours
 from .surface import build_tin_surface
 from .utils import resolve_scale
 
@@ -221,11 +221,12 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
                     if not block_name:
                         continue
                     block_props = get_block_properties(doc, block_name)
+                    block_layer = block_props["layer"] if settings.get("layer_separation", True) else "0"
                     msp.add_blockref(
                         block_name,
                         (x, y),
                         dxfattribs={
-                            "layer": block_props["layer"] if settings.get("layer_separation", True) else "0",
+                            "layer": block_layer,
                             "color": block_props["color"],
                             "xscale": scale_value,
                             "yscale": scale_value,
@@ -233,6 +234,23 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
                             "rotation": 0.0,
                         },
                     )
+                    # Для задвижек (zadv) добавляем текст с номером в том же слое, что и блок
+                    if pt_code in {"zadv", "zad", "задв", "зад"} and comment:
+                        # Смещение текста справа от блока
+                        text_offset_x = 1.5 * scale_factor
+                        text_offset_y = 0.0
+                        # Формируем текст с префиксом "№"
+                        text_content = f"№{comment}"
+                        zadv_text = msp.add_mtext(
+                            text_content,
+                            dxfattribs={
+                                "layer": block_layer,
+                                "char_height": 0.5,  # Фиксированная высота для текста задвижки
+                                "style": "Simplex",
+                                "color": block_props["color"],
+                            },
+                        )
+                        zadv_text.set_location((x + text_offset_x, y + text_offset_y, z))
                     break
 
     # Добавляем полилинии и собираем структурные линии
@@ -241,6 +259,13 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
         breaklines = build_polyline_by_code(final_data, msp, doc, scale_factor, text_scale)
     else:
         breaklines = extract_structural_breaklines(final_data)
+
+    # Добавляем контуры растительности с заливкой
+    if settings.get("show_polylines", True):
+        try:
+            build_vegetation_contours(final_data, msp, doc, scale_factor)
+        except Exception as exc:
+            logger.warning("Ошибка при построении контуров растительности: %s", exc)
 
     # Строим TIN если включено - используем все точки из файла
     if tin_enabled:

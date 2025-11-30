@@ -65,10 +65,17 @@ label_colors = {
 
 polyline_prefixes = {"k", "gaz", "kabsv", "neft", "Tr", "elkab", "Elkab", "voda", "zab", "brV", "brN", "pod", "Votk", "Notk"}
 
+# Коды для контуров растительности (замкнутые контуры с заливкой)
+vegetation_contour_codes = {"контур", "куст", "лес", "растительность", "kontur", "kust", "les", "rast"}
+
 polyline_layer_mapping = {
     "gaz": "(036) Газопроводы",       # пример: gaz1, gaz2 → Газовая_труба
     "neft": "(014) Нефтепроводы магистральные",     # пример: neft1, neft2 → Нефтяная_труба
     "voda": "(017) ВодоснаБжение",
+    "kontur": "(024) Контуры",
+    "контур": "(024) Контуры",
+    "куст": "(026) Растительность",
+    "лес": "(026) Растительность",
     # добавляйте здесь любые другие соответствия
 }
 
@@ -120,12 +127,12 @@ sm_controller_config = {
         },
         "KabZNM": {
             "name": "206-3",
-            "code": {"KabZnm", "kabznM", "KABZNM", "КабЗНМ", "кабзнм", "укмет"},
+            "code": {"KabZnm", "kabznM", "KABZNM", "КабЗНМ", "кабзнм", "укмет", "KabZnSv", "KabZnEl"},
             "scale": lambda h: 1.0
         },
         "KabZNB": {
             "name": "119",
-            "code": {"KabZnb", "kabznB", "KABZNB", "КабЗНБ", "кабзнб"},
+            "code": {"KabZnb", "kabznB", "KABZNB", "КабЗНБ", "кабзнб", "KanZnStor"},
             "scale": lambda h: 1.0
         },
         "Zadv": {
@@ -170,7 +177,7 @@ sm_controller_config = {
         },
         "Колодец Дренажные трубопроводы": {
             "name": "117-5",
-            "code": {"КолДр", "дренаж", "дренажные трубопроводы", "Дренаж"},
+            "code": {"КолДр", "дренаж", "дренажные трубопроводы", "Дренаж","Drenazh"},
             "scale": lambda h: 1.0
         },
         "Колодец Газопроводы": {
@@ -240,12 +247,12 @@ sm_controller_config = {
         },
         "VL деревянная": {
             "name": "115-7c",
-            "code": {"vlDER", "ВлДер"},
+            "code": {"vlDER", "ВлДер", "VlDer"},
             "scale": lambda h: 1.0
         },
         "VL металлическая": {
             "name": "115-7a",
-            "code": {"vlMET", "влМЕТ", "ВЛМЕТ"},
+            "code": {"vlMET", "влМЕТ", "ВЛМЕТ", "VlMet"},
             "scale": lambda h: 1.0
         }
     },
@@ -262,7 +269,7 @@ sm_controller_config = {
     },
     "tower_config": {
         "codes": {"tower", "вышка"},
-        "prefixes": {"tower", "вышка"},
+        "prefixes": {"tower", "вышка", "ferma"},
         "group_size": 4,
         "min_points": 3,              # допускаем построение по трём точкам (четвёртая восстановится)
         "right_angle_tolerance": 0.05, # относительный допуск при поиске прямого угла (5 %)
