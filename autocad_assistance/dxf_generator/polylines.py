@@ -113,7 +113,7 @@ def build_polyline_by_code(final_data, msp, doc=None, scale_factor: float = 1.0,
             polyline_attribs["color"] = layer_def.dxf.color
             polyline_attribs["linetype"] = layer_def.dxf.linetype
 
-        msp.add_lwpolyline([(x, y) for x, y, _ in ordered_points], dxfattribs=polyline_attribs)
+        msp.add_lwpolyline([(x, y) for x, y, _, _ in ordered_points], dxfattribs=polyline_attribs)
 
         for idx in range(len(ordered_points) - 1):
             x1, y1 = ordered_points[idx][:2]
