@@ -12,7 +12,7 @@ Autocad Assistance Bot
 - Логирование действий в SQLite (путь настраивается, по умолчанию внешний том).
 
 Стек и структура
-- Python 3.11+.
+- Python 3.10+.
 - Телеграм: python-telegram-bot v21.
 - Геоданные: pyproj, shapely, pandas.
 - DXF: ezdxf.
