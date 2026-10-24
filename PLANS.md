@@ -5,17 +5,18 @@ matching file under `harness/build/`.
 
 ## Current phase and execution order
 
-- GEOAI-007C: baseline confirmed and commit preparation complete, 2026-10-24
-  (Europe/Moscow). Regression 10/10, API 6/6, pip check and diff check passed.
-- Evidence: `/home/geoai/dev-data/geoai-007c/20261024T204452Z/`.
-- Git: `codex/geo-ai-start`, HEAD `36f49b2`, uncommitted working changes,
-  empty index, no remote. Commit/push and workflow changes still need approval.
-- Next: GEOAI-007A -> GEOAI-007B -> GEOAI-008 -> 009 -> 010 -> 011.
-- 007A/007B task definitions are not present in the repository; obtain their
-  scope and acceptance criteria before implementation. Do not infer them
-  from their identifiers or start a later phase automatically.
-- Known limitation: inherited CI uses direct unittest discovery, incompatible
-  with the required isolation bootstrap. No CI run is claimed.
+- Baseline GEOAI-007C is committed at `c33340366ee4016a7e2d2576bb9c46931875db16`
+  on `codex/geo-ai-start` and preserved in a verified bundle and separate
+  bare Git store under `/home/geoai/dev-data/geoai-autonomy/`.
+- Current work: autonomous tooling and isolated pilot. Codex CLI and Cursor
+  Agent CLI are installed; Codex signed in and completed a read-only tool
+  call. Cursor sign-in and full pilot are pending. No task is queued.
+- Agreed package: pilot -> GEOAI-008 (#2) -> 009 (#3) -> 010 (#4) -> 011 (#5).
+  Only issues bearing `geoai-queue` are dispatchable; the four product Issues
+  currently carry `geoai-planned` only.
+- GEOAI-007A/007B definitions are absent and outside this package.
+- Inherited CI uses direct unittest discovery, incompatible with the required
+  isolation bootstrap. Local baseline success is not CI/deployment readiness.
 
 ## Foundation
 

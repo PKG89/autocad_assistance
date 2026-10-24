@@ -42,3 +42,33 @@ Keep one concise entry per task. Do not paste full command output.
 - Next: recover GEOAI-007A scope/acceptance criteria and execute it as the
   next approved phase; then 007B -> 008 -> 009 -> 010 -> 011. 007A/007B
   specifications were absent at handoff; no later phase was started.
+
+## AUTONOMY-001 — setup in progress
+
+- VM109: Debian 13.7, 2 CPU, 3.8 GiB RAM, 53 GiB available disk.
+- Restorable pre-commit snapshot: `/home/geoai/dev-data/geoai-autonomy/baseline-20261024T205926Z/`
+  (33 changed/untracked files, archive and bundle verified).
+- Baseline: preflight and verify exit 0; 10/10 regression, 6/6 API tests,
+  pip check and git diff --check passed.
+- Local commit `c33340366ee4016a7e2d2576bb9c46931875db16` saves 32
+  baseline files; inherited `.github/workflows/cicd.yml` edit remains
+  uncommitted. Verified `verified-baseline.bundle` and bare store
+  `baseline.git` point to the same commit. No Git remote/push/deployment.
+- Installed under `/home/geoai/.local/opt/geoai-autonomy/`: Symphony v0.0.3,
+  Codex CLI 0.164.0 plus code-mode host, Cursor Agent 2026.10.22-27dcf5f,
+  and user-local bubblewrap 0.12.0. Official release hashes or HTTPS package
+  source verified.
+- Codex device login completed; a real read-only file tool call returned
+  the exact sentinel. Cursor CLI remains unauthenticated after one failed
+  browser login; a second login is pending. No Cursor code run yet.
+- Bubblewrap probe: worker sees and writes its workspace, but cannot see
+  `.ssh` or the controller's verified bundle. Pilot acceptance stored outside
+  worktree; pre-implementation run failed as expected (missing module), no
+  PASS. User-level detached-process probe survived SSH disconnect;
+  `loginctl enable-linger geoai` was denied, so boot persistence is unresolved.
+- GitHub ownership verified (`PKG89` admin). Issues #2–#5 created with
+  `geoai-planned`; none has queue label. Full pilot and autonomous service
+  are not yet running. Independent Proxmox host-key check remains unperformed;
+  SSH used the pinned key at owner's latest instruction.
+- Next: complete Cursor auth, run full pilot with Codex/Cursor and negative
+  gate, build/verify the protected controller, then queue GEOAI-008.

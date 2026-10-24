@@ -11,17 +11,19 @@ Telegram and HTTP are adapters around framework-independent services.
 
 ## Branch and approval rules
 
-Work only on `codex/geo-ai-start`; never switch to `main`.
+Work on `codex/geo-ai-start` or isolated `codex/geoai-*` pilot/issue branches; never switch to `main`.
 
 Allowed without additional approval:
 
-- Read and edit this repository on the current feature branch.
+- Read and edit this repository on the approved feature/pilot branches.
+- For the approved autonomous package, make local commits and isolated copies,
+  install user-local official tools, run the dispatcher pilot and GEOAI-008–011.
 - Create or update tests and phase/build context.
 - Use `.venv`; install only previously approved Python dependencies there.
 - Run unit, regression, API, lint, and static checks.
 - Write task reports only under `/home/geoai/dev-data/`.
 
-Always require explicit approval for commit, push, merge, rebase, remotes,
+Always require explicit approval for push, merge, rebase, remotes,
 `main`, `.github/workflows/`, CI/CD, production access, Proxmox, firewall,
 VLAN/networking, Docker daemon configuration, secrets, `.env`, database
 migrations, reset, clean, data deletion, system packages, or `sudo`.
@@ -40,7 +42,9 @@ For each approved task:
 4. Make the smallest change.
 5. Run focused tests, then the regression baseline.
 6. Run `git diff --check` and report changed files and limitations.
-7. Stop. Do not begin the next GEOAI task automatically.
+7. Stop unless the approved autonomous controller has independently accepted
+   and preserved the result. For the approved 008–011 package, it may then
+   dispatch the next task in order. Never expand the package automatically.
 
 Use `scripts/geoai-preflight.sh` and `scripts/geoai-verify.sh` when applicable.
 A task is done only when criteria and target tests pass, the regression result
@@ -55,7 +59,8 @@ jobs or install large ML frameworks without a separate decision.
 
 Read `PLANS.md` and the approved `harness/build/` phase instead of re-auditing
 the repository. Use focused search, one task at a time, short factual reports,
-and no extra agents unless they provide necessary value and are permitted.
+and no extra agents except the single approved Cursor executor managed by
+the autonomous controller.
 
 ## Skill usage
 
@@ -88,3 +93,25 @@ Use isolated bootstrap runners via `scripts/geoai-verify.sh`. Direct unittest
 discovery is incompatible with the regression isolation guard. The inherited
 CI workflow still uses direct discovery and needs a separately approved fix.
 The local passing baseline does not establish CI or deployment readiness.
+
+## Approved autonomous package (2026-10-25, Europe/Moscow)
+
+The owner authorized local commits, user-local official tool installation, an
+isolated pilot and sequential GEOAI-008–011 execution, with Codex accepting
+Cursor's implementation. This overrides the earlier one-phase stop rule only
+for this agreed package. GEOAI-007A/007B have no recorded acceptance criteria
+and are not in this package. Production deployment, publishing code, merge to
+main, destructive data changes and sending survey data externally remain out
+of scope. No `.env` or production secrets may be read or copied.
+
+The controller must protect its workflow, state and frozen acceptance checks
+outside disposable worktrees; allow only one Cursor worker; persist a 30-minute
+per-task and two-hour package active-time budget across restarts; allow at
+most two returns for repair; and mark exhausted/blocked work BLOCKED without
+automatic retry. Codex must inspect the actual diff, run independent checks
+and preserve an accepted commit in the separate local Git store before the
+GitHub Issue is closed. Acceptance is bound to the checked file revision.
+
+The VM109 SSH connection now uses the saved pinned host key per the owner's
+latest instruction. The previously requested independent Proxmox-console
+comparison has not been performed; record this as a remaining limitation.
