@@ -233,3 +233,41 @@ Keep one concise entry per task. Do not paste full command output.
   010, verify negative gate, then queue #5. Original branch retains inherited
   uncommitted CI edit. Reboot recovery and independent Proxmox host-key check
   remain unverified; inherited CI still uses direct discovery.
+
+## GEOAI-011 — accepted locally; package complete
+
+- Frozen task SHA-256 `a2da4daf381c3e0a601627b3bc9ea309ad6da7cbb9235c48fddaf726756563f5`
+  and external test SHA-256 `a9112bd5b6d839a88c6f3aa3d64ee14c326c5f9462faa246fbf366a6f2606c40`.
+  Negative gate on clean handoff `072fbf1f2ac6be23193c826cb7ba4483e1f7a4cc`
+  failed as expected. Symphony dispatched Issue #5; one Cursor worker created
+  the common DXF service, Telegram/API adapters and focused tests without
+  changing geometry/KML algorithms or templates.
+- Initial independent gate passed eight focused, seven frozen, 10 regression
+  and six API tests at digest
+  `1c7d4daf017b9d9d825264747681949108d2823048cc2dc264d8cd776dba31bb`.
+  Codex review independently reproduced fabricated `None` comments in DXF,
+  noted missing TIN `scale_value` passthrough and a broad ValueError handler.
+  Broker returned exact-digest feedback for one Cursor repair. An independent
+  synthetic probe then found only the real comment, with no `None` text.
+- Repaired digest `4d04c236e2fbd8645b9f597f6135ace044e558c6b997509840d1cc8904407580`
+  passed 11 focused, seven frozen, 10 regression and six API tests, plus
+  pip, diff, scope and unsafe-path checks. Codex recomputed file hashes and
+  reviewed all five changed files. Accepted product commit
+  `b78b1f591244f04c6652c9fe857b93d282f134ec` is clean, stored in bare
+  branch `codex/geoai-011` and verified bundle
+  `geoai-011-accepted.bundle` (SHA-256
+  `178eafc32fc314f2e1e88fe3875e3d8cb6530cfa00821fa9aba1b1593e323cb6`).
+  Controller: ACCEPTED, two Cursor attempts, one repair return, 181.24
+  task-active seconds and 1803.72 package-active seconds. GitHub Issue #5
+  closed. The total active package time stayed under two hours.
+- Git after completion: accepted 008/009/010/011 product branches are local
+  in the separate bare store; no external code remote/push, merge, main,
+  production/deployment, .env, source survey or CI change. Original
+  `codex/geo-ai-start` checkout retains only its inherited uncommitted
+  `.github/workflows/cicd.yml` edit. Symphony dispatcher and protected broker
+  were stopped after the queue emptied; the package-specific user `@reboot`
+  crontab was removed (entry saved in control directory). Reboot recovery was
+  not tested. Independent Proxmox host-key comparison remains unperformed.
+- Next: treat 008–011 as the local accepted development baseline. Define a
+  separate scope for inherited CI repair, authentication/ownership, resource
+  retention/quotas and deployment. GEOAI-007A/007B have no recorded criteria.

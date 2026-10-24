@@ -19,11 +19,14 @@ matching file under `harness/build/`.
 - GEOAI-010 (#4) is ACCEPTED at local commit
   `5c5915fbb3e6df07a1a7b2d1d3a73d8a02750564`; its Issue is closed.
   Explicit mapping and typed API passed protected tests and Codex review.
-- Current work: prepare frozen GEOAI-011 (#5) acceptance from accepted 010,
-  then queue exactly that Issue.
-- The final approved package phase is GEOAI-011 (#5), starting from accepted
-  010. Only issues bearing `geoai-queue` may dispatch;
-  #5 carries `geoai-planned` only and is not queued yet.
+- GEOAI-011 (#5) is ACCEPTED at local commit
+  `b78b1f591244f04c6652c9fe857b93d282f134ec`; its Issue is closed.
+  Both Telegram and API use the isolated shared DXF service. The protected
+  package 008–011 is complete; the dispatcher and broker are stopped.
+- Next decision: separately define GEOAI-007A/007B if still wanted, fix the
+  inherited CI test invocation under a new scope, and plan authentication,
+  retention, quotas and deployment before exposing the API. No new Issue is
+  eligible for the package-specific queue.
 - GEOAI-007A/007B definitions are absent and outside this package.
 - Inherited CI uses direct unittest discovery, incompatible with the required
   isolation bootstrap. Local baseline success is not CI/deployment readiness.
