@@ -32,6 +32,17 @@ def get_text_scale(scale_factor: float) -> float:
 
 def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_settings: dict | None = None) -> None:
     """Generate a DXF file from prepared survey data."""
+    # Validate before creating a drawing instead of silently dropping points.
+    for row_number, (_, row) in enumerate(final_data.iterrows(), start=1):
+        try:
+            valid = all(math.isfinite(float(row[axis])) for axis in ("X", "Y", "Z"))
+        except (TypeError, ValueError):
+            valid = False
+        if not valid:
+            raise ValueError(
+                f"Строка данных {row_number}: X, Y и Z должны быть конечными числами. "
+                "Проверьте пустые ячейки и соответствие колонок."
+            )
     # Используем настройки по умолчанию (все включено)
     settings = {
         "show_points": True,

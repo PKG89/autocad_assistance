@@ -86,6 +86,8 @@ def load_dxf_lines(file_path: str, min_circle_radius: float = 10.0) -> List[Tupl
                 coords.append((x, y, elevation))
             
             if len(coords) >= 2:
+                if polyline.closed and coords[-1] != coords[0]:
+                    coords.append(coords[0])
                 lines_data.append((coords, layer))
                 logger.debug("Найдена LWPOLYLINE на слое %s с %d точками", layer, len(coords))
         except Exception as e:
@@ -110,6 +112,8 @@ def load_dxf_lines(file_path: str, min_circle_radius: float = 10.0) -> List[Tupl
                 coords.append((x, y, z))
             
             if len(coords) >= 2:
+                if polyline.is_closed and coords[-1] != coords[0]:
+                    coords.append(coords[0])
                 lines_data.append((coords, layer))
                 logger.debug("Найдена POLYLINE на слое %s с %d точками", layer, len(coords))
         except Exception as e:

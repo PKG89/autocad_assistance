@@ -103,6 +103,11 @@ _KML_STATE_KEYS: Iterable[str] = (
     "kml_projection_raw",
     "kml_last_points",
     "kml_swap_xy",
+    "kml_lon_hint",
+    "kml_to_dxf_mode",
+    "kml_file_path",
+    "dxf_projection",
+    "dxf_transformer",
 )
 
 

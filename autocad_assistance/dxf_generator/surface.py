@@ -160,7 +160,7 @@ def build_tin_surface(
             except Exception as exc:
                 logger.debug("Failed to add structural polyline: %s", exc)
 
-    base_triangles = _triangulate(points)
+    base_triangles = _triangulate([(x, y, z) for x, y, z, _ in points])
     if base_triangles:
         result.base_triangles = len(base_triangles)
         _add_triangles(msp, base_triangles, TIN_TRIANGLE_LAYER, GREEN_COLOR)

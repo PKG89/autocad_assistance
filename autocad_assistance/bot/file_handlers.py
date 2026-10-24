@@ -331,7 +331,12 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     with open(file_path, "r", encoding=encoding) as source:
         reader = csv.reader(source, delimiter=delimiter, skipinitialspace=True)
         for row in reader:
-            cleaned = [cell.strip() for cell in row if cell.strip()]
+            cleaned = [cell.strip() for cell in row]
+            if delimiter == " ":
+                cleaned = [cell for cell in cleaned if cell]
+            # A header is not a survey point; preserve empty data columns.
+            if not rows and [cell.lower() for cell in cleaned[1:4]] in (["x", "y", "z"], ["y", "x", "z"]):
+                continue
             if len(cleaned) >= 4:
                 rows.append(cleaned)
 
@@ -408,7 +413,7 @@ async def handle_mapping_callback(update: Update, context: ContextTypes.DEFAULT_
     data_initial = context.user_data["data_initial"]
     final_rows = []
     for _, row in data_initial.iterrows():
-        tokens = list(row.dropna().astype(str))
+        tokens = list(row.fillna("").astype(str))
         if len(tokens) < 4:
             continue
         point = tokens[mapping["Point"]]
@@ -448,7 +453,7 @@ async def handle_mapping_text(update: Update, context: ContextTypes.DEFAULT_TYPE
     data_initial = context.user_data["data_initial"]
     final_rows = []
     for _, row in data_initial.iterrows():
-        tokens = list(row.dropna().astype(str))
+        tokens = list(row.fillna("").astype(str))
         if len(tokens) < 4:
             continue
         point = tokens[mapping["Point"]]
@@ -597,6 +602,9 @@ async def handle_tin_refine_toggle(update: Update, context: ContextTypes.DEFAULT
 async def handle_scale_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     await query.answer()
+    if query.data == "workflow_scale":
+        await _prompt_scale_selection(update, context)
+        return STATE_SCALE
     option = SCALE_OPTIONS.get(query.data)
     if not option:
         await query.edit_message_text("Неизвестный вариант масштаба.", reply_markup=build_scale_keyboard())

@@ -32,6 +32,7 @@ from autocad_assistance.state import (
     STATE_WORKFLOW,
     STATE_KML_PROJECTION,
     STATE_KML_POINTS,
+    reset_workflow_state,
 )
 from telegram.ext import (
     CallbackQueryHandler,
@@ -128,6 +129,7 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler("start", start),
+            MessageHandler(MAIN_MENU_FILTER, process_main_menu_text),
             MessageHandler(filters.Document.ALL, handle_file),
         ],
         states={
@@ -140,7 +142,7 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
             STATE_MAPPING: [
                 CommandHandler("start", start),
                 MessageHandler(MAIN_MENU_FILTER, process_main_menu_text),
-                CallbackQueryHandler(handle_mapping_callback),
+                CallbackQueryHandler(handle_mapping_callback, pattern="^(workflow_mapping|[12])$"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_mapping_text),
             ],
             STATE_SCALE: [
@@ -152,8 +154,8 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
             STATE_WORKFLOW: [
                 CommandHandler("start", start),
                 MessageHandler(MAIN_MENU_FILTER, process_main_menu_text),
-                # Let top-level CallbackQueryHandlers handle workflow button clicks;
-                # removing the no-op handler prevents swallowing the callback.
+                CallbackQueryHandler(handle_mapping_callback, pattern="^workflow_mapping$"),
+                CallbackQueryHandler(handle_scale_callback, pattern="^workflow_scale$"),
                 MessageHandler(filters.Document.ALL, handle_file),
             ],
             STATE_KML_PROJECTION: [
@@ -193,14 +195,10 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
     # Inline callback handlers for the workflow buttons. These match the
     # callback_data values produced by `keyboard.build_workflow_keyboard`.
     try:
-        # workflow mapping/scale/generate/newfile
-        app.add_handler(CallbackQueryHandler(handle_mapping_callback, pattern="^workflow_mapping$"))
-        app.add_handler(CallbackQueryHandler(handle_scale_callback, pattern="^workflow_scale$"))
+        # TIN callbacks do not leave STATE_WORKFLOW.
         app.add_handler(CallbackQueryHandler(handle_tin_callback, pattern="^workflow_tin$"))
         app.add_handler(CallbackQueryHandler(handle_tin_refine_toggle, pattern="^workflow_refine$"))
-        # For generate and newfile, we provide lightweight handlers that
-        # currently call the no-op placeholder (application logic lives in
-        # other modules like dxf_generator). Keep them logged so clicks are visible.
+        # Geometry generation stays in the generator module.
         async def _workflow_generate(update, context):
             logger.info("workflow_generate pressed: %s", update.callback_query.data)
             await update.callback_query.answer()
@@ -272,16 +270,16 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
         async def _workflow_newfile(update, context):
             logger.info("workflow_newfile pressed: %s", update.callback_query.data)
             await update.callback_query.answer()
+            reset_workflow_state(context)
             await update.callback_query.edit_message_text("Готово. Отправьте новый файл.", reply_markup=None)
+            return STATE_FILE
 
         app.add_handler(CallbackQueryHandler(_workflow_generate, pattern="^workflow_generate$"))
-        app.add_handler(CallbackQueryHandler(_workflow_newfile, pattern="^workflow_newfile$"))
+        conv_handler.states[STATE_WORKFLOW].append(
+            CallbackQueryHandler(_workflow_newfile, pattern="^workflow_newfile$")
+        )
 
-        # Generic handlers: scale selection is handled by handle_scale_callback
-        app.add_handler(CallbackQueryHandler(handle_scale_callback, pattern="^scale_"))
         app.add_handler(CallbackQueryHandler(handle_tin_callback, pattern=r"^tin_(?:toggle|page|done|cancel)"))
-        # Mapping choices from mapping keyboard (callback_data '1' or '2')
-        app.add_handler(CallbackQueryHandler(handle_mapping_callback, pattern="^[12]$"))
     except Exception:
         logger.exception("Failed to register inline callback handlers")
 

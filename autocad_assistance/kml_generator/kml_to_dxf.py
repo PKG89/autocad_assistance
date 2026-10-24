@@ -146,14 +146,14 @@ def kml_to_dxf(
                 if len(dxf_points) == 2:
                     # Для двух точек используем LINE
                     msp.add_line(
-                        dxf_points[0][:2],  # Только X, Y для LINE
-                        dxf_points[1][:2],
+                        dxf_points[0],
+                        dxf_points[1],
                         dxfattribs={"layer": layer_name}
                     )
                 else:
-                    # Для большего количества точек используем LWPOLYLINE
-                    msp.add_lwpolyline(
-                        [(p[0], p[1]) for p in dxf_points],  # Только X, Y для LWPOLYLINE
+                    # Сохраняем высоту каждой вершины.
+                    msp.add_polyline3d(
+                        dxf_points,
                         dxfattribs={"layer": layer_name}
                     )
                 
