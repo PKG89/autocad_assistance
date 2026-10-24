@@ -1,13 +1,12 @@
 import os
 import tempfile
-import chardet
-import csv
 import re
 from typing import List, Optional, Set
 
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 
+from autocad_assistance.services.survey_parser import SurveyParseError, parse_survey_bytes
 from autocad_assistance.keyboard import (
     BUTTON_KML,
     BUTTON_NEW_DXF,
@@ -74,13 +73,6 @@ def _format_selected_codes(codes: list[str], selected_indexes: Set[int]) -> str:
     else:
         preview = ", ".join(selected_codes[:TIN_CODES_PREVIEW_LIMIT]) + f" … (+{len(selected_codes) - TIN_CODES_PREVIEW_LIMIT})"
     return f"Выбрано кодов: {len(selected_codes)}\n{preview}"
-
-
-def detect_delimiter(line: str) -> str:
-    for candidate in ("\t", ";", ",", "|"):
-        if candidate in line:
-            return candidate
-    return " "
 
 
 async def process_main_menu_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Optional[int]:
@@ -307,46 +299,18 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     with open(file_path, "rb") as source:
         raw_data = source.read()
-    # Prefer UTF-8 (including BOM) and only fall back to chardet if decoding fails.
     try:
-        raw_data.decode("utf-8-sig")
-        encoding = "utf-8-sig"
-    except UnicodeDecodeError:
-        result_encoding = chardet.detect(raw_data) or {}
-        encoding = result_encoding.get("encoding") or "utf-8"
-        if isinstance(encoding, str) and encoding.lower() == "ascii":
-            encoding = "cp1251"
-    context.user_data["encoding"] = encoding
-
-    delimiter = " "
-    with open(file_path, "r", encoding=encoding) as source:
-        for line in source:
-            stripped = line.strip()
-            if stripped:
-                delimiter = detect_delimiter(stripped)
-                logger.info("Определён разделитель: %s", repr(delimiter))
-                break
-
-    rows = []
-    with open(file_path, "r", encoding=encoding) as source:
-        reader = csv.reader(source, delimiter=delimiter, skipinitialspace=True)
-        for row in reader:
-            cleaned = [cell.strip() for cell in row]
-            if delimiter == " ":
-                cleaned = [cell for cell in cleaned if cell]
-            # A header is not a survey point; preserve empty data columns.
-            if not rows and [cell.lower() for cell in cleaned[1:4]] in (["x", "y", "z"], ["y", "x", "z"]):
-                continue
-            if len(cleaned) >= 4:
-                rows.append(cleaned)
-
-    if not rows:
+        parsed = parse_survey_bytes(raw_data)
+    except SurveyParseError:
         await update.message.reply_text("Файл не содержит достаточного количества данных.")
         return ConversationHandler.END
 
+    logger.info("Определён разделитель: %s", repr(parsed.delimiter))
+    context.user_data["encoding"] = parsed.encoding
+
     import pandas as pd
 
-    data_initial = pd.DataFrame(rows)
+    data_initial = pd.DataFrame(parsed.rows)
     context.user_data["data_initial"] = data_initial
     context.user_data["data_initial_count"] = len(data_initial)
     context.user_data["mapping_ready"] = False
