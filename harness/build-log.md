@@ -206,3 +206,30 @@ Keep one concise entry per task. Do not paste full command output.
   comparison and inherited direct-discovery CI are unresolved.
 - Next: freeze 010 task and tests against accepted 009, verify negative gate,
   then queue #4. #5 remains unqueued until accepted 010.
+
+## GEOAI-010 — accepted locally
+
+- Frozen task SHA-256 `cc318eef33dad33d78b2be5d56349c631e1d2032ecb98ddc74e06fbaffd34a1a`
+  and external test SHA-256 `2e5ecefb98cba6464219791aa9aa2e8b7d4a675e0d5f281b93d9c536b5f1b547`.
+  Negative gate on clean local handoff `935857e9d650b8c28d4b5b385e9f75241dbb86c5`
+  failed as expected. Symphony dispatched Issue #4 to protected broker and
+  one Cursor worker. Cursor implementation changed only the mapping service,
+  API upload adapter and two focused test files.
+- Independent PASS digest `89b894342fd623b3aa8e813fec59745ae32eb5c05c2d3880c7f70a16ae0a9bfd`:
+  22 focused, six frozen, 10 regression and six API tests, plus pip, diff,
+  scope and unsafe-path checks. Codex recomputed changed-file hashes and
+  digest and reviewed the actual candidate. A stale workflow path briefly
+  caused false blocked reports and a nested `bwrap` denial in Codex's sandbox;
+  the workflow was corrected to inspect the protected host gate and exact
+  GEOAI-010 worktree. No additional Cursor run or repair return occurred.
+- Accepted local commit `5c5915fbb3e6df07a1a7b2d1d3a73d8a02750564`
+  is clean, stored in bare branch `codex/geoai-010` and verified bundle
+  `geoai-010-accepted.bundle` (SHA-256
+  `88952f5a9407220126e27de79327af7b66316c05176f222adfde399a5084c809`).
+  Controller: ACCEPTED, one Cursor attempt, zero returns, 128.82 task-active
+  seconds and 1622.48 package-active seconds. GitHub Issue #4 closed.
+  No code push, merge, deployment, .env, survey-source or CI change occurred.
+- Next: freeze 011 service/API/Telegram and DXF/TIN acceptance from accepted
+  010, verify negative gate, then queue #5. Original branch retains inherited
+  uncommitted CI edit. Reboot recovery and independent Proxmox host-key check
+  remain unverified; inherited CI still uses direct discovery.

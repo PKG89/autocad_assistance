@@ -16,12 +16,14 @@ matching file under `harness/build/`.
   `10cd7ff75cc44eacfd38d2df937605f82f64a688`; its Issue is closed. The
   protected broker/Symphony handoff, exact review, one repair, independent
   checks and local preservation completed.
-- Current work: prepare frozen GEOAI-010 (#4) acceptance from the accepted
-  009 commit, then queue exactly that Issue. GEOAI-011 (#5) follows only
-  after 010 is accepted.
-- Agreed remainder: GEOAI-009 (#3) -> 010 (#4) -> 011 (#5), one accepted
-  predecessor at a time. Only issues bearing `geoai-queue` may dispatch;
-  #4–#5 carry `geoai-planned` only; neither is queued yet.
+- GEOAI-010 (#4) is ACCEPTED at local commit
+  `5c5915fbb3e6df07a1a7b2d1d3a73d8a02750564`; its Issue is closed.
+  Explicit mapping and typed API passed protected tests and Codex review.
+- Current work: prepare frozen GEOAI-011 (#5) acceptance from accepted 010,
+  then queue exactly that Issue.
+- The final approved package phase is GEOAI-011 (#5), starting from accepted
+  010. Only issues bearing `geoai-queue` may dispatch;
+  #5 carries `geoai-planned` only and is not queued yet.
 - GEOAI-007A/007B definitions are absent and outside this package.
 - Inherited CI uses direct unittest discovery, incompatible with the required
   isolation bootstrap. Local baseline success is not CI/deployment readiness.

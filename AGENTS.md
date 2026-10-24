@@ -137,10 +137,14 @@ GEOAI-009 is ACCEPTED at local commit `10cd7ff75cc44eacfd38d2df937605f82f64a688`
 and exact digest `a941392bffa076503c3f103e77e4920f3599a55fe3658abf996a61aeea83638d`.
 After one Codex repair return, 12 focused, five frozen, 10 regression and six
 API tests passed; separate bare Git branch and verified bundle preserve the
-commit. Issue #3 is closed. The remaining approved order is 010 (#4), then
-011 (#5), each from its accepted predecessor. Frozen tasks/tests and controller
-state stay outside both agent workspaces. The Codex subprocess receives no
-GitHub token. #4/#5 remain planned and unqueued until protected gates are
-ready. A user crontab now starts broker/dispatcher at reboot; reboot recovery
-is not tested. `loginctl enable-linger` was denied. Do not call the full
-008–011 package complete until 010–011 are accepted/preserved.
+commit. Issue #3 is closed. GEOAI-010 is also ACCEPTED at
+local commit `5c5915fbb3e6df07a1a7b2d1d3a73d8a02750564`, exact digest
+`89b894342fd623b3aa8e813fec59745ae32eb5c05c2d3880c7f70a16ae0a9bfd`.
+Its 22 focused, six frozen, 10 regression and six API tests passed; separate
+bare Git branch and verified bundle preserve it. Issue #4 is closed. Current
+phase is GEOAI-011 (#5), to start only from accepted 010 after frozen
+acceptance is prepared. Frozen tasks/tests and controller state stay outside
+both agent workspaces. The Codex subprocess receives no GitHub token. A user
+crontab starts broker/dispatcher at reboot; reboot recovery is not tested.
+`loginctl enable-linger` was denied. Do not call the full package complete
+until 011 is accepted and preserved.
