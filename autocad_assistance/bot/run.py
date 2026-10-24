@@ -1,5 +1,7 @@
 import logging
 import atexit
+import asyncio
+import io
 import signal
 import traceback
 import os
@@ -9,6 +11,7 @@ from pathlib import Path
 from telegram.ext import ApplicationBuilder, CommandHandler
 from autocad_assistance.config import BOT_TOKEN
 from autocad_assistance import db
+from autocad_assistance.services.dxf_jobs import render_dxf_bytes
 from autocad_assistance.bot.start import register_basic_handlers, start, cancel
 from autocad_assistance.bot.file_handlers import (
     handle_file,
@@ -222,44 +225,33 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
                     f"🔄 Генерация DXF запущена (масштаб {scale_label})...",
                     reply_markup=None
                 )
-                
-                # Создаем временный файл для DXF
-                import tempfile
-                import os
-                
-                temp_dir = tempfile.mkdtemp()
+
                 output_filename = f"generated_{context.user_data.get('original_filename', 'drawing')}.dxf"
-                output_path = os.path.join(temp_dir, output_filename)
-                
-                # Импортируем и вызываем генератор DXF
-                from autocad_assistance.dxf_generator import generate_dxf_ezdxf
                 tin_settings = {
                     "codes": list(context.user_data.get("tin_codes") or []),
                     "scale_value": context.user_data.get("scale_value"),
                     "refine": bool(context.user_data.get("tin_refine")),
                 }
-                generate_dxf_ezdxf(final_data, output_path, scale_factor, tin_settings=tin_settings)
-                
-                # Отправляем файл пользователю
-                with open(output_path, 'rb') as dxf_file:
-                    await context.bot.send_document(
-                        chat_id=update.effective_chat.id,
-                        document=dxf_file,
-                        filename=output_filename,
-                        caption=f"✅ DXF файл создан (масштаб {scale_label})\n📊 Обработано точек: {len(final_data)}"
-                    )
+                dxf_bytes = await asyncio.to_thread(
+                    render_dxf_bytes,
+                    final_data,
+                    scale_factor=scale_factor,
+                    tin_settings=tin_settings,
+                )
+                dxf_file = io.BytesIO(dxf_bytes)
+                dxf_file.name = output_filename
+
+                await context.bot.send_document(
+                    chat_id=update.effective_chat.id,
+                    document=dxf_file,
+                    filename=output_filename,
+                    caption=f"✅ DXF файл создан (масштаб {scale_label})\n📊 Обработано точек: {len(final_data)}"
+                )
                 
                 # Показываем меню workflow
                 from autocad_assistance.state import show_workflow_menu
                 await show_workflow_menu(update, context, notice="✅ DXF файл успешно создан и отправлен!")
                 
-                # Очищаем временный файл
-                try:
-                    os.unlink(output_path)
-                    os.rmdir(temp_dir)
-                except Exception:
-                    pass
-                    
             except Exception as exc:
                 logger.exception("Ошибка при генерации DXF: %s", exc)
                 await update.callback_query.edit_message_text(

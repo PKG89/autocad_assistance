@@ -7,12 +7,16 @@ from uuid import UUID
 
 from fastapi import APIRouter, File, Query, UploadFile, status
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from fastapi.responses import JSONResponse, Response
+from pydantic import BaseModel, Field
 
 from autocad_assistance.services.column_mapping import (
     MappingValidationError,
     map_survey_rows,
+)
+from autocad_assistance.services.dxf_jobs import (
+    DxfCoordinateValidationError,
+    render_dxf_bytes,
 )
 from autocad_assistance.services.survey_parser import SurveyParseError, parse_survey_bytes
 from autocad_assistance.services.uploads import (
@@ -60,6 +64,18 @@ class PreviewResponse(BaseModel):
 
 class MappingRequest(BaseModel):
     mapping: dict[str, object]
+
+
+class TinSettingsRequest(BaseModel):
+    codes: list[str] = []
+    refine: bool = False
+    scale_value: float | None = None
+
+
+class DxfRequest(BaseModel):
+    mapping: dict[str, object]
+    scaleFactor: float = 1.0
+    tinSettings: TinSettingsRequest = Field(default_factory=TinSettingsRequest)
 
 
 class MappingRow(BaseModel):
@@ -321,6 +337,71 @@ def create_upload_router(
             rows=limited_rows,
             rowCount=len(mapped.rows),
             returnedRows=len(limited_rows),
+        )
+
+    @router.post(
+        "/uploads/{upload_id}/dxf",
+        responses={
+            200: {"description": "DXF generated"},
+            404: {"model": ErrorResponse, "description": "Upload not found"},
+            422: {"model": ErrorResponse, "description": "Generation unavailable"},
+            500: {"model": ErrorResponse, "description": "Generation failure"},
+        },
+    )
+    async def upload_dxf(
+        upload_id: UUID,
+        payload: DxfRequest,
+    ):
+        try:
+            stored_file, stored_format = await run_in_threadpool(
+                _resolve_upload_file,
+                Path(upload_root),
+                str(upload_id),
+            )
+        except FileNotFoundError:
+            return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+
+        if stored_format == "kml":
+            return _error(
+                422,
+                "UNSUPPORTED_DXF_FORMAT",
+                "DXF generation supports only TXT and CSV uploads",
+            )
+
+        if stored_format not in {"txt", "csv"}:
+            return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+
+        try:
+            raw_data = await run_in_threadpool(stored_file.read_bytes)
+            parsed = await run_in_threadpool(parse_survey_bytes, raw_data)
+            mapped = await run_in_threadpool(
+                map_survey_rows,
+                parsed.rows,
+                payload.mapping,
+            )
+            dxf_bytes = await run_in_threadpool(
+                render_dxf_bytes,
+                mapped.rows,
+                scale_factor=payload.scaleFactor,
+                tin_settings={
+                    "codes": payload.tinSettings.codes,
+                    "refine": payload.tinSettings.refine,
+                    "scale_value": payload.tinSettings.scale_value,
+                },
+            )
+        except (OSError, SurveyParseError, csv.Error):
+            return _error(422, "INVALID_SURVEY", "Survey data cannot be mapped")
+        except MappingValidationError as exc:
+            return _error(422, exc.code, exc.message)
+        except DxfCoordinateValidationError as exc:
+            return _error(422, "INVALID_COORDINATE", str(exc))
+        except Exception:
+            return _error(500, "DXF_GENERATION_FAILED", "Unable to generate DXF")
+
+        return Response(
+            content=dxf_bytes,
+            media_type="application/dxf",
+            headers={"Content-Disposition": 'attachment; filename="drawing.dxf"'},
         )
 
     return router
