@@ -10,6 +10,10 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from autocad_assistance.services.column_mapping import (
+    MappingValidationError,
+    map_survey_rows,
+)
 from autocad_assistance.services.survey_parser import SurveyParseError, parse_survey_bytes
 from autocad_assistance.services.uploads import (
     EmptyUploadError,
@@ -52,6 +56,27 @@ class PreviewResponse(BaseModel):
     rowCount: int
     returnedRows: int
     warnings: list[PreviewWarning]
+
+
+class MappingRequest(BaseModel):
+    mapping: dict[str, object]
+
+
+class MappingRow(BaseModel):
+    Point: str
+    X: str
+    Y: str
+    Z: str
+    Code: str
+    Comments: str | None
+
+
+class MappingResponse(BaseModel):
+    uploadId: str
+    mapping: dict[str, int]
+    rows: list[MappingRow]
+    rowCount: int
+    returnedRows: int
 
 
 def _error(status_code: int, code: str, message: str) -> JSONResponse:
@@ -233,6 +258,69 @@ def create_upload_router(
             rowCount=len(parsed.rows),
             returnedRows=len(limited_rows),
             warnings=warnings,
+        )
+
+    @router.post(
+        "/uploads/{upload_id}/mapping",
+        response_model=MappingResponse,
+        responses={
+            404: {"model": ErrorResponse, "description": "Upload not found"},
+            422: {"model": ErrorResponse, "description": "Mapping unavailable"},
+        },
+    )
+    async def upload_mapping(
+        upload_id: UUID,
+        payload: MappingRequest,
+        limit: Annotated[int | None, Query(gt=0)] = None,
+    ):
+        preview_limit = limit if limit is not None else min(10, max_preview_rows)
+        if preview_limit > max_preview_rows:
+            return _error(
+                422,
+                "PREVIEW_LIMIT_EXCEEDED",
+                f"Preview limit cannot exceed {max_preview_rows}",
+            )
+
+        try:
+            stored_file, stored_format = await run_in_threadpool(
+                _resolve_upload_file,
+                Path(upload_root),
+                str(upload_id),
+            )
+        except FileNotFoundError:
+            return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+
+        if stored_format == "kml":
+            return _error(
+                422,
+                "UNSUPPORTED_MAPPING_FORMAT",
+                "Column mapping supports only TXT and CSV uploads",
+            )
+
+        if stored_format not in {"txt", "csv"}:
+            return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+
+        try:
+            raw_data = await run_in_threadpool(stored_file.read_bytes)
+            parsed = await run_in_threadpool(parse_survey_bytes, raw_data)
+            mapped = await run_in_threadpool(
+                map_survey_rows,
+                parsed.rows,
+                payload.mapping,
+            )
+        except (OSError, SurveyParseError, csv.Error):
+            return _error(422, "INVALID_SURVEY", "Survey data cannot be mapped")
+        except MappingValidationError as exc:
+            return _error(422, exc.code, exc.message)
+
+        limited_rows = [MappingRow(**mapped_row) for mapped_row in mapped.rows[:preview_limit]]
+        response_mapping = {key: int(value) for key, value in payload.mapping.items()}
+        return MappingResponse(
+            uploadId=str(upload_id),
+            mapping=response_mapping,
+            rows=limited_rows,
+            rowCount=len(mapped.rows),
+            returnedRows=len(limited_rows),
         )
 
     return router
