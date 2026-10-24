@@ -72,3 +72,27 @@ Keep one concise entry per task. Do not paste full command output.
   SSH used the pinned key at owner's latest instruction.
 - Next: complete Cursor auth, run full pilot with Codex/Cursor and negative
   gate, build/verify the protected controller, then queue GEOAI-008.
+
+## AUTONOMY-002 — pilot auth block preserved
+
+- Date: 2026-10-25 (Europe/Moscow). The second Cursor browser login also
+  returned `Sign-in failed. Please try again.` Cursor Agent CLI on VM109 has
+  no authenticated user API key; the owner is checking Windows sign-in.
+- The protected pilot controller was updated to persist `BLOCKED` with reason
+  `Cursor user API key missing` before launching a worker. `resume` returned
+  `BLOCKED_AUTH`; a second `resume` refused the persisted block. `status`
+  reports zero attempts/returns, zero active time and no live process;
+  `logs` and `stop` safely report no active attempt. `unblock-auth` refuses
+  while the key is absent.
+- Sandbox probe passed again. The pilot checkout remains clean on
+  `codex/geoai-pilot`. Frozen task and acceptance SHA-256 values are
+  `e52a9b15af468d9ffae57f29da74569043fef5603a033ca51dd0a39b910cb459`
+  and `1a07e8254c8ce395dfab6f565fa8258d510bc66f2d895bec6d508cfad0b4e8b2`.
+- No Cursor implementation, accepted pilot, GitHub queue label, Symphony
+  service, push or deployment occurred. The draft workflow remains inactive.
+  A repository-scoped GitHub Issues credential is still needed on VM109 for
+  dispatch; the Windows `gh` token was not copied. User-session linger after
+  reboot remains unresolved, although a detached process survived SSH exit.
+- Next: verify VM109 Cursor CLI with a real call after login or a user API
+  key is installed; clear the auth block, run the pilot, verify preservation
+  and stop/resume, then activate bounded issue dispatch and start GEOAI-008.

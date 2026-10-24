@@ -10,7 +10,9 @@ matching file under `harness/build/`.
   bare Git store under `/home/geoai/dev-data/geoai-autonomy/`.
 - Current work: autonomous tooling and isolated pilot. Codex CLI and Cursor
   Agent CLI are installed; Codex signed in and completed a read-only tool
-  call. Cursor sign-in and full pilot are pending. No task is queued.
+  call. Two Cursor browser logins failed; the pilot controller persists
+  `BLOCKED` with zero attempts. The owner is checking sign-in on Windows.
+  Full pilot and service dispatch remain pending. No task is queued.
 - Agreed package: pilot -> GEOAI-008 (#2) -> 009 (#3) -> 010 (#4) -> 011 (#5).
   Only issues bearing `geoai-queue` are dispatchable; the four product Issues
   currently carry `geoai-planned` only.

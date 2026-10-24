@@ -80,14 +80,15 @@ verified results, Git state, limitations, and the next step in
 `harness/build-log.md`. Read all three before continuing; update them after a
 phase. Keep raw evidence and task reports under `/home/geoai/dev-data/`.
 
-GEOAI-007C baseline confirmation and commit preparation completed on
-2026-10-24 (Europe/Moscow). Regression 10/10 and API 6/6 passed; pip and diff
-checks passed. HEAD remains `36f49b2a2ee5a412a1e5a2c5e8fdc275fcafb3be`;
-changes are uncommitted, index empty, no remote configured.
-Next candidate: GEOAI-007A, then 007B, then 008 through 011. The scope and
-acceptance criteria for 007A/007B are not yet recorded in this checkout;
-recover their task definitions before implementation. Follow the existing
-one-phase stop rule and approval rules above.
+GEOAI-007C baseline confirmation completed on 2026-10-24 (Europe/Moscow).
+Regression 10/10 and API 6/6 passed; pip and diff checks passed. The product
+baseline was locally committed as `c33340366ee4016a7e2d2576bb9c46931875db16`.
+The current documentation handoff is `d56f0f4d31e340874e731805e79c52b135b122b6`.
+Both are recoverable from the verified bundle/bare store under
+`/home/geoai/dev-data/geoai-autonomy/`. No Git remote is configured. The
+inherited `.github/workflows/cicd.yml` edit remains uncommitted and must be
+preserved. GEOAI-007A/007B specifications are absent; they are outside the
+approved autonomous package.
 
 Use isolated bootstrap runners via `scripts/geoai-verify.sh`. Direct unittest
 discovery is incompatible with the regression isolation guard. The inherited
@@ -115,3 +116,11 @@ GitHub Issue is closed. Acceptance is bound to the checked file revision.
 The VM109 SSH connection now uses the saved pinned host key per the owner's
 latest instruction. The previously requested independent Proxmox-console
 comparison has not been performed; record this as a remaining limitation.
+
+Current controller state: the disposable pilot is `BLOCKED` before any Cursor
+attempt because Cursor Agent CLI on VM109 is unauthenticated. Two browser
+login attempts returned `Sign-in failed. Please try again.` The owner is
+checking Cursor sign-in on Windows. Do not clear this block or queue Issue #2
+until an actual Cursor CLI call and the full pilot pass. Issues #2–#5 carry
+`geoai-planned` only. Symphony WORKFLOW is a draft and must remain inactive
+until the protected dispatcher, credential and persistence checks pass.
