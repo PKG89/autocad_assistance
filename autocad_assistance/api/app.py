@@ -33,11 +33,14 @@ def create_app(
     *,
     upload_root: str | Path | None = None,
     max_upload_bytes: int = DEFAULT_MAX_UPLOAD_BYTES,
+    max_preview_rows: int = 50,
 ) -> FastAPI:
     """Create an isolated HTTP application without starting a server."""
 
     if max_upload_bytes <= 0:
         raise ValueError("max_upload_bytes must be positive")
+    if max_preview_rows <= 0:
+        raise ValueError("max_preview_rows must be positive")
 
     resolved_upload_root = Path(upload_root) if upload_root is not None else (
         Path(tempfile.gettempdir()) / "autocad-assistance-geo-ai" / "uploads"
@@ -49,6 +52,7 @@ def create_app(
     )
     app.state.upload_root = resolved_upload_root
     app.state.max_upload_bytes = max_upload_bytes
+    app.state.max_preview_rows = max_preview_rows
     app.state.max_upload_request_bytes = (
         max_upload_bytes + MULTIPART_OVERHEAD_BYTES
     )
@@ -82,6 +86,7 @@ def create_app(
         create_upload_router(
             upload_root=resolved_upload_root,
             max_upload_bytes=max_upload_bytes,
+            max_preview_rows=max_preview_rows,
         )
     )
 
