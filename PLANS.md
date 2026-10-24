@@ -8,14 +8,17 @@ matching file under `harness/build/`.
 - Baseline GEOAI-007C is committed at `c33340366ee4016a7e2d2576bb9c46931875db16`
   on `codex/geo-ai-start` and preserved in a verified bundle and separate
   bare Git store under `/home/geoai/dev-data/geoai-autonomy/`.
-- Current work: autonomous tooling and isolated pilot. Codex CLI and Cursor
-  Agent CLI are installed; Codex signed in and completed a read-only tool
-  call. Two Cursor browser logins failed; the pilot controller persists
-  `BLOCKED` with zero attempts. The owner is checking sign-in on Windows.
-  Full pilot and service dispatch remain pending. No task is queued.
-- Agreed package: pilot -> GEOAI-008 (#2) -> 009 (#3) -> 010 (#4) -> 011 (#5).
-  Only issues bearing `geoai-queue` are dispatchable; the four product Issues
-  currently carry `geoai-planned` only.
+- Completed: Codex and Cursor both passed real CLI calls. The disposable pilot
+  is `ACCEPTED` at local commit `08bdbad32799ad48cb6f8df3eaad37d562fb7aa9`.
+  GEOAI-008 (#2) is `ACCEPTED` at local commit
+  `aec7fdad107cc1e4382b97f2d3218129e80dbccc`; its Issue is closed.
+- Current work: protect and start the Symphony dispatcher and prepare
+  GEOAI-009 (#3) from the accepted 008 commit. The VM109 GitHub Issues token
+  passed read/write probes. The Symphony WORKFLOW is still inactive, so
+  autonomous service status is not RUNNING.
+- Agreed remainder: GEOAI-009 (#3) -> 010 (#4) -> 011 (#5), one accepted
+  predecessor at a time. Only issues bearing `geoai-queue` may dispatch;
+  #3–#5 currently carry `geoai-planned` only.
 - GEOAI-007A/007B definitions are absent and outside this package.
 - Inherited CI uses direct unittest discovery, incompatible with the required
   isolation bootstrap. Local baseline success is not CI/deployment readiness.

@@ -96,3 +96,56 @@ Keep one concise entry per task. Do not paste full command output.
 - Next: verify VM109 Cursor CLI with a real call after login or a user API
   key is installed; clear the auth block, run the pilot, verify preservation
   and stop/resume, then activate bounded issue dispatch and start GEOAI-008.
+
+## AUTONOMY-003 — pilot accepted
+
+- Cursor CLI browser login succeeded on VM109; `agent status` confirmed the
+  account. A real isolated read-only call returned the exact first heading of
+  `AGENTS.md`, and the worktree stayed clean.
+- Frozen pilot task/test hashes: `e52a9b15af468d9ffae57f29da74569043fef5603a033ca51dd0a39b910cb459`
+  and `1a07e8254c8ce395dfab6f565fa8258d510bc66f2d895bec6d508cfad0b4e8b2`.
+  The pre-implementation gate failed; Cursor's deliberately incomplete first
+  pass also failed three frozen cases despite passing its focused test. Codex
+  reviewed digest `c8c3214b9b159a6fdd49817ea6ca0851626260e659b06990e2eaf144a3dccaef`
+  and sent specific repair feedback. The repaired digest
+  `fc0b43d48c87b72a0afe7c2f477b8d7e4c3dac971f12941686c5fb7f83f68038`
+  passed four focused, four frozen, 10 regression and six API tests.
+- Stop/resume killed the old Cursor process, preserved 112.69 seconds of
+  active package time and one repair return, and refused duplicate or post-
+  acceptance resumes. Accepted local commit:
+  `08bdbad32799ad48cb6f8df3eaad37d562fb7aa9`. Separate bare branch
+  `codex/geoai-pilot` and verified `pilot-accepted.bundle` hold it. No pilot
+  product code was merged or published.
+
+## GEOAI-008 — accepted locally
+
+- Cursor implemented the independent TXT/CSV parser and Telegram adapter on
+  isolated `codex/geoai-008` from `76bfca4671647a7462687f1e3f16d639042a0cd0`.
+  The frozen task/test hashes were
+  `bee33f75df02d96b9be2f6ec5728a85cd532da0ff02276b090c2d273abe34120`
+  and `37d27bf2a28f3d6bb3afc2f971859e9850e9d7f1a6382c6b128b894114862e3f`.
+- First protected gate rejected an out-of-scope build-log edit. Codex also
+  reproduced unhandled codec/decode exceptions and returned both findings.
+  Cursor removed the edit and added explicit `SurveyParseError` handling/tests.
+  A second gate had a false positive from pre-existing trailing spaces in the
+  tracked Telegram file; `git diff --check` found no new whitespace. The gate
+  was corrected to scan changed tracked lines and whole new files. Frozen
+  task, external cases, file scope and revision digest were unchanged. The
+  corrected gate passed without another Cursor run or counter reset.
+- Accepted digest `da7c0387c8cc9ddf3eed2b7197e5ae3701712960633bc68a92662948ba30299c`:
+  13 focused, six frozen, 10 regression and six API tests passed in the
+  networkless sandbox; pip check, diff check and scope checks passed.
+  Accepted local commit `aec7fdad107cc1e4382b97f2d3218129e80dbccc`
+  is clean, stored under bare branch `codex/geoai-008` and verified in
+  `/home/geoai/dev-data/geoai-autonomy/geoai-008-accepted.bundle` (SHA-256
+  `b37acace553105970aa8f85e473c52b0192ac693b513cfac6398543c8e63b024`).
+  GitHub Issue #2 was closed with local-only status noted. No push, merge,
+  deployment, `.env` or survey data change occurred.
+- GitHub Issues token on VM109 is geoai-owned mode 0600; authenticated GET
+  `/user` and Issue #2 returned 200, as did an idempotent write of its
+  existing `geoai-planned` label. The token value was not logged or copied.
+- Next: complete protected Symphony dispatch and service survival check;
+  freeze GEOAI-009 acceptance, then start #3 from the accepted 008 commit.
+  Issues #3–#5 are not queue-labeled. The inherited CI edit remains
+  uncommitted in the original checkout; independent Proxmox host-key
+  comparison and reboot persistence remain unresolved.

@@ -83,7 +83,8 @@ phase. Keep raw evidence and task reports under `/home/geoai/dev-data/`.
 GEOAI-007C baseline confirmation completed on 2026-10-24 (Europe/Moscow).
 Regression 10/10 and API 6/6 passed; pip and diff checks passed. The product
 baseline was locally committed as `c33340366ee4016a7e2d2576bb9c46931875db16`.
-The current documentation handoff is `d56f0f4d31e340874e731805e79c52b135b122b6`.
+The initial documentation handoff is `d56f0f4d31e340874e731805e79c52b135b122b6`;
+use `git log -1` for later documentation-only state commits.
 Both are recoverable from the verified bundle/bare store under
 `/home/geoai/dev-data/geoai-autonomy/`. No Git remote is configured. The
 inherited `.github/workflows/cicd.yml` edit remains uncommitted and must be
@@ -117,10 +118,18 @@ The VM109 SSH connection now uses the saved pinned host key per the owner's
 latest instruction. The previously requested independent Proxmox-console
 comparison has not been performed; record this as a remaining limitation.
 
-Current controller state: the disposable pilot is `BLOCKED` before any Cursor
-attempt because Cursor Agent CLI on VM109 is unauthenticated. Two browser
-login attempts returned `Sign-in failed. Please try again.` The owner is
-checking Cursor sign-in on Windows. Do not clear this block or queue Issue #2
-until an actual Cursor CLI call and the full pilot pass. Issues #2–#5 carry
-`geoai-planned` only. Symphony WORKFLOW is a draft and must remain inactive
-until the protected dispatcher, credential and persistence checks pass.
+Current handoff (2026-10-25, Europe/Moscow): Cursor Agent CLI is authenticated
+and has completed real isolated work. The disposable pilot passed a deliberate
+negative gate, Codex review/feedback, Cursor repair, independent recheck,
+stop/resume and preservation. Accepted pilot commit is
+`08bdbad32799ad48cb6f8df3eaad37d562fb7aa9` in the separate bare Git
+store and verified bundle. GEOAI-008 was then implemented by Cursor and
+accepted as `aec7fdad107cc1e4382b97f2d3218129e80dbccc` after 13 focused,
+six frozen, 10 regression and six API tests passed. This commit is local only;
+the separate bare store and verified bundle preserve it. GitHub Issue #2 is
+closed with that limitation recorded. GEOAI-009 (#3) is next and must start
+from the accepted 008 commit. Issues #3–#5 still carry `geoai-planned` only.
+The repository-scoped GitHub Issues token on VM109 passed authenticated read
+and idempotent write probes. Symphony WORKFLOW remains a draft until the
+protected dispatch/broker and disconnect-survival checks pass; do not add
+`geoai-queue` or report the autonomous service RUNNING before those gates.
