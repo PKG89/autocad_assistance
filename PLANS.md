@@ -12,13 +12,16 @@ matching file under `harness/build/`.
   is `ACCEPTED` at local commit `08bdbad32799ad48cb6f8df3eaad37d562fb7aa9`.
   GEOAI-008 (#2) is `ACCEPTED` at local commit
   `aec7fdad107cc1e4382b97f2d3218129e80dbccc`; its Issue is closed.
-- Current work: protect and start the Symphony dispatcher and prepare
-  GEOAI-009 (#3) from the accepted 008 commit. The VM109 GitHub Issues token
-  passed read/write probes. The Symphony WORKFLOW is still inactive, so
-  autonomous service status is not RUNNING.
+- GEOAI-009 (#3) is ACCEPTED at local commit
+  `10cd7ff75cc44eacfd38d2df937605f82f64a688`; its Issue is closed. The
+  protected broker/Symphony handoff, exact review, one repair, independent
+  checks and local preservation completed.
+- Current work: prepare frozen GEOAI-010 (#4) acceptance from the accepted
+  009 commit, then queue exactly that Issue. GEOAI-011 (#5) follows only
+  after 010 is accepted.
 - Agreed remainder: GEOAI-009 (#3) -> 010 (#4) -> 011 (#5), one accepted
   predecessor at a time. Only issues bearing `geoai-queue` may dispatch;
-  #3–#5 currently carry `geoai-planned` only.
+  #4–#5 carry `geoai-planned` only; neither is queued yet.
 - GEOAI-007A/007B definitions are absent and outside this package.
 - Inherited CI uses direct unittest discovery, incompatible with the required
   isolation bootstrap. Local baseline success is not CI/deployment readiness.

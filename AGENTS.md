@@ -127,9 +127,20 @@ store and verified bundle. GEOAI-008 was then implemented by Cursor and
 accepted as `aec7fdad107cc1e4382b97f2d3218129e80dbccc` after 13 focused,
 six frozen, 10 regression and six API tests passed. This commit is local only;
 the separate bare store and verified bundle preserve it. GitHub Issue #2 is
-closed with that limitation recorded. GEOAI-009 (#3) is next and must start
-from the accepted 008 commit. Issues #3–#5 still carry `geoai-planned` only.
-The repository-scoped GitHub Issues token on VM109 passed authenticated read
-and idempotent write probes. Symphony WORKFLOW remains a draft until the
-protected dispatch/broker and disconnect-survival checks pass; do not add
-`geoai-queue` or report the autonomous service RUNNING before those gates.
+closed with that limitation recorded. GEOAI-009 (#3) started from the accepted
+008 lineage and local handoff commit `88aa9948faa58863cc290094894ffecfaa33afb1`.
+The repository-scoped GitHub Issues token on VM109 passed authenticated
+read/write probes. Symphony and the protected host broker are running in
+detached VM109 processes. Issue #3 was queue-labeled; Symphony dispatched a
+Codex lead, which requested Cursor implementation through the protected broker.
+GEOAI-009 is ACCEPTED at local commit `10cd7ff75cc44eacfd38d2df937605f82f64a688`
+and exact digest `a941392bffa076503c3f103e77e4920f3599a55fe3658abf996a61aeea83638d`.
+After one Codex repair return, 12 focused, five frozen, 10 regression and six
+API tests passed; separate bare Git branch and verified bundle preserve the
+commit. Issue #3 is closed. The remaining approved order is 010 (#4), then
+011 (#5), each from its accepted predecessor. Frozen tasks/tests and controller
+state stay outside both agent workspaces. The Codex subprocess receives no
+GitHub token. #4/#5 remain planned and unqueued until protected gates are
+ready. A user crontab now starts broker/dispatcher at reboot; reboot recovery
+is not tested. `loginctl enable-linger` was denied. Do not call the full
+008–011 package complete until 010–011 are accepted/preserved.

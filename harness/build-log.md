@@ -149,3 +149,60 @@ Keep one concise entry per task. Do not paste full command output.
   Issues #3–#5 are not queue-labeled. The inherited CI edit remains
   uncommitted in the original checkout; independent Proxmox host-key
   comparison and reboot persistence remain unresolved.
+
+## GEOAI-009 — protected dispatch started
+
+- Frozen task SHA-256 `4c6938d69c6596c17952cca0f39cbfd6d4b2c13936468e035a6ba97b5d9e3eac`
+  and external test SHA-256 `c5f1cf2d1deae2d3991e47d87f7246a08de65db691c43453f599b65783b66a1c`;
+  the untouched 008-based worktree failed the new frozen preview cases as
+  expected. Exact base is local handoff `88aa9948faa58863cc290094894ffecfaa33afb1`.
+- Protected broker and Symphony dispatcher are detached processes on VM109.
+  A first dispatch exposed a Codex CLI approval-policy schema mismatch; the
+  workflow was corrected to `never` with workspace-write sandbox. The next
+  Symphony dispatch succeeded: Codex wrote one broker request, broker
+  verified Issue #3 and launched Cursor supervisor PID 11597. Controller
+  reported RUNNING, attempt 1, repair returns 0, intact frozen hashes.
+  The broker removed `geoai-queue` while Cursor works. Codex app-server is
+  launched through a wrapper that removes the GitHub token from its env.
+- Current Git: original checkout `codex/geo-ai-start` keeps inherited
+  `.github/workflows/cicd.yml` edit untouched. Product worktree is
+  `codex/geoai-009` from the local accepted 008 lineage. No code push,
+  merge, deployment, or source-data modification occurred.
+- Next: wait for Cursor and protected gate, inspect exact diff and report,
+  return specific feedback if needed, accept and preserve 009 only after
+  independent PASS. Then prepare and run 010 from the accepted 009 commit.
+  Automatic process restart after VM reboot, independent Proxmox host-key
+  comparison, and inherited CI discovery are unresolved.
+
+## GEOAI-009 — accepted locally
+
+- Cursor's first two attempts were stopped after 603.55 and 222.34 seconds
+  of analysis without file edits. The initial stop exposed a leaked GNU
+  `timeout` child process group; it was terminated and the controller stop
+  logic was fixed. A process-group regression probe passed. Existing `.venv`
+  was mounted read-only in the Cursor sandbox; Cursor model switched to the
+  locally available Codex 5.3 Low Fast through the Cursor CLI. Third attempt
+  produced code and tests. These operational stops did not consume repair
+  returns, and active-time counters were preserved.
+- First independent gate passed 11 focused, five frozen, 10 regression and
+  six API tests at digest `4466fbde9ade2ab2245c9bc22a1e1d640ff1e47d65b5ab6d274029cdf764759e`.
+  Codex review reproduced an unhandled `csv.Error` on an oversized field.
+  Protected broker transitioned the exact revision to REWORK_REQUIRED and
+  launched one Cursor repair. The repaired revision
+  `a941392bffa076503c3f103e77e4920f3599a55fe3658abf996a61aeea83638d`
+  passed 12 focused, five frozen, 10 regression and six API tests, plus
+  scope, whitespace, pip and diff checks. Codex reviewed exact file hashes.
+- Accepted local product commit `10cd7ff75cc44eacfd38d2df937605f82f64a688`
+  is clean and stored in bare branch `codex/geoai-009` and verified bundle
+  `geoai-009-accepted.bundle` (SHA-256
+  `aed66f5e5495edfb3500d9917f495d1d08ea8855295f0039005f8c3d3c2166c0`).
+  Controller: ACCEPTED, four Cursor attempts, one repair return, 951.12
+  task-active seconds and 1493.66 package-active seconds. GitHub Issue #3
+  closed. No code push, merge, deployment, .env, survey-source, or inherited
+  CI change occurred.
+- User crontab includes `@reboot` launcher for broker and dispatcher. Actual
+  reboot recovery is untested; login linger remains denied. Original branch
+  retains inherited uncommitted CI edit. Independent Proxmox host-key
+  comparison and inherited direct-discovery CI are unresolved.
+- Next: freeze 010 task and tests against accepted 009, verify negative gate,
+  then queue #4. #5 remains unqueued until accepted 010.
