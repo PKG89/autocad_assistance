@@ -1,6 +1,7 @@
 # GEOAI-030 — offline tracing experiment; domain validation remains open
 
-Status: READY for synthetic, read-only experiment after accepted
+Status: SYNTHETIC LOCAL GATE PASSED; exact feature/PR CI pending. Full
+GEOAI-030 remains domain blocked after accepted
 GEOAI-029 at `79528bb9f6070e458724886a915f9d035cdfd110`.
 Full GEOAI-030 production acceptance is blocked by absent authorized
 held-out topographic objects and agreed per-class regression criteria.
@@ -53,3 +54,18 @@ dependency.
 Do not mark full GEOAI-030 accepted until authorized, independent
 real references and class-level regression criteria support it. Stop
 on budget, unexpected edits, lost isolation or production action.
+
+## Local result (2026-10-25)
+
+Three focused tests passed deterministic read-only tracing, source XYZ
+preservation, bounded context/gaps, whole-object family split,
+invalid/over-limit data and benchmark repeatability. Held-out
+uncrossing case improved exact matched edges 2/4 → 4/4; a legitimate
+crossing regressed 5/5 → 3/5. The latter prevents automatic adoption.
+The full gate passed 156 focused, 10 isolated regression and six API
+tests, `pip check`, zero blocked operations and diff check. Repeatable
+synthetic report SHA-256:
+`24582b7cb5dccaaee70491ca3a33071b644aeac5acfeabfd4cdf42ada92de188`.
+No product API, project state or DXF generator was changed. Exact CI
+for this experimental commit remains pending; full GEOAI-030 cannot
+be accepted without authorized independent objects and class criteria.

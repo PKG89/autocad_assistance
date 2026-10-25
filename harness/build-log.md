@@ -1306,3 +1306,24 @@ Keep one concise entry per task. Do not paste full command output.
   Valid self-crossings are possible, so the candidate cannot alter
   generated DXF or be called domain-validated. Full GEOAI-030 remains
   dependent on authorized real held-out objects and criteria.
+
+## GEOAI-030 — synthetic experiment local pass; full task blocked
+
+- Frozen fixture at `1ae3b57` was augmented only with family IDs to
+  enforce whole-object split, without changing points or truth.
+  Offline review-only 2-opt candidate starts from exact legacy
+  anchored nearest order. It preserves row/XYZ input and reports
+  source, baseline and candidate 2D length, self/environment crossings,
+  turn reversals and ranked gaps; no API/jobs/DXF mutation.
+- Three focused tests passed deterministic benchmark, invalid/limit
+  cases and split isolation. Held-out synthetic class
+  `uncrossing-helpful` improved matched edges 2/4 → 4/4; class
+  `crossing-legitimate` regressed 5/5 → 3/5. Automatic adoption is
+  unsuitable. Report `/home/geoai/dev-data/geoai-autonomy/p7-030-report.json`
+  SHA-256 `24582b7cb5dccaaee70491ca3a33071b644aeac5acfeabfd4cdf42ada92de188`.
+  Full gate `p7-030/full-gate.log` passed 156 focused, 10 isolated
+  regression, six API, `pip check`, zero blocked operations and diff
+  check. Exact feature/PR CI pending for the experimental commit.
+- Full GEOAI-030 and dependent 031 cannot be accepted without
+  authorized, independent real reference objects and agreed class
+  regression criteria. No production action or real data was used.

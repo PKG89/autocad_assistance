@@ -96,7 +96,7 @@ mapping and DXF through the shared engine.
 | P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
 | P6 | 028 | DXF comparison and quality measures | 027 | ACCEPTED at 1ea061c |
 | P7 | 029 | Versioned object-code rules | 012, 028 | ACCEPTED at 79528bb |
-| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | SYNTHETIC EXPERIMENT READY; real validation pending |
+| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | SYNTHETIC LOCAL PASS; real validation blocked |
 | P7 | 031 | Contours and composite situation objects | 028–030 | PROPOSED |
 | P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | PROPOSED |
 | P8 | 033 | Terrain contours and elevation checks | 032 | PROPOSED |
@@ -213,6 +213,11 @@ The bounded synthetic 030 experiment is READY under
 `harness/build/030-tracing-experiment.md` and frozen fixture
 `harness/fixtures/030-synthetic-objects.json`. It cannot change the
 generator or count as full 030 acceptance without real held-out data.
+The 030 synthetic experiment passed local tests and full gate. It
+measured one class gain (2/4 → 4/4 exact edges) and one class regression
+(5/5 → 3/5); the candidate remains review-only. Exact feature/PR CI
+is pending; full 030 and dependent 031 remain blocked by missing
+authorized real references and agreed class criteria.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

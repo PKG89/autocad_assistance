@@ -400,6 +400,13 @@ GEOAI-030 has a bounded offline synthetic experiment READY under
 whole object in `harness/fixtures/030-synthetic-objects.json`.
 Keep the candidate out of production DXF/jobs. Full 030 acceptance
 needs authorized real held-out references and class-level criteria.
+GEOAI-030 synthetic local gate passed with a review-only 2-opt
+uncrossing candidate: one held-out object improved 2/4 → 4/4 exact
+edges and a valid crossing regressed 5/5 → 3/5. The candidate never
+changes jobs or DXF. Three focused tests, 156 total focused, 10
+regression and six API passed; exact feature/PR CI is pending. Full 030 and 031
+remain blocked until authorized real objects and per-class criteria
+are supplied. Continue only independent dependency-ready work.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
