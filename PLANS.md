@@ -185,6 +185,10 @@ GitHub push/PR runs 40155918471/40155921751 passed. GEOAI-027 is
 READY from this base with only synthetic fixtures in development; real
 examples need explicit provenance and use permission.
 No production publication is authorized.
+GEOAI-026 static-script correction passed the repeat local gate: the
+missing `/app/line-edits.js` route is added and asserted in the
+authenticated app test. GEOAI-027 implementation waits for exact
+feature/PR CI.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

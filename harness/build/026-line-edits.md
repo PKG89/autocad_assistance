@@ -102,3 +102,14 @@ blocker in shared memory.
   draft PR #6 run 40155921751 passed. Full-branch bundle SHA-256
   `512dfb668dcc522d67482b226fc3ded041e91654467e23e83a6eb923b0163ef6`
   matched VM and Windows.
+
+## Post-acceptance integration correction
+
+During GEOAI-027 dependency inspection, the HTML's new
+`/app/line-edits.js` script was found without a matching static route.
+The real web cabinet would return 404 for that script. Added the route
+and an authenticated app test that requires status 200 and the
+`GeoaiLineEdits` module. The correction gate
+`p6-026/static-route-gate.log` passed 137 focused, 10 isolated
+regression and six isolated API tests, zero blocked operations,
+`pip check` and diff check. Exact GitHub feature/PR CI is pending.

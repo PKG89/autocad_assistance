@@ -94,6 +94,9 @@ class LineEditTests(unittest.IsolatedAsyncioTestCase):
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app), base_url=ORIGIN) as client:
             self.assertEqual((await client.get(self.path + "/current")).status_code, 401)
             headers = await self.login(client)
+            script = await client.get("/app/line-edits.js")
+            self.assertEqual(script.status_code, 200, script.text[:100])
+            self.assertIn(b"GeoaiLineEdits", script.content)
             initial = (await client.get(self.path + "/current")).json()
             self.assertEqual(initial["version"], 0)
             self.assertFalse(initial["staleDecisions"])

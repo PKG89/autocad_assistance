@@ -359,6 +359,12 @@ GEOAI-027 is READY under `harness/build/027-reference-archive.md`:
 private immutable references with explicit provenance and permission
 evidence, synthetic fixtures only for development. No production action.
 
+GEOAI-026 integration correction is in progress: the web HTML
+referenced `/app/line-edits.js` but the FastAPI static route was
+missing. The route and focused regression test are added; the repeat
+full gate passed 137 focused + 10 regression + six API tests. Exact
+feature/PR CI remains before continuing GEOAI-027 code.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

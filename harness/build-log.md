@@ -1174,3 +1174,16 @@ Keep one concise entry per task. Do not paste full command output.
   explicit provenance and permission evidence and use only synthetic
   examples during development. No real reference files or rights
   were supplied in-session; no production action.
+
+## GEOAI-026 integration correction — gate/CI pending
+
+- While inspecting GEOAI-027's API wiring, found that the 026 HTML
+  includes `/app/line-edits.js` but the FastAPI app did not serve it.
+  The detached static browser harness had tested the script itself;
+  the real app route would be 404. Added the exact static route and a
+  focused authenticated app test requiring script status 200/content.
+  Four focused line-edit tests passed. The repeat full gate
+  `p6-026/static-route-gate.log` passed 137 focused, 10 isolated
+  regression and six isolated API tests with zero blocked operations,
+  `pip check` and diff check. Exact feature/PR CI must pass before
+  resuming 027 implementation.

@@ -169,6 +169,10 @@ def create_app(
         async def candidates_script() -> FileResponse:
             return FileResponse(web_root / "line-candidates.js", media_type="text/javascript", headers=web_headers)
 
+        @app.get("/app/line-edits.js", include_in_schema=False)
+        async def line_edits_script() -> FileResponse:
+            return FileResponse(web_root / "line-edits.js", media_type="text/javascript", headers=web_headers)
+
         @app.get("/app/styles.css", include_in_schema=False)
         async def web_style() -> FileResponse:
             return FileResponse(web_root / "styles.css", media_type="text/css", headers=web_headers)
