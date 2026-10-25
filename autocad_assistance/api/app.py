@@ -20,7 +20,7 @@ from .owner_guard import OwnerGuardMiddleware
 from .owned_files import create_owned_files_router
 from .uploads import create_upload_router
 from autocad_assistance.services.auth_store import AuthStore
-from autocad_assistance.services.project_store import ProjectStore
+from autocad_assistance.services.project_store import ProjectStore, ResourceQuota
 
 
 DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -42,6 +42,8 @@ def create_app(
     auth_root: str | Path | None = None,
     auth_origin: str | None = None,
     project_root: str | Path | None = None,
+    resource_quota: ResourceQuota | None = None,
+    upload_retention_days: int | None = None,
 ) -> FastAPI:
     """Create an isolated HTTP application without starting a server."""
 
@@ -53,6 +55,8 @@ def create_app(
         raise ValueError("auth_origin is required when auth_root is configured")
     if auth_root is not None and project_root is None:
         raise ValueError("project_root is required when auth_root is configured")
+    if auth_root is None and (resource_quota is not None or upload_retention_days is not None):
+        raise ValueError("Resource policy requires authenticated project storage")
     if auth_root is not None:
         auth_origin = validate_auth_origin(auth_origin)
 
@@ -75,7 +79,10 @@ def create_app(
         path="/api/v1/uploads",
         max_body_bytes=app.state.max_upload_request_bytes,
     )
-    project_store = ProjectStore(project_root) if auth_root is not None else None
+    project_store = (
+        ProjectStore(project_root, quota=resource_quota, upload_retention_days=upload_retention_days)
+        if auth_root is not None else None
+    )
     if auth_root is not None:
         identity_store = AuthStore(auth_root)
         app.state.auth_store = identity_store

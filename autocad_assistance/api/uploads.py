@@ -33,7 +33,9 @@ from autocad_assistance.services.uploads import (
     remove_stored_upload,
     store_upload,
 )
-from autocad_assistance.services.project_store import ProjectNotFoundError, ProjectStore
+from autocad_assistance.services.project_store import (
+    ProjectNotFoundError, ProjectStore, ResourceQuotaExceededError,
+)
 
 
 class UploadResponse(BaseModel):
@@ -203,6 +205,11 @@ def create_upload_router(
                 await run_in_threadpool(
                     project_store.register_upload_owner, request.scope["geoai.owner_id"], stored
                 )
+            except ResourceQuotaExceededError:
+                await run_in_threadpool(
+                    remove_stored_upload, upload_root, stored.upload_id, stored.format
+                )
+                return _error(429, "QUOTA_EXCEEDED", "Owner resource quota exceeded")
             except Exception:
                 await run_in_threadpool(
                     remove_stored_upload, upload_root, stored.upload_id, stored.format

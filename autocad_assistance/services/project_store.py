@@ -10,12 +10,15 @@ import os
 from pathlib import Path
 import sqlite3
 import stat
+import time
 from typing import Iterator, Mapping
 import unicodedata
 from uuid import UUID, uuid4
 
 from autocad_assistance.services.survey_contract import SurveyContext
-from autocad_assistance.services.uploads import StoredUpload, read_stored_upload, validate_upload_bytes
+from autocad_assistance.services.uploads import (
+    StoredUpload, read_stored_upload, remove_stored_upload, validate_upload_bytes,
+)
 
 
 MAX_SOURCE_BYTES = 10 * 1024 * 1024
@@ -36,6 +39,26 @@ class ProjectIntegrityError(IOError):
     """Stored bytes or path no longer match accepted metadata."""
 
 
+class ResourceQuotaExceededError(ProjectStoreError):
+    """A configured owner resource limit would be exceeded."""
+
+
+@dataclass(frozen=True)
+class ResourceQuota:
+    max_projects: int = 20
+    max_uploads: int = 100
+    max_revisions: int = 500
+    max_jobs: int = 500
+    max_total_bytes: int = 512 * 1024 * 1024
+
+    def __post_init__(self) -> None:
+        if any(value <= 0 for value in (
+            self.max_projects, self.max_uploads, self.max_revisions,
+            self.max_jobs, self.max_total_bytes,
+        )):
+            raise ValueError("Resource quota limits must be positive")
+
+
 @dataclass(frozen=True)
 class ProjectRecord:
     project_id: str
@@ -51,6 +74,16 @@ class UploadOwnerRecord:
     sha256: str
     stored_format: str
     size_bytes: int
+    created_at: int | None
+    expires_at: int | None
+    state: str
+
+
+@dataclass(frozen=True)
+class UploadCleanupReport:
+    candidates: tuple[str, ...]
+    removed: tuple[str, ...]
+    failed: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -123,7 +156,14 @@ class ProjectStore:
     operations over HTTP. No Telegram database is opened or migrated.
     """
 
-    def __init__(self, root: str | Path) -> None:
+    def __init__(
+        self, root: str | Path, *, quota: ResourceQuota | None = None,
+        upload_retention_days: int | None = None,
+    ) -> None:
+        if upload_retention_days is not None and upload_retention_days <= 0:
+            raise ValueError("upload_retention_days must be positive")
+        self.quota = quota or ResourceQuota()
+        self.upload_retention_days = upload_retention_days
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True, mode=0o700)
         self.files_root = self.root / "projects"
@@ -131,7 +171,7 @@ class ProjectStore:
         self.db_path = self.root / "projects.sqlite3"
         with self._db() as db:
             current = db.execute("PRAGMA user_version").fetchone()[0]
-            if current not in (0, 1, 2):
+            if current not in (0, 1, 2, 3):
                 raise ProjectStoreError(f"Unsupported project schema version: {current}")
             if current == 0:
                 db.executescript(
@@ -172,9 +212,12 @@ class ProjectStore:
                     owner_id TEXT NOT NULL,
                     sha256 TEXT NOT NULL,
                     stored_format TEXT NOT NULL,
-                    size_bytes INTEGER NOT NULL
+                    size_bytes INTEGER NOT NULL,
+                    created_at INTEGER,
+                    expires_at INTEGER,
+                    state TEXT NOT NULL DEFAULT 'active'
                 );
-                PRAGMA user_version = 2;
+                PRAGMA user_version = 3;
                 """
                 )
             elif current == 1:
@@ -192,6 +235,18 @@ class ProjectStore:
                     )
                     db.execute("PRAGMA user_version = 2")
                     db.execute("COMMIT")
+                    current = 2
+                except Exception:
+                    db.execute("ROLLBACK")
+                    raise
+            if current == 2:
+                db.execute("BEGIN IMMEDIATE")
+                try:
+                    db.execute("ALTER TABLE upload_owners ADD COLUMN created_at INTEGER")
+                    db.execute("ALTER TABLE upload_owners ADD COLUMN expires_at INTEGER")
+                    db.execute("ALTER TABLE upload_owners ADD COLUMN state TEXT NOT NULL DEFAULT 'active'")
+                    db.execute("PRAGMA user_version = 3")
+                    db.execute("COMMIT")
                 except Exception:
                     db.execute("ROLLBACK")
                     raise
@@ -207,6 +262,40 @@ class ProjectStore:
             yield db
         finally:
             db.close()
+
+    def _require_quota(
+        self, db: sqlite3.Connection, owner_id: str | None,
+        *, projects: int = 0, uploads: int = 0, revisions: int = 0,
+        jobs: int = 0, bytes_added: int = 0,
+    ) -> None:
+        if owner_id is None:
+            return  # Historical local-only projects have no authenticated owner.
+        counts = (
+            db.execute("SELECT count(*) FROM projects WHERE owner_id=?", (owner_id,)).fetchone()[0],
+            db.execute("SELECT count(*) FROM upload_owners WHERE owner_id=?", (owner_id,)).fetchone()[0],
+            db.execute("""SELECT count(*) FROM revisions r JOIN projects p
+                ON p.project_id=r.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0],
+            db.execute("""SELECT count(*) FROM jobs j JOIN revisions r ON r.revision_id=j.revision_id
+                JOIN projects p ON p.project_id=r.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0],
+        )
+        limits = (
+            self.quota.max_projects, self.quota.max_uploads,
+            self.quota.max_revisions, self.quota.max_jobs,
+        )
+        if any(count + change > limit for count, change, limit in zip(
+            counts, (projects, uploads, revisions, jobs), limits
+        )):
+            raise ResourceQuotaExceededError("Owner resource count quota exceeded")
+        upload_bytes = db.execute(
+            "SELECT COALESCE(sum(size_bytes),0) FROM upload_owners WHERE owner_id=?", (owner_id,)
+        ).fetchone()[0]
+        revision_bytes = db.execute("""SELECT COALESCE(sum(r.source_size),0) FROM revisions r
+            JOIN projects p ON p.project_id=r.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0]
+        result_bytes = db.execute("""SELECT COALESCE(sum(j.result_size),0) FROM jobs j
+            JOIN revisions r ON r.revision_id=j.revision_id
+            JOIN projects p ON p.project_id=r.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0]
+        if upload_bytes + revision_bytes + result_bytes + bytes_added > self.quota.max_total_bytes:
+            raise ResourceQuotaExceededError("Owner byte quota exceeded")
 
     def _open_directory(self, *parts: str, create: bool = False) -> int:
         flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
@@ -275,6 +364,7 @@ class ProjectStore:
         with self._db() as db:
             db.execute("BEGIN IMMEDIATE")
             try:
+                self._require_quota(db, owner_id, projects=1)
                 descriptor = self._open_directory(project_id, create=True)
                 os.close(descriptor)
                 db.execute(
@@ -303,25 +393,88 @@ class ProjectStore:
         upload_id = _uuid(stored.upload_id)
         if stored.format not in {"txt", "csv", "kml"} or not 0 < stored.size_bytes <= MAX_SOURCE_BYTES:
             raise ProjectStoreError("Stored upload metadata is invalid")
+        created_at = int(time.time())
+        expires_at = (
+            created_at + self.upload_retention_days * 86400
+            if self.upload_retention_days is not None else None
+        )
         with self._db() as db:
+            db.execute("BEGIN IMMEDIATE")
             try:
+                self._require_quota(db, owner_id, uploads=1, bytes_added=stored.size_bytes)
                 db.execute(
-                    "INSERT INTO upload_owners VALUES (?, ?, ?, ?, ?)",
-                    (upload_id, owner_id, stored.sha256, stored.format, stored.size_bytes),
+                    """INSERT INTO upload_owners(
+                        upload_id,owner_id,sha256,stored_format,size_bytes,created_at,expires_at,state
+                    ) VALUES (?,?,?,?,?,?,?,'active')""",
+                    (upload_id, owner_id, stored.sha256, stored.format, stored.size_bytes,
+                     created_at, expires_at),
                 )
+                db.execute("COMMIT")
             except sqlite3.IntegrityError as exc:
+                db.execute("ROLLBACK")
                 raise ProjectStoreError("Upload already has an owner") from exc
+            except Exception:
+                db.execute("ROLLBACK")
+                raise
         return self.assert_upload_owner(owner_id, upload_id)
 
     def assert_upload_owner(self, owner_id: str, upload_id: str) -> UploadOwnerRecord:
         with self._db() as db:
             row = db.execute(
-                "SELECT * FROM upload_owners WHERE upload_id = ? AND owner_id = ?",
-                (_uuid(upload_id), _uuid(owner_id)),
+                """SELECT * FROM upload_owners WHERE upload_id=? AND owner_id=?
+                AND state='active' AND (expires_at IS NULL OR expires_at > ?)""",
+                (_uuid(upload_id), _uuid(owner_id), int(time.time())),
             ).fetchone()
         if row is None:
             raise ProjectNotFoundError(upload_id)
         return UploadOwnerRecord(**dict(row))
+
+    def expired_uploads(self, *, now: int | None = None, limit: int = 100) -> tuple[UploadOwnerRecord, ...]:
+        if not 1 <= limit <= 100:
+            raise ValueError("cleanup limit must be between 1 and 100")
+        cutoff = int(time.time()) if now is None else int(now)
+        with self._db() as db:
+            rows = db.execute(
+                """SELECT * FROM upload_owners WHERE expires_at IS NOT NULL
+                AND expires_at <= ? AND state IN ('active','deleting')
+                ORDER BY expires_at,upload_id LIMIT ?""", (cutoff, limit),
+            ).fetchall()
+        return tuple(UploadOwnerRecord(**dict(row)) for row in rows)
+
+    def cleanup_expired_uploads(
+        self, upload_root: str | Path, *, now: int | None = None,
+        limit: int = 100, apply: bool = False,
+    ) -> UploadCleanupReport:
+        cutoff = int(time.time()) if now is None else int(now)
+        candidates = self.expired_uploads(now=cutoff, limit=limit)
+        if not apply:
+            return UploadCleanupReport(tuple(item.upload_id for item in candidates), (), ())
+        removed: list[str] = []
+        failed: list[str] = []
+        for item in candidates:
+            with self._db() as db:
+                db.execute("BEGIN IMMEDIATE")
+                row = db.execute(
+                    """SELECT state,expires_at FROM upload_owners WHERE upload_id=?""",
+                    (item.upload_id,),
+                ).fetchone()
+                if row is None or row["expires_at"] is None or row["expires_at"] > cutoff:
+                    db.execute("ROLLBACK")
+                    continue
+                db.execute(
+                    "UPDATE upload_owners SET state='deleting' WHERE upload_id=?",
+                    (item.upload_id,),
+                )
+                db.execute("COMMIT")
+            try:
+                remove_stored_upload(upload_root, item.upload_id, item.stored_format)
+            except (OSError, ValueError):
+                failed.append(item.upload_id)
+                continue
+            with self._db() as db:
+                db.execute("DELETE FROM upload_owners WHERE upload_id=? AND state='deleting'", (item.upload_id,))
+            removed.append(item.upload_id)
+        return UploadCleanupReport(tuple(item.upload_id for item in candidates), tuple(removed), tuple(failed))
 
     def get_project(self, project_id: str) -> ProjectRecord:
         with self._db() as db:
@@ -388,9 +541,10 @@ class ProjectStore:
         with self._db() as db:
             db.execute("BEGIN IMMEDIATE")
             try:
-                project = db.execute("SELECT 1 FROM projects WHERE project_id = ?", (project_id,)).fetchone()
+                project = db.execute("SELECT owner_id FROM projects WHERE project_id = ?", (project_id,)).fetchone()
                 if project is None:
                     raise ProjectNotFoundError(project_id)
+                self._require_quota(db, project["owner_id"], revisions=1, bytes_added=len(raw))
                 previous = db.execute(
                     "SELECT revision_id, sequence FROM revisions WHERE project_id = ? ORDER BY sequence DESC LIMIT 1",
                     (project_id,),
@@ -531,6 +685,11 @@ class ProjectStore:
         with self._db() as db:
             db.execute("BEGIN IMMEDIATE")
             try:
+                owner = db.execute("""SELECT p.owner_id FROM revisions r JOIN projects p
+                    ON p.project_id=r.project_id WHERE r.revision_id=?""", (revision_id,)).fetchone()
+                if owner is None:
+                    raise ProjectNotFoundError(revision_id)
+                self._require_quota(db, owner["owner_id"], jobs=1)
                 db.execute(
                     """INSERT INTO jobs(job_id, revision_id, request_json, request_sha256, status, algorithm_version)
                     VALUES (?, ?, ?, ?, ?, ?)""",
@@ -599,6 +758,8 @@ class ProjectStore:
                 state = db.execute("SELECT status, result_sha256 FROM jobs WHERE job_id = ?", (job_id,)).fetchone()
                 if state is None or state["status"] != "succeeded" or state["result_sha256"] is not None:
                     raise ProjectStoreError("Only a successful unpublished job can publish a result")
+                owner = db.execute("SELECT owner_id FROM projects WHERE project_id=?", (revision.project_id,)).fetchone()
+                self._require_quota(db, owner["owner_id"], bytes_added=len(result_bytes))
                 descriptor = self._open_directory(
                     revision.project_id, "revisions", revision.revision_id, "results", create=True
                 )

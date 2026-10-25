@@ -743,3 +743,34 @@ Keep one concise entry per task. Do not paste full command output.
   014–017 are accepted; 018 is READY. Next: implement 018 in the same
   feature worktree, run the focused and full isolated gates, then push
   only the reviewed feature commit and inspect both CI events.
+
+## GEOAI-018 — local gate passed; remote gate pending
+
+- Base: accepted 017 at `f3bee9c`, followed by P2 checkpoint and 018
+  frozen-scope commit `d2ee01d`. Only the feature worktree changed.
+- Project metadata schema v3 adds optional creation/expiry times and
+  cleanup state for uploads. Version-2 rows migrate with NULL times,
+  so historical uploads are not assigned an invented expiration. The
+  opt-in retention setting creates expiration only for new uploads.
+- Transactional per-owner caps cover projects, registered uploads,
+  revisions, jobs and accepted bytes across uploads/sources/results.
+  Development defaults are 20/100/500/500 and 512 MiB; callers can
+  inject stricter limits. A rejected HTTP upload removes its newly
+  written file and returns `QUOTA_EXCEEDED` (429). Concurrent project
+  writers cannot exceed a single-project cap.
+- Expired-upload maintenance is bounded to 100 records per call and
+  dry-run by default. Explicit apply marks a row deleting, unlinks only
+  its UUID-named regular file through no-follow descriptors and then
+  retires the row. A symlink failure remains retryable. Project source
+  snapshots and DXF results are never removed by this command.
+- Final local gate at
+  `/home/geoai/dev-data/geoai-autonomy/p3-018-final.log` and
+  `p3-018/final-gate/`: 113 focused, 10 isolated regression and six
+  isolated API tests passed with zero blocked network, dotenv, write
+  and process operations; `pip check` and `git diff --check` passed.
+  Tests cover count/byte limits, restart, two concurrent writers,
+  API 429 with file rollback, v2 migration, opt-out retention,
+  dry-run/apply, symlink retry and revision survival after cleanup.
+- GitHub feature/PR CI is pending. Next: commit exact reviewed files,
+  push only `codex/geoai-current`, inspect both CI runs. No cleanup of
+  real data, production migration, deployment or credential change ran.

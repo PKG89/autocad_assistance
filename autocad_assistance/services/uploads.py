@@ -269,7 +269,11 @@ def remove_stored_upload(upload_root: str | Path, upload_id: str, stored_format:
     try:
         upload_fd = os.open(canonical_id, flags, dir_fd=root_fd)
         try:
-            os.unlink(f"{canonical_id}.{stored_format}", dir_fd=upload_fd)
+            filename = f"{canonical_id}.{stored_format}"
+            mode = os.stat(filename, dir_fd=upload_fd, follow_symlinks=False).st_mode
+            if not stat.S_ISREG(mode):
+                raise OSError("Stored upload is not a regular file")
+            os.unlink(filename, dir_fd=upload_fd)
         finally:
             os.close(upload_fd)
         os.rmdir(canonical_id, dir_fd=root_fd)
