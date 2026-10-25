@@ -1610,3 +1610,35 @@ Keep one concise entry per task. Do not paste full command output.
   and release approval. No VM settings, network rules, secrets,
   running services, real data or pilot state were changed. GEOAI-039
   remains PARTIAL and GEOAI-040 BLOCKED.
+
+## GEOAI-039 VM110 technical preparation — 2026-10-25
+
+- The owner authorised VM110 preparation and a limited synthetic pilot after
+  private-access and off-VM restore gates. Console-confirmed SSH host identity
+  was pinned and `ssh geoai-pilot` succeeded as `openclaw`; `sudo -n` works.
+  Guest netplan directly shows static `192.168.1.162/24`, rather than DHCP.
+- The Git-source verifier on VM109 rebuilt exact product `79528bb` and separate
+  overlay `7f5bbec` archives and checked all eight overlay file hashes.
+  Independent Windows and delivered VM110 tar hashes matched the combined
+  manifest. The P6 rollback tar matched its recorded hash.
+- VM110 now has a dedicated service user and isolated code/state/backup/log
+  directories. Python 3.13.5 venv `pip check` passed; `pip freeze` SHA-256
+  equals the release lock. Official Caddy 2.11.7 tar hash matched the
+  manifest. NetBird 0.81.2, nftables and Certbot DNS-Cloudflare are installed.
+  Both pilot systemd units remain disabled/inactive. The exact-release pilot
+  config and empty marked state passed `geoai_pilot_ops check` (144 files).
+- Local nftables default-deny input is enabled. It preserves LAN SSH and
+  allows TCP 22/443 on future NetBird `wt0` only from the two owner-selected
+  observed peer IPs. Fresh SSH login succeeded after applying the rules;
+  timed rollback units were cancelled. No 443/18460 listener exists.
+- VM110's separate synthetic target check passed HTTPS, 401/403 access,
+  three queued/running/succeeded jobs, DXF, restart preservation, 27-file
+  backup/restore, tamper refusal and P6 rollback compatibility. This is a new
+  target-environment check, not a repeat of GEOAI-030 experiments.
+- The owner selected NetBird group/clients, `geoai.exitline.site`, Cloudflare
+  DNS-01, and Proxmox storages `backup-fast-nfs`/`backup-weekly-nfs` with
+  proposed retention. NetBird still needs a one-use setup key, Cloudflare a
+  scoped DNS token. Neither secret is in chat/Git. PVE storage/schedule access
+  and off-VM restore remain unverified. No shared VPN policy or Proxmox
+  schedule was changed. Full target evidence and next gates are in
+  `harness/build/039-vm110-pilot-execution.md`; GEOAI-039 remains PARTIAL.

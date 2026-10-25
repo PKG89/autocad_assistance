@@ -5,6 +5,23 @@ matching file under `harness/build/`.
 
 ## Current phase and execution order
 
+### VM110 target update — 2026-10-25
+
+The owner authorised VM110 preparation and a limited synthetic pilot after
+artifact, private-access and off-VM restore gates. Direct VM110 checks and
+actions are recorded in `harness/build/039-vm110-pilot-execution.md`. Exact
+product and separate overlay hashes, Python lock, target synthetic flow and
+P6 compatibility passed. VM110 has static guest address `192.168.1.162/24`
+in netplan (earlier DHCP wording is superseded), NetBird installed but not
+enrolled, default-deny local firewall preserving LAN SSH, disabled pilot
+systemd units, and a new empty marked state. The owner approved the proposed
+technical thresholds and selected two client peers, private DNS/TLS and
+backup storage names. One-use NetBird and Cloudflare credentials, real VPN
+IP/certificate, off-VM restore and target acceptance metrics remain open;
+GEOAI-039 is PARTIAL. No pilot service, public listener, production data,
+shared VPN policy, Proxmox schedule or PR merge has changed. GEOAI-040
+production publication remains BLOCKED.
+
 ### Authoritative status snapshot — 2026-10-25
 
 The chosen release candidate is exact commit

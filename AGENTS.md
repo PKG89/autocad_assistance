@@ -1,5 +1,22 @@
 # AutoCAD Assistance GEO AI
 
+## VM110 pilot execution handoff (2026-10-25)
+
+The owner authorised a limited synthetic closed pilot of the exact product
+`79528bb9f6070e458724886a915f9d035cdfd110` plus the separate
+`7f5bbecbb05a9f86f9850ed7e045a49fde040b89` operational package.
+Direct SSH access to VM110 is `ssh geoai-pilot`. Read
+`harness/build/039-vm110-pilot-execution.md` for verified target changes,
+current services and remaining private-access/off-VM-backup gates. The VM110
+product and P6 rollback archives, overlay, Python lock, systemd templates and
+an empty pilot state are prepared; both application services remain stopped.
+VM110 NetBird is installed but needs login; no pilot HTTPS listener exists.
+The owner selected two NetBird client peers, `geoai.exitline.site`, ACME
+DNS-01 through Cloudflare, and Proxmox storage names. Setup key and DNS token
+must be supplied through root-only files, never chat or Git. Do not alter
+shared VPN policies or Proxmox schedules without a separate concrete approval.
+Do not start the pilot until private access and an off-VM backup restore pass.
+
 ## Closed-pilot preparation handoff (2026-10-25)
 
 The selected release remains exact commit
