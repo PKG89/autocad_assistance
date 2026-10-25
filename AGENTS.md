@@ -6,12 +6,18 @@ The selected release remains exact commit
 `79528bb9f6070e458724886a915f9d035cdfd110`, not the later
 development HEAD. Read `harness/build/039-pilot-preparation.md`,
 `harness/build/039-deployment-plan.md` and
-`harness/pilot/release-79528bb.json` before GEOAI-039/040 work.
+`harness/pilot/combined-manifest.json` before GEOAI-039/040 work.
+A separately versioned `pilot_ops/` overlay contains the operational
+ASGI adapter; never describe it as part of the 79528bb product archive.
+The overlay/product/P6 rollback combination passed synthetic loopback
+HTTPS checks, but target Caddy/NetBird and load remain unmeasured.
 A separate Debian 13 VM is proposed; VM109/CT108 were inspected
-read-only and are not selected. New empty pilot state needs no
+read-only and are not selected. `pve1.netbird.cloud` was unreachable
+from available hosts, so VM ID/IP and hypervisor reserve are unknown.
+New empty pilot state needs no
 production migration. Project SQLite uses user_version 8, auth SQLite
 uses 1; staging manifest schemaVersion 5 is unrelated. The ASGI
-operational adapter, private HTTPS details, target measurements and
+overlay is implemented; private HTTPS details, target measurements and
 owner sign-off remain gates. Do not launch, merge, change network,
 secrets, working data or running services under this preparation scope.
 

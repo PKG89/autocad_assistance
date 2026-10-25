@@ -17,9 +17,12 @@ and changes to working data remain unauthorized.
   not a database version: project SQLite uses user_version 8 and auth
   SQLite uses user_version 1.
 - `scripts/geoai_staging.py` deliberately accepts synthetic mode and
-  loopback HTTPS only. It is an acceptance/recovery tool, not a
-  production deployment command. GEOAI-040 must specify and review
-  the actual production runner before any publication.
+  loopback HTTPS only. The separately versioned `pilot_ops/` package
+  supplies the pilot ASGI adapter, exact-release/lock checks,
+  backup/restore and unactivated systemd/Caddy templates. The combined
+  manifest is `harness/pilot/combined-manifest.json`; the product
+  archive alone is not the checked operational kit. Target Caddy/VPN
+  and capacity remain unverified until the separate launch approval.
 - Verified archive SHA-256:
   `cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81`.
   Package lock SHA-256:
@@ -47,27 +50,34 @@ separate authorization for production publication and any migration.
 
 ## Proposed execution sequence after authorization
 
-1. Record approved commit, archive SHA-256, package lock SHA-256,
-   schema and operator in a release record. Verify a clean artifact and
-   target capacity; deny mismatched hashes or dependencies.
+1. Record product commit, product archive SHA-256, overlay source
+   commit/tree and tar SHA-256, lock SHA-256, schema and operator.
+   Compare both artifacts to the combined manifest. Verify target
+   capacity; deny mismatched hashes or dependencies.
 2. For a fresh isolated pilot, verify empty pilot roots and never touch
    production data. Only if a later, separately approved migration is
    required: take a consistent source backup and verify a restore to a
    separate location before touching the source environment.
-3. Prepare a new release directory with the exact archive and isolated
-   runtime. Apply only reviewed environment settings and secrets.
+3. Extract the exact product tar under `releases/<product SHA>/` and
+   the separate overlay tar to `pilot_ops/`. Use Python 3.13.5 and
+   the pinned lock in a separate venv. Render the reviewed config,
+   systemd units and VPN-only Caddyfile; `geoai_pilot_ops check`
+   verifies extracted product bytes and package versions before start.
+   Apply only reviewed environment settings and secrets.
    Do not copy synthetic credentials or test data.
 4. If a migration is approved, run its reviewed dry run and backup
    compatibility check, then migrate during the window. If no migration
    is approved or required, do not change the schema.
-5. Switch the release pointer atomically to the exact release ID.
-   Perform HTTPS health and unauthenticated 401 checks, then a permitted
+5. Start the explicit overlay launcher with config pointing to the
+   exact release ID and marked pilot state; open only the private
+   Caddy listener. Perform HTTPS health and anonymous 401 checks, then a permitted
    owner smoke flow: login, project/import/preview/mapping, job/DXF,
    plan/decision/edit and catalog. Check worker, disk, latency/error
    monitoring and logs for secret leakage.
 6. Release owner decides keep or rollback using agreed thresholds. For
-   compatible schema, switch code pointer to the previous accepted
-   release and verify health and saved data. If state must roll back,
+   compatible schema, stop service and select the checked P6 archive
+   `1ea061c1...` in a reviewed config, then verify health and saved
+   data on a copy. If state must roll back,
    stop writes and restore the *verified* backup to a fresh root, then
    switch only after integrity and owner/result checks pass. Never
    overwrite the sole backup or perform an unreviewed reverse migration.
@@ -76,9 +86,11 @@ separate authorization for production publication and any migration.
 
 ## Test-environment evidence
 
-GEOAI-039 executes the analogous sequence only on disposable synthetic
-data and loopback HTTPS. Its result and any remaining gaps are recorded
-in `harness/build/039-release-acceptance.md` and `harness/build-log.md`.
+GEOAI-039 and the overlay combination check executed analogous
+sequences only on disposable synthetic data and loopback HTTPS.
+Their results and remaining gaps are recorded in
+`harness/build/039-release-acceptance.md`,
+`harness/build/039-pilot-preparation.md` and `harness/build-log.md`.
 The synthetic checks passed, including fresh-root restore and code
 rollback; production capacity, observability and migration status
 remain open for owner review.

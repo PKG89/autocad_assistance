@@ -1,0 +1,25 @@
+[Unit]
+Description=GEO AI closed-pilot VPN-only TLS proxy
+Requires=geoai-pilot.service
+After=geoai-pilot.service
+ConditionPathExists=/etc/geoai-pilot/Caddyfile
+
+[Service]
+Type=simple
+User=caddy
+Group=caddy
+ExecStartPre=/usr/bin/caddy validate --config /etc/geoai-pilot/Caddyfile
+ExecStart=/usr/bin/caddy run --config /etc/geoai-pilot/Caddyfile
+ExecReload=/usr/bin/caddy reload --config /etc/geoai-pilot/Caddyfile
+Restart=on-failure
+RestartSec=5
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/caddy
+
+[Install]
+WantedBy=multi-user.target
