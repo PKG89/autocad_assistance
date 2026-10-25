@@ -895,3 +895,29 @@ Keep one concise entry per task. Do not paste full command output.
   result publication/download and browser job controls. No production
   worker or deployment is authorized. GEOAI-020 is READY; next is
   implementation in the same feature worktree and full isolated gates.
+
+## GEOAI-020 — local implementation and browser evidence; CI pending
+
+- Implemented from clean scope commit `8d1e411` in the one writable
+  feature worktree. Explicit `jobs_root` enables one 014 coordinator
+  only in authenticated mode. Project schema v5 atomically records
+  idempotency UUID, owner, revision, exact request digest and job ID;
+  duplicate requests replay one job, changed intent conflicts.
+- Status, cancel, retry, paginated history and result download are
+  owner scoped. Successful child output is read with no-follow and a
+  SHA-256 comparison before versioned result publication. A coordinator
+  recovery bug was fixed so interrupted records remain visible for
+  explicit retry. Legacy no-auth API and Telegram paths remain intact.
+- Initial full gate exposed a schema-version check in the 018 cleanup
+  CLI and a minimal v2 migration fixture. Both were updated for v5;
+  the following full gate passed 120 focused, 10 isolated regression
+  and six isolated API tests with zero blocked operations, plus
+  `pip check`, `git diff --check` and `node --check`.
+- Disposable browser test used a synthetic revision and account,
+  double-clicked the submit button and observed exactly one job and
+  one idempotency claim in SQLite. The job succeeded, produced a DXF
+  download link, and history/link survived reload. Test server/tunnel
+  stopped; no real data or production side effects.
+- Final local gate log: `p3-020/accepted-gate.log`. Next: inspect exact
+  staged diff, commit, push only `codex/geoai-current`, require feature
+  and PR CI, then record acceptance and P3 checkpoint.

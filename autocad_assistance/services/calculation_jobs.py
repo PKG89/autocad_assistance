@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, replace
 from decimal import Decimal, InvalidOperation
+import hashlib
 import json
 import math
 import os
@@ -14,7 +15,7 @@ import subprocess
 import sys
 from threading import Condition, Thread
 import time
-from typing import Mapping, Sequence
+from typing import Callable, Mapping, Sequence
 from uuid import UUID, uuid4
 
 
@@ -39,6 +40,7 @@ class JobSnapshot:
     error_code: str | None
     created_at: float
     updated_at: float
+    result_sha256: str | None = None
 
 
 class CalculationJobManager:
@@ -111,9 +113,15 @@ class CalculationJobManager:
         self._write_json(self._directory(snapshot.job_id) / "state.json", asdict(snapshot))
         self._records[snapshot.job_id] = snapshot
 
-    def _set_state(self, job_id: str, status: str, error_code: str | None = None) -> JobSnapshot:
+    def _set_state(
+        self, job_id: str, status: str, error_code: str | None = None,
+        result_sha256: str | None = None,
+    ) -> JobSnapshot:
         current = self._records[job_id]
-        updated = replace(current, status=status, error_code=error_code, updated_at=time.time())
+        updated = replace(
+            current, status=status, error_code=error_code,
+            result_sha256=result_sha256, updated_at=time.time(),
+        )
         self._save(updated)
         self._condition.notify_all()
         return updated
@@ -138,12 +146,14 @@ class CalculationJobManager:
                 ):
                     snapshot = replace(snapshot, status="failed", error_code="MISSING_RESULT", updated_at=time.time())
                     self._save(snapshot)
-                else:
-                    self._records[snapshot.job_id] = snapshot
+                self._records[snapshot.job_id] = snapshot
             except (OSError, ValueError, TypeError, KeyError):
                 continue
 
-    def _submit_request(self, request: dict, *, attempt: int, retry_of: str | None) -> JobSnapshot:
+    def _submit_request(
+        self, request: dict, *, attempt: int, retry_of: str | None,
+        on_admit: Callable[[str], None] | None = None,
+    ) -> JobSnapshot:
         with self._condition:
             if self._closed:
                 raise JobStateError("Coordinator is closed")
@@ -158,7 +168,10 @@ class CalculationJobManager:
             try:
                 self._write_json(job_dir / "request.json", request)
                 self._save(snapshot)
+                if on_admit is not None:
+                    on_admit(job_id)
             except Exception:
+                self._records.pop(job_id, None)
                 for child in job_dir.iterdir():
                     child.unlink()
                 job_dir.rmdir()
@@ -172,6 +185,7 @@ class CalculationJobManager:
         *,
         scale_factor: float = 1.0,
         tin_settings: Mapping[str, object] | None = None,
+        on_admit: Callable[[str], None] | None = None,
     ) -> JobSnapshot:
         if not 0 < len(mapped_rows) <= 100_000:
             raise ValueError("Job requires 1 to 100000 mapped rows")
@@ -205,7 +219,7 @@ class CalculationJobManager:
         encoded = json.dumps(request, ensure_ascii=False, allow_nan=False).encode("utf-8")
         if len(encoded) > 32 * 1024 * 1024:
             raise ValueError("Job request exceeds the 32 MiB limit")
-        return self._submit_request(request, attempt=1, retry_of=None)
+        return self._submit_request(request, attempt=1, retry_of=None, on_admit=on_admit)
 
     def get(self, job_id: str) -> JobSnapshot:
         with self._condition:
@@ -228,7 +242,7 @@ class CalculationJobManager:
                 return current
             raise JobStateError("Only queued or running jobs can be cancelled")
 
-    def retry(self, job_id: str) -> JobSnapshot:
+    def retry(self, job_id: str, *, on_admit: Callable[[str], None] | None = None) -> JobSnapshot:
         with self._condition:
             try:
                 current = self._records[job_id]
@@ -239,7 +253,7 @@ class CalculationJobManager:
             if current.attempt > self.max_retries:
                 raise JobStateError("Job retry limit reached")
             request = json.loads((self._directory(job_id) / "request.json").read_text(encoding="utf-8"))
-        return self._submit_request(request, attempt=current.attempt + 1, retry_of=job_id)
+        return self._submit_request(request, attempt=current.attempt + 1, retry_of=job_id, on_admit=on_admit)
 
     def result_path(self, job_id: str) -> Path:
         snapshot = self.get(job_id)
@@ -264,6 +278,9 @@ class CalculationJobManager:
                     data = source.read(self.max_output_bytes + 1)
                 if not 0 < len(data) <= self.max_output_bytes:
                     raise JobStateError("Job result exceeds the output limit")
+                expected = self.get(job_id).result_sha256
+                if expected is None or hashlib.sha256(data).hexdigest() != expected:
+                    raise JobStateError("Job result checksum is invalid")
                 return data
             finally:
                 os.close(result_fd)
@@ -351,8 +368,19 @@ class CalculationJobManager:
                         candidate.unlink(missing_ok=True)
                         self._set_state(job_id, "failed", "INVALID_RESULT")
                     else:
+                        candidate_fd = os.open(candidate, os.O_RDONLY | os.O_NOFOLLOW)
+                        try:
+                            if not stat.S_ISREG(os.fstat(candidate_fd).st_mode):
+                                raise JobStateError("Job candidate is not regular")
+                            with os.fdopen(candidate_fd, "rb", closefd=False) as source:
+                                data = source.read(self.max_output_bytes + 1)
+                            if not 0 < len(data) <= self.max_output_bytes:
+                                raise JobStateError("Job candidate exceeds the output limit")
+                            result_sha256 = hashlib.sha256(data).hexdigest()
+                        finally:
+                            os.close(candidate_fd)
                         os.replace(candidate, job_dir / "result.dxf")
-                        self._set_state(job_id, "succeeded")
+                        self._set_state(job_id, "succeeded", result_sha256=result_sha256)
         except (OSError, ValueError):
             candidate.unlink(missing_ok=True)
             self._remove_transient_dirs(job_dir)

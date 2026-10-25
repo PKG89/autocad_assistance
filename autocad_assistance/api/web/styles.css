@@ -27,5 +27,9 @@ th, td { padding: 9px 12px; border-bottom: 1px solid #e1e9e5; text-align: left; 
 th { background: #eaf3ef; }
 ul { padding-left: 22px; line-height: 1.6; }
 li { overflow-wrap: anywhere; }
+.job-row { margin: 12px 0; }
+.job-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.job-actions button, .job-actions a { font-size: .9rem; padding: 7px 11px; }
+.job-actions a { border-radius: 8px; background: #e5f4ef; color: #124f45; font-weight: 650; text-decoration: none; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) { .shell { padding: 12px; } .card { padding: 18px; } .topbar div { display: grid; gap: 3px; } }

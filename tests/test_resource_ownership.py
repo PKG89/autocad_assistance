@@ -159,7 +159,7 @@ class MigrationTests(unittest.TestCase):
             with self.assertRaises(ProjectNotFoundError):
                 store.assert_project_owner(str(uuid4()), legacy_id)
             with closing(sqlite3.connect(database)) as db, db:
-                self.assertEqual(db.execute("PRAGMA user_version").fetchone()[0], 4)
+                self.assertEqual(db.execute("PRAGMA user_version").fetchone()[0], 5)
                 self.assertEqual(db.execute("SELECT name FROM projects WHERE project_id=?", (legacy_id,)).fetchone()[0], "Legacy")
             self.assertEqual(ProjectStore(root).get_project(legacy_id).name, "Legacy")
 

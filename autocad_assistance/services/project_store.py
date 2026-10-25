@@ -43,6 +43,18 @@ class ResourceQuotaExceededError(ProjectStoreError):
     """A configured owner resource limit would be exceeded."""
 
 
+class SubmissionConflictError(ProjectStoreError):
+    """One idempotency key was reused for a different request."""
+
+
+class DuplicateSubmissionError(ProjectStoreError):
+    """A matching idempotent job has already been admitted."""
+
+    def __init__(self, job_id: str) -> None:
+        super().__init__("Submission already accepted")
+        self.job_id = job_id
+
+
 @dataclass(frozen=True)
 class ResourceQuota:
     max_projects: int = 20
@@ -121,6 +133,7 @@ class ProjectJobRecord:
     result_size: int | None
     algorithm_version: str
     created_at: str
+    retry_of: str | None
 
 
 def _uuid(value: str) -> str:
@@ -180,7 +193,7 @@ class ProjectStore:
         self.db_path = self.root / "projects.sqlite3"
         with self._db() as db:
             current = db.execute("PRAGMA user_version").fetchone()[0]
-            if current not in (0, 1, 2, 3, 4):
+            if current not in (0, 1, 2, 3, 4, 5):
                 raise ProjectStoreError(f"Unsupported project schema version: {current}")
             if current == 0:
                 db.executescript(
@@ -214,7 +227,8 @@ class ProjectStore:
                     result_sha256 TEXT,
                     result_size INTEGER,
                     algorithm_version TEXT NOT NULL,
-                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    retry_of TEXT
                 );
                 CREATE TABLE IF NOT EXISTS upload_owners (
                     upload_id TEXT PRIMARY KEY,
@@ -233,7 +247,15 @@ class ProjectStore:
                     outcome TEXT NOT NULL CHECK(outcome IN ('removed','failed')),
                     recorded_at INTEGER NOT NULL
                 );
-                PRAGMA user_version = 4;
+                CREATE TABLE IF NOT EXISTS job_submissions (
+                    request_id TEXT PRIMARY KEY,
+                    owner_id TEXT NOT NULL,
+                    revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+                    request_sha256 TEXT NOT NULL,
+                    job_id TEXT NOT NULL UNIQUE REFERENCES jobs(job_id),
+                    created_at INTEGER NOT NULL
+                );
+                PRAGMA user_version = 5;
                 """
                 )
             elif current == 1:
@@ -278,6 +300,29 @@ class ProjectStore:
                         recorded_at INTEGER NOT NULL
                     )""")
                     db.execute("PRAGMA user_version = 4")
+                    db.execute("COMMIT")
+                    current = 4
+                except Exception:
+                    db.execute("ROLLBACK")
+                    raise
+            if current == 4:
+                db.execute("BEGIN IMMEDIATE")
+                try:
+                    tables = {row[0] for row in db.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table'"
+                    )}
+                    if "jobs" in tables:
+                        db.execute("ALTER TABLE jobs ADD COLUMN retry_of TEXT")
+                    if {"jobs", "revisions"}.issubset(tables):
+                        db.execute("""CREATE TABLE job_submissions (
+                            request_id TEXT PRIMARY KEY,
+                            owner_id TEXT NOT NULL,
+                            revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+                            request_sha256 TEXT NOT NULL,
+                            job_id TEXT NOT NULL UNIQUE REFERENCES jobs(job_id),
+                            created_at INTEGER NOT NULL
+                        )""")
+                    db.execute("PRAGMA user_version = 5")
                     db.execute("COMMIT")
                 except Exception:
                     db.execute("ROLLBACK")
@@ -777,6 +822,86 @@ class ProjectStore:
     ) -> ProjectJobRecord:
         self.assert_revision_owner(owner_id, revision_id)
         return self.register_job(revision_id, job_id, request_settings=request_settings, status=status)
+
+    def register_job_submission_for(
+        self, owner_id: str, revision_id: str, job_id: str,
+        request_id: str, *, request_settings: Mapping[str, object],
+        retry_of: str | None = None,
+    ) -> ProjectJobRecord:
+        owner_id, revision_id, job_id, request_id = (
+            _uuid(owner_id), _uuid(revision_id), _uuid(job_id), _uuid(request_id)
+        )
+        if retry_of is not None:
+            retry_of = _uuid(retry_of)
+        request_json = _canonical_json(dict(request_settings))
+        request_hash = _digest(request_json.encode("utf-8"))
+        with self._db() as db:
+            db.execute("BEGIN IMMEDIATE")
+            try:
+                revision = db.execute("""SELECT r.algorithm_version FROM revisions r
+                    JOIN projects p ON p.project_id=r.project_id
+                    WHERE r.revision_id=? AND p.owner_id=?""",
+                    (revision_id, owner_id),
+                ).fetchone()
+                if revision is None:
+                    raise ProjectNotFoundError(revision_id)
+                existing = db.execute(
+                    "SELECT owner_id,revision_id,request_sha256,job_id FROM job_submissions WHERE request_id=?",
+                    (request_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["owner_id"] == owner_id
+                        and existing["revision_id"] == revision_id
+                        and existing["request_sha256"] == request_hash
+                    ):
+                        raise DuplicateSubmissionError(existing["job_id"])
+                    raise SubmissionConflictError("Idempotency key belongs to a different request")
+                self._require_quota(db, owner_id, jobs=1)
+                db.execute("""INSERT INTO jobs(
+                    job_id,revision_id,request_json,request_sha256,status,algorithm_version,retry_of
+                ) VALUES (?,?,?,?,?,?,?)""", (
+                    job_id, revision_id, request_json, request_hash, "queued",
+                    revision["algorithm_version"], retry_of,
+                ))
+                db.execute("""INSERT INTO job_submissions(
+                    request_id,owner_id,revision_id,request_sha256,job_id,created_at
+                ) VALUES (?,?,?,?,?,?)""", (
+                    request_id, owner_id, revision_id, request_hash, job_id, int(time.time()),
+                ))
+                db.execute("COMMIT")
+            except Exception:
+                db.execute("ROLLBACK")
+                raise
+        return self.get_job(job_id)
+
+    def lookup_job_submission_for(
+        self, owner_id: str, revision_id: str, request_id: str,
+        *, request_settings: Mapping[str, object],
+    ) -> str | None:
+        owner_id, revision_id, request_id = _uuid(owner_id), _uuid(revision_id), _uuid(request_id)
+        request_json = _canonical_json(dict(request_settings))
+        request_hash = _digest(request_json.encode("utf-8"))
+        with self._db() as db:
+            row = db.execute(
+                "SELECT owner_id,revision_id,request_sha256,job_id FROM job_submissions WHERE request_id=?",
+                (request_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        if (row["owner_id"], row["revision_id"], row["request_sha256"]) != (
+            owner_id, revision_id, request_hash,
+        ):
+            raise SubmissionConflictError("Idempotency key belongs to a different request")
+        return row["job_id"]
+
+    def list_jobs_for(self, owner_id: str, project_id: str) -> tuple[ProjectJobRecord, ...]:
+        self.assert_project_owner(owner_id, project_id)
+        with self._db() as db:
+            rows = db.execute("""SELECT j.job_id FROM jobs j
+                JOIN revisions r ON r.revision_id=j.revision_id
+                WHERE r.project_id=? ORDER BY j.rowid DESC""", (project_id,)).fetchall()
+        return tuple(self.get_job(row["job_id"]) for row in rows)
 
     def get_job(self, job_id: str) -> ProjectJobRecord:
         with self._db() as db:

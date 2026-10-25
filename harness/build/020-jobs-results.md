@@ -1,6 +1,6 @@
 # GEOAI-020 — durable web jobs, result downloads and retry
 
-Status: READY. Base: accepted GEOAI-019 feature commit
+Status: LOCAL GATE PASSED; FEATURE/PR CI PENDING. Base: accepted GEOAI-019 feature commit
 `897cf600e916207fa2a8f6a9797e3bc8729fe642`. Dependencies
 014–019 passed local and GitHub feature/PR checks. P3 deadline is
 2026-10-25T05:01:04Z.
@@ -75,3 +75,30 @@ spend. Stop on an unaccepted dependency, missing access/domain
 decision, unexpected edits, lost isolation, exhausted time/repair
 budget or unauthorized production action; record HEAD, diff, checks
 and exact blocker.
+
+## Implementation and local evidence
+
+- One opt-in coordinator binds an immutable accepted TXT/CSV revision to
+  the 014 child process. New schema v5 stores a unique client UUID
+  claim and job provenance in one SQLite transaction before admission.
+  Matching retries return the same ID across concurrent requests and
+  restart; a changed request returns 409. Coordinator admission failure
+  rolls back its temporary request/state directory.
+- Authenticated owner routes expose submit, list, status, cancel,
+  explicit retry and accepted-result download. The screen restores
+  history after reload, polls only active jobs, disables pending
+  actions and displays a DXF link only after versioned publication.
+  Result bytes pass a bounded no-follow read and coordinator SHA-256
+  check before ProjectStore copies and hashes them.
+- Focused tests cover real DXF generation, concurrent key claim,
+  replay/conflict, cancellation/retry, restart, owner boundary,
+  admission rollback, tampered result and prior resource migrations.
+  The full local gate is recorded under
+  `/home/geoai/dev-data/geoai-autonomy/p3-020/accepted-gate.log`.
+- A disposable browser fixture on localhost showed one accepted job
+  and one key claim after a double click; it reached `succeeded`,
+  revealed the DXF link and retained both history and link on reload.
+  Its server and SSH tunnel were stopped. No real survey or production
+  identity was used.
+- GitHub feature/PR checks are pending. No production migration,
+  cleanup or deployment ran.

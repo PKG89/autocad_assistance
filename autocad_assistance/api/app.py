@@ -5,6 +5,7 @@ geometry generators.  API adapters can be added here incrementally without
 starting polling or performing product work during import.
 """
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 import tempfile
 from typing import Literal
@@ -18,10 +19,13 @@ from .middleware import RequestBodyLimitMiddleware
 from .auth import create_auth_router, validate_auth_origin
 from .owner_guard import OwnerGuardMiddleware
 from .owned_files import create_owned_files_router
+from .jobs import create_job_router
 from .projects import create_project_router
 from .uploads import create_upload_router
 from autocad_assistance.services.auth_store import AuthStore
 from autocad_assistance.services.project_store import ProjectStore, ResourceQuota
+from autocad_assistance.services.calculation_jobs import CalculationJobManager
+from autocad_assistance.services.project_jobs import ProjectJobBridge
 
 
 DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -45,6 +49,7 @@ def create_app(
     project_root: str | Path | None = None,
     resource_quota: ResourceQuota | None = None,
     upload_retention_days: int | None = None,
+    jobs_root: str | Path | None = None,
 ) -> FastAPI:
     """Create an isolated HTTP application without starting a server."""
 
@@ -58,6 +63,8 @@ def create_app(
         raise ValueError("project_root is required when auth_root is configured")
     if auth_root is None and (resource_quota is not None or upload_retention_days is not None):
         raise ValueError("Resource policy requires authenticated project storage")
+    if jobs_root is not None and auth_root is None:
+        raise ValueError("jobs_root requires authenticated project storage")
     if auth_root is not None:
         auth_origin = validate_auth_origin(auth_origin)
 
@@ -65,9 +72,19 @@ def create_app(
         Path(tempfile.gettempdir()) / "autocad-assistance-geo-ai" / "uploads"
     )
 
+    @asynccontextmanager
+    async def lifespan(application: FastAPI):
+        try:
+            yield
+        finally:
+            manager = getattr(application.state, "job_manager", None)
+            if manager is not None:
+                manager.close()
+
     app = FastAPI(
         title="AutoCAD Assistance GEO AI",
         version="0.1.0",
+        lifespan=lifespan,
     )
     app.state.upload_root = resolved_upload_root
     app.state.max_upload_bytes = max_upload_bytes
@@ -103,10 +120,26 @@ def create_app(
             error_code="PROJECT_BODY_TOO_LARGE",
             subject="Project request",
         )
+        if jobs_root is not None:
+            app.add_middleware(
+                RequestBodyLimitMiddleware,
+                path="/api/v1/jobs",
+                include_subpaths=True,
+                max_body_bytes=64 * 1024,
+                error_code="JOB_BODY_TOO_LARGE",
+                subject="Job request",
+            )
+            manager = CalculationJobManager(jobs_root)
+            app.state.job_manager = manager
+            app.state.project_job_bridge = ProjectJobBridge(project_store, manager)
         app.include_router(create_auth_router(identity_store, auth_origin))
         app.add_middleware(OwnerGuardMiddleware, store=identity_store, trusted_origin=auth_origin)
-        app.include_router(create_owned_files_router(project_store))
+        app.include_router(create_owned_files_router(
+            project_store, getattr(app.state, "project_job_bridge", None),
+        ))
         app.include_router(create_project_router(project_store, resolved_upload_root))
+        if jobs_root is not None:
+            app.include_router(create_job_router(app.state.project_job_bridge))
 
         web_root = Path(__file__).parent / "web"
         web_headers = {

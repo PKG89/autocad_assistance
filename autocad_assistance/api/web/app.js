@@ -5,6 +5,9 @@ const fields = ["Point", "X", "Y", "Z", "Code", "Comments"];
 let csrfToken = null;
 let uploadId = null;
 let previewColumns = [];
+let submitIntent = null;
+const retryIntents = new Map();
+let jobPoll = null;
 
 function message(text, isError = false) {
   $("status").textContent = text;
@@ -53,6 +56,8 @@ async function busy(button, action, retainOnSuccess = false) {
 }
 
 function showLogin() {
+  clearTimeout(jobPoll);
+  jobPoll = null;
   csrfToken = null;
   uploadId = null;
   $("login-panel").hidden = false;
@@ -88,9 +93,14 @@ async function loadProjects(preferredId = null) {
 async function loadRevisions() {
   const list = $("revision-list");
   list.replaceChildren();
+  const revisionSelect = $("job-revision");
+  const previousRevision = revisionSelect.value;
+  revisionSelect.replaceChildren(new Option("— выберите —", ""));
   const projectId = $("project-select").value;
   if (!projectId) {
     list.append(item("Сначала выберите проект."));
+    $("job-submit").disabled = true;
+    await loadJobs();
     return;
   }
   const response = await api(`/api/v1/projects/${projectId}/revisions?page=1&pageSize=50`);
@@ -99,6 +109,86 @@ async function loadRevisions() {
   }
   for (const revision of response.data) {
     list.append(item(`Версия ${revision.sequence} · ${revision.sourceFormat.toUpperCase()} · ${revision.createdAt}`));
+    revisionSelect.add(new Option(`Версия ${revision.sequence} · ${revision.createdAt}`, revision.revisionId));
+  }
+  if (response.data.some((revision) => revision.revisionId === previousRevision)) {
+    revisionSelect.value = previousRevision;
+  } else if (response.data.length) {
+    revisionSelect.value = response.data[0].revisionId;
+  }
+  $("job-submit").disabled = !revisionSelect.value;
+  await loadJobs();
+}
+
+function jobAction(label, handler) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  button.addEventListener("click", () => busy(button, handler));
+  return button;
+}
+
+async function loadJobs() {
+  clearTimeout(jobPoll);
+  jobPoll = null;
+  const list = $("job-list");
+  list.replaceChildren();
+  const projectId = $("project-select").value;
+  if (!projectId) {
+    list.append(item("Сначала выберите проект."));
+    return;
+  }
+  let response;
+  try {
+    response = await api(`/api/v1/projects/${projectId}/jobs?page=1&pageSize=50`);
+  } catch (error) {
+    if (error.status === 404) {
+      $("job-panel").hidden = true;
+      return;
+    }
+    throw error;
+  }
+  $("job-panel").hidden = false;
+  if ($("project-select").value !== projectId) return;
+  if (!response.data.length) list.append(item("Заданий пока нет."));
+  let active = false;
+  for (const job of response.data) {
+    const row = item(`Версия ${job.revisionId} · ${job.status} · попытка ${job.attempt}${job.errorCode ? ` · ${job.errorCode}` : ""}`);
+    row.className = "job-row";
+    const actions = document.createElement("div");
+    actions.className = "job-actions";
+    if (["queued", "running", "cancelling"].includes(job.status)) active = true;
+    if (["queued", "running"].includes(job.status)) {
+      actions.append(jobAction("Отменить", async () => {
+        await api(`/api/v1/jobs/${job.jobId}/cancel`, { method: "POST" });
+        await loadJobs();
+      }));
+    }
+    if (["failed", "cancelled"].includes(job.status) && job.attempt <= 2) {
+      actions.append(jobAction("Повторить", async () => {
+        let key = retryIntents.get(job.jobId);
+        if (!key) {
+          key = crypto.randomUUID();
+          retryIntents.set(job.jobId, key);
+        }
+        await api(`/api/v1/jobs/${job.jobId}/retry`, {
+          method: "POST", headers: { "Idempotency-Key": key },
+        });
+        retryIntents.delete(job.jobId);
+        await loadJobs();
+      }));
+    }
+    if (job.resultReady) {
+      const link = document.createElement("a");
+      link.href = `/api/v1/jobs/${job.jobId}/result`;
+      link.textContent = "Скачать DXF";
+      actions.append(link);
+    }
+    row.append(actions);
+    list.append(row);
+  }
+  if (active) {
+    jobPoll = setTimeout(() => loadJobs().catch((error) => message(error.message, true)), 3000);
   }
 }
 
@@ -186,8 +276,30 @@ $("project-form").addEventListener("submit", (event) => {
 });
 
 $("project-select").addEventListener("change", () => {
+  submitIntent = null;
+  retryIntents.clear();
   loadRevisions().catch((error) => message(error.message, true));
 });
+
+$("job-revision").addEventListener("change", () => {
+  submitIntent = null;
+  $("job-submit").disabled = !$("job-revision").value;
+});
+
+$("job-submit").addEventListener("click", (event) => busy(event.currentTarget, async () => {
+  const revisionId = $("job-revision").value;
+  if (!revisionId) throw new Error("Выберите версию съёмки");
+  if (!submitIntent || submitIntent.revisionId !== revisionId) {
+    submitIntent = { revisionId, key: crypto.randomUUID() };
+  }
+  const job = await api("/api/v1/jobs", {
+    method: "POST", headers: { "Idempotency-Key": submitIntent.key },
+    body: JSON.stringify({ revisionId, tinSettings: {} }),
+  });
+  submitIntent = null;
+  message(`Задание ${job.jobId} принято.`);
+  await loadJobs();
+}));
 
 $("upload-form").addEventListener("submit", (event) => {
   event.preventDefault();

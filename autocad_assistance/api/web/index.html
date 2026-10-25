@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GEO AI — импорт съёмки</title>
+  <title>GEO AI — проекты и расчёт DXF</title>
   <link rel="stylesheet" href="/app/styles.css">
   <script src="/app/app.js" defer></script>
 </head>
@@ -69,6 +69,15 @@
       <section class="card">
         <h2>Версии выбранного проекта</h2>
         <ul id="revision-list"></ul>
+      </section>
+
+      <section id="job-panel" class="card" hidden>
+        <h2>4. Расчёт DXF</h2>
+        <label>Версия съёмки<select id="job-revision"><option value="">— выберите —</option></select></label>
+        <p class="hint">Задание использует сохранённые исходные данные и сопоставление колонок. Повтор после ошибки запускается только по кнопке.</p>
+        <button id="job-submit" type="button" disabled>Начать расчёт</button>
+        <h3>Задания проекта</h3>
+        <ul id="job-list"></ul>
       </section>
     </div>
   </main>
