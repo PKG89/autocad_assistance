@@ -1434,3 +1434,68 @@ Keep one concise entry per task. Do not paste full command output.
   not prove source provenance, but rules out assuming that the final
   drawing directly labels the survey-point sequence. Its private
   aggregate report remains outside Git.
+
+## GEOAI-039 — exact release candidate, isolated acceptance, partial final gate
+
+- Accepted dependencies 018, 021–022, P0–P6 and 029 were verified.
+  The chosen release is exact ancestor `79528bb9f6070e458724886a915f9d035cdfd110`,
+  whose feature/PR CI runs 40158200653/40158204850 succeeded. The
+  release archive SHA-256 is
+  `cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81`;
+  an independent `git archive` rebuild matched exactly. Python 3.13.5,
+  33-package lock SHA-256
+  `d8d2cf3756f29f64246f133f694ee61aa9711f8eb8e95c4fd2039734d381c351`
+  and schema v5 were verified. The archive contains no 030 experiment
+  or 036 readiness API. The current development HEAD is not the release.
+- A first test invocation ran inside a staged release and created
+  `bot_shutdown.log`; immutable verification correctly rejected it.
+  Root cause was a focused Telegram import. The tainted stage was
+  preserved for diagnosis. The suite was rerun on a separate extracted
+  copy of the exact archive, leaving a newly built stage verified.
+  A subsequent owner-seeding import created exactly three Python
+  bytecode cache files; only those diagnosed extras were removed, and
+  the stage verified again. All later imports disabled bytecode writes.
+  These were acceptance-process repairs, not product-code changes.
+- The final isolated release gate passed 151 focused tests, 10
+  regression and six API tests in 77.516 seconds, `pip check`, and zero
+  blocked network/dotenv/write/process operations in the isolated
+  bootstrap reports. Focused checks include nine calculation-job tests,
+  six resource-limit tests, seven upload-security tests and three
+  ownership tests. The checksum-verified stage remained immutable
+  through the subsequent HTTPS checks.
+- Verified localhost HTTPS synthetic flow passed owner login,
+  anonymous 401, CSV import, project/revision, job and DXF download
+  (source/result SHA-256 recorded privately), plan JSON, A/B decision
+  replay/stale rejection and distinct DXF orders, controlled line edits,
+  reference archive upload/download, exact DXF comparison, and the
+  75-entry object-code catalog. Fixed import/job smoke elapsed 2.441
+  seconds. The plan exposed three unsupported LWPOLYLINE bulges from
+  this fixture; an older fixture-specific smoke expectation of zero
+  was diagnosed, and the endpoint/hash checks passed with explicit
+  unsupported reporting. The app supports one provisioned owner in
+  this configuration; cross-owner isolation was verified by focused
+  tests with separate auth roots, not by two live accounts.
+- A sampled staging server high-water mark after the main workflow was
+  331,564 kB; this is a small synthetic workload, not a production
+  concurrency or site-capacity guarantee. No application log files,
+  request bodies or credentials were emitted in stage logs. Backup
+  while the service ran was refused without creating a target.
+- After stopping the server, an offline backup of 339 files succeeded;
+  its manifest SHA-256 is
+  `b6580c757fc332649e5a8b072f36a337b5a7298e24d32ab310d7a670bc1f461e`.
+  Switching code to compatible accepted P6 commit
+  `1ea061c1afb4b75b0aba06ae67d402b0a3e815a6` preserved HTTPS
+  health, owner/project, source and DXF SHA-256. The same backup
+  restored to a fresh root with candidate 79528bb and passed HTTPS
+  owner/source/result checks and release-file integrity. A separately
+  corrupted copy was rejected before the restore target existed.
+  All three disposable server processes are stopped; no real data,
+  production service, merge or publication was touched.
+- GEOAI-039 remains PARTIAL: an actual target, acceptable load/error
+  thresholds, monitoring and operational owner, and a reviewed
+  migration/no-migration decision are absent. GEOAI-040 requires full
+  sign-off and separate authorization. Materials for 030–038 are
+  consolidated in `harness/build/missing-materials.md`; the concrete
+  proposed rollout/rollback steps are in
+  `harness/build/039-deployment-plan.md`. Source HEAD before this
+  documentation commit was clean `75b02eb`.

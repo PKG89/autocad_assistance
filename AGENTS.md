@@ -439,6 +439,18 @@ approved comparison use, whole-object splits and class criteria.
 Private exact XY inspection found that finished plan vertices almost
 never coincide with `POINT` entities on major layers. Do not infer a
 field-source mapping or any positional tolerance from this alone.
+GEOAI-039 release review selects exact `79528bb` containing accepted
+P0–P6 and 029 only; do not deploy the later development HEAD as this
+release. Its disposable synthetic gate passed 151 focused, 10 isolated
+regression and six API tests, verified HTTPS workflows, checksum-locked
+build, offline backup, fresh-root restore and compatible code rollback.
+039 remains PARTIAL pending target-specific load/operations review and
+owner sign-off. 040 publication, merge and production migration are not
+authorized. See `harness/build/039-release-acceptance.md`, the unified
+`harness/build/missing-materials.md`, and the review-only deployment plan.
+Do not repeat synthetic 030 experiments without a new falsifiable
+hypothesis; keep the current generator unchanged. Resume 030/031 or
+037/038 only when the evidence gates in `PLANS.md` are met.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

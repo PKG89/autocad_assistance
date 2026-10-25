@@ -5,6 +5,35 @@ matching file under `harness/build/`.
 
 ## Current phase and execution order
 
+### Authoritative status snapshot — 2026-10-25
+
+The chosen release candidate is exact commit
+`79528bb9f6070e458724886a915f9d035cdfd110`: it contains accepted
+P0–P6 and 029 and precedes the 030 experiment and 036 API. GEOAI-039
+has passed disposable synthetic staging checks but is PARTIAL until a
+target-specific load/operations review and release sign-off. GEOAI-040
+has no publication authorization. Detailed evidence and the proposed
+deployment sequence are in `harness/build/039-release-acceptance.md`
+and `harness/build/039-deployment-plan.md`.
+
+| Status | Stages | Exact remaining gate |
+| --- | --- | --- |
+| ACCEPTED | 007A/007B/007C, 008–011, P1 012–014, P2 015–017, P3 018–020, P4 021–022, P5 023–025, P6 026–028, P7 029 | Existing feature/PR CI and local acceptance passed; these are the selected release functions. |
+| ACCEPTED as an audit only | P10 036 | Reports `readyForTraining=false` and `readyForEvaluation=false` under current unverified evidence; outside chosen release. No training permission follows from this acceptance. |
+| PARTIAL | P7 030 | Synthetic review-only candidate measured a class regression. Resume only with authorized source-point/final-DXF object pairs, independent whole-object split, labelled correct links/breaks and agreed per-class baseline/regression criteria. Keep current generator unchanged. Do not repeat synthetic trials without a new checkable hypothesis. |
+| BLOCKED | P7 031 | Full 030 accepted first; then split 031 by object class with reviewed examples, class-specific expected geometry and checks. |
+| BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
+| BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
+| BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
+| PARTIAL | P11 039 | Candidate/staging verification passed. Target, load threshold, observability, migration/no-migration decision and release owner sign-off remain open. |
+| BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/migration authorization. No merge or production change now. |
+
+The unified material request is `harness/build/missing-materials.md`.
+Only independently ready tasks with defined requirements may proceed.
+None of 030–035 or 037–038 is currently READY for product work.
+The remaining READY statements in the chronological log below describe
+earlier checkpoints; this status snapshot is the current authority.
+
 - Baseline GEOAI-007C is committed at `c33340366ee4016a7e2d2576bb9c46931875db16`
   on `codex/geo-ai-start` and preserved in a verified bundle and separate
   bare Git store under `/home/geoai/dev-data/geoai-autonomy/`.
@@ -68,11 +97,12 @@ API tests plus successful GitHub push/PR CI. P2 is complete. GEOAI-018
 is READY under `harness/build/018-resource-limits.md` with P3 bounds in
 `/home/geoai/dev-data/geoai-autonomy/p3-run-manifest.json`.
 
-## Proposed product roadmap — not queued
+## Product roadmap and acceptance history
 
-Numbers 012–040 were checked against this plan on 2026-10-25: none were
-assigned here. Each row below is PROPOSED and needs a frozen task specification,
-base HEAD, file scope, tests, budget and package authorization before dispatch.
+Numbers 012–040 were checked against this plan on 2026-10-25. The table
+below records outcomes reached since that initial proposal. A remaining
+task needs a frozen specification, base HEAD, file scope, tests, budget
+and accepted dependencies before dispatch.
 The first product milestone is a private web cabinet for upload, preview,
 mapping and DXF through the shared engine.
 
@@ -96,17 +126,17 @@ mapping and DXF through the shared engine.
 | P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
 | P6 | 028 | DXF comparison and quality measures | 027 | ACCEPTED at 1ea061c |
 | P7 | 029 | Versioned object-code rules | 012, 028 | ACCEPTED at 79528bb |
-| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | SYNTHETIC EXPERIMENT ACCEPTED; real validation blocked |
-| P7 | 031 | Contours and composite situation objects | 028–030 | BLOCKED by full 030/domain data |
-| P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | PROPOSED |
-| P8 | 033 | Terrain contours and elevation checks | 032 | PROPOSED |
-| P9 | 034 | Report data model and templates | 012, 015 | PROPOSED |
-| P9 | 035 | Versioned deliverable package | 034; 033 if terrain included | PROPOSED |
-| P10 | 036 | Verified dataset readiness | 025, 027–028 | READY |
+| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | PARTIAL: synthetic experiment only; real held-out criteria missing |
+| P7 | 031 | Contours and composite situation objects | 028–030 | BLOCKED by full 030 and class evidence |
+| P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | BLOCKED by domain references, masks and licensed implementation |
+| P8 | 033 | Terrain contours and elevation checks | 032 | BLOCKED by 032 and contour criteria |
+| P9 | 034 | Report data model and templates | 012, 015 | BLOCKED by owner forms and numeric rules |
+| P9 | 035 | Versioned deliverable package | 034; 033 if terrain included | BLOCKED by 034 and chosen contents |
+| P10 | 036 | Dataset-readiness audit | 025, 027–028 | ACCEPTED at e5663fa; reports not ready for training/evaluation |
 | P10 | 037 | Small offline recommendation model | 036 | BLOCKED by actual data readiness |
 | P10 | 038 | Reviewable model suggestions | 025, 037 | BLOCKED by 037 |
-| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PROPOSED |
-| P11 | 040 | Authorized publication and operations | 039, release authorization | PROPOSED |
+| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: isolated release tests passed, target sign-off pending |
+| P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by full 039 and explicit authorization |
 
 For a first limited site release, P1–P4 plus P11 are the main path. P5–P10
 can follow; the document package can move earlier if it does not depend on
