@@ -508,6 +508,18 @@ production migration are not authorized. See
 `harness/build/039-vm110-pilot-execution.md`,
 `harness/build/039-release-acceptance.md` and
 `harness/build/missing-materials.md`.
+The owner chose a separate corrected candidate without shrinking the pilot
+boundary. Product `15374b5c856958fdf67c5efdce68db81e05ac92f` is a
+direct child of `79528bb`; compatible operational package
+`71ab84cba999bcf2fd105b69917cdd1e8907671f` adds its archive to the
+allowlist and enforces a 2.5 GiB systemd cap. The saved 100k synthetic
+fixture passed on VM110 in 33.34 s with a 78,585,786-byte DXF and
+925.7 MiB cgroup peak. This verifies that fixture only. Candidate state
+was isolated, backed up and restored; the original config/overlay/unit
+were restored afterward. Both pilot services are stopped and disabled.
+GEOAI-039 remains PARTIAL pending owner acceptance and implementation of
+the selected Proxmox backup schedules. See
+`harness/build/039-100k-release-manifest.json` and the updated VM110 report.
 Do not repeat synthetic 030 experiments without a new falsifiable
 hypothesis; keep the current generator unchanged. Resume 030/031 or
 037/038 only when the evidence gates in `PLANS.md` are met.

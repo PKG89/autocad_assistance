@@ -22,10 +22,18 @@ The bounded session passed HTTPS auth/ownership smoke, 100 API requests
 (5.35 s), restart persistence and a 136-file off-VM synthetic restore on
 VM109. The agreed 100,000-point, 10,000,026-byte input was admitted, but
 its DXF job failed after 23.81 s at the product's 25 MiB output file limit.
-Thus GEOAI-039 remains PARTIAL and the user acceptance gate is held. Both
-pilot services are stopped and disabled; SSH, nftables and NetBird remain
-active. Before resuming, the owner must choose a narrower verified pilot
-boundary or request a separately reviewed release that handles this input.
+The owner selected a corrected release without narrowing this boundary.
+Product candidate `15374b5c856958fdf67c5efdce68db81e05ac92f`, based
+directly on `79528bb`, and separate operational package
+`71ab84cba999bcf2fd105b69917cdd1e8907671f` passed isolated checks.
+On VM110 the exact saved synthetic fixture completed via HTTPS in 33.34 s:
+78,585,786-byte DXF, 925.7 MiB application cgroup peak, one worker and a
+2.5 GiB service cap. The result survived restart and a 150-file offline
+backup/restore. This is evidence for this fixture, not for arbitrary surveys
+of 100,000 points. GEOAI-039 remains PARTIAL pending owner acceptance and
+operational backup arrangements. Both pilot services are stopped and disabled;
+SSH, nftables and NetBird remain active. The old `79528bb` config/overlay
+were restored after the candidate session and passed their exact check.
 The Proxmox backup schedules remain unconfigured; VM109 is only a temporary
 restore test site. No production data, public listener, router/DHCP or
 shared VPN policy change, PR merge or permanent monitoring occurred.
@@ -34,14 +42,16 @@ GEOAI-040 production publication remains BLOCKED. Detailed evidence is in
 
 ### Release scope and status snapshot — 2026-10-25
 
-The chosen product archive is exact commit
-`79528bb9f6070e458724886a915f9d035cdfd110`: accepted P0–P6 and 029,
-preceding the 030 experiment and 036 audit API. The separate `pilot_ops/`
-package implements the operational ASGI launcher, config checks,
-backup/restore and service/TLS templates; it is not part of that product
-archive. The bounded VM110 session above supersedes the earlier proposed
-target state. GEOAI-039 remains PARTIAL because its 100,000-point criterion
-failed and owner scope/sign-off is pending. GEOAI-040 has no publication
+The selected functions remain accepted P0–P6 and 029, preceding the 030
+experiment and 036 audit API. The original product archive is exact commit
+`79528bb9f6070e458724886a915f9d035cdfd110` and remains unchanged.
+The corrected product candidate `15374b5c856958fdf67c5efdce68db81e05ac92f`
+adds only the bounded 100k DXF fix. The separate `pilot_ops/` package
+implements the operational ASGI launcher, config checks, backup/restore
+and service/TLS templates; it is not part of either product archive.
+GEOAI-039 remains PARTIAL because technical success on one synthetic fixture
+does not complete owner sign-off or the Proxmox backup arrangement.
+GEOAI-040 has no publication
 authorization. The fresh pilot state needed no production-data migration;
 project SQLite is user_version 8 and auth SQLite is user_version 1.
 The staging manifest's schemaVersion 5 is a separate format.
@@ -55,7 +65,7 @@ The staging manifest's schemaVersion 5 is a separate format.
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
 | BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
 | BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
-| PARTIAL | P11 039 | Exact candidate plus separate overlay ran on VM110 with private HTTPS and off-VM synthetic restore. Small workloads passed; 100,000-point input was admitted but its DXF job failed at the 25 MiB output limit. Owner scope decision, long-term backup schedule and sign-off remain open. |
+| PARTIAL | P11 039 | Corrected candidate plus separate overlay passed the saved 100,000-point synthetic HTTPS check within 120 s and 2.5 GiB, with restart and backup/restore. Owner acceptance, broader survey evidence and Proxmox backup schedule remain open. |
 | BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/migration authorization. No merge or production change now. |
 
 The unified material request is `harness/build/missing-materials.md`.
@@ -165,7 +175,7 @@ mapping and DXF through the shared engine.
 | P10 | 036 | Dataset-readiness audit | 025, 027–028 | ACCEPTED at e5663fa; reports not ready for training/evaluation |
 | P10 | 037 | Small offline recommendation model | 036 | BLOCKED by actual data readiness |
 | P10 | 038 | Reviewable model suggestions | 025, 037 | BLOCKED by 037 |
-| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: VM110 bounded session passed small workload; 100k-point job failed at 25 MiB output limit; owner scope decision and sign-off pending |
+| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: corrected candidate passed saved 100k synthetic fixture; owner sign-off and long-term backup schedule pending |
 | P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by full 039 and explicit authorization |
 
 For a first limited site release, P1–P4 plus P11 are the main path. P5–P10
