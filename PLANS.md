@@ -90,11 +90,11 @@ mapping and DXF through the shared engine.
 | P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | ACCEPTED at eecaad8 |
 | P4 | 022 | Reproducible staging, recovery and rollback | 021 | ACCEPTED |
 | P5 | 023 | Browser plan viewer | 015, 020–021 | ACCEPTED |
-| P5 | 024 | A/B line-connection candidates | 012, 023 | LOCAL VERIFIED; CI pending |
-| P5 | 025 | Confirmed decisions and review history | 017, 023–024 | PROPOSED |
-| P6 | 026 | Reversible derived-geometry edits | 025 | PROPOSED |
-| P6 | 027 | Reference-object archive | 015, 017, 025 | PROPOSED |
-| P6 | 028 | DXF comparison and quality measures | 027 | PROPOSED |
+| P5 | 024 | A/B line-connection candidates | 012, 023 | ACCEPTED |
+| P5 | 025 | Confirmed decisions and review history | 017, 023–024 | ACCEPTED |
+| P6 | 026 | Reversible derived-geometry edits | 025 | ACCEPTED, correction at 5880fea |
+| P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
+| P6 | 028 | DXF comparison and quality measures | 027 | READY |
 | P7 | 029 | Versioned object-code rules | 012, 028 | PROPOSED |
 | P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | PROPOSED |
 | P7 | 031 | Contours and composite situation objects | 028–030 | PROPOSED |
@@ -190,8 +190,10 @@ missing `/app/line-edits.js` route is added and asserted in the
 authenticated app test. GEOAI-027 implementation waits for exact
 feature/PR CI, now successful at `5880fea` (40156349260/40156351787).
 GEOAI-027 is in implementation from this corrected accepted base.
-GEOAI-027 now passed local tests and synthetic HTTPS acceptance; exact
-feature/PR CI is pending. GEOAI-028 depends on that acceptance.
+GEOAI-027 passed local tests, synthetic HTTPS and exact feature/PR CI
+at `f618613` (40156949699/40156952551). GEOAI-028 is READY under
+`harness/build/028-dxf-comparison.md` with exact diagnostics and no
+invented geodetic tolerance.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

@@ -1,6 +1,6 @@
 # GEOAI-027 — private, immutable reference archive
 
-Status: LOCAL GATE PASSED; exact feature/PR CI pending after GEOAI-026 and its static-route correction passed
+Status: ACCEPTED after exact feature/PR CI passed and GEOAI-026 correction passed
 exact feature and PR CI. Corrected base:
 `5880fea3b9341ba371baa429fab9364cb87a1aac`.
 P6 manifest deadline 2026-10-25T06:33:23Z; task ceiling 90 minutes,
@@ -66,5 +66,6 @@ The final isolated gate passed 144 focused, 10 regression and six API
 tests, `pip check`, zero blocked operations and `git diff --check`.
 Disposable localhost HTTPS with verified certificate passed create,
 repeat/conflict, list, download, rights omission and source parity.
-Only synthetic fixtures were used. Await exact feature/PR CI before
-accepting GEOAI-027 or starting GEOAI-028.
+Only synthetic fixtures were used. Exact HEAD
+`f618613a5d832756671a47db3351c9e2f3f7397e` passed push CI
+40156949699 and draft PR CI 40156952551. GEOAI-028 may start.

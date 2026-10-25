@@ -1191,7 +1191,7 @@ Keep one concise entry per task. Do not paste full command output.
   `b3f529b58c4331f8cb10ff646088dac3f5fe6b2e60d56fdd5a2faea9034a3bac`
   matched VM/Windows. GEOAI-027 implementation resumes from this base.
 
-## GEOAI-027 — local gate passed; exact CI pending
+## GEOAI-027 — accepted; GEOAI-028 ready
 
 - Corrected accepted base `5880fea`. Schema v8 stores a private,
   immutable reference DXF entry bound to an owned source revision and
@@ -1209,4 +1209,9 @@ Keep one concise entry per task. Do not paste full command output.
   Disposable verified localhost HTTPS passed create, idempotent repeat,
   conflict, list/download byte parity, permission rejection and
   unchanged source SHA-256. No real survey/reference or production action.
-- Exact feature/PR CI pending. GEOAI-028 must wait for this acceptance.
+- Exact feature HEAD `f618613a5d832756671a47db3351c9e2f3f7397e`
+  passed GitHub push CI 40156949699 and draft PR CI 40156952551.
+  Complete branch bundle SHA-256
+  `c019a3e0c02f805ada39f249b996d11253f0996eb92c407e64a7333fb93ac607`
+  matched VM/Windows. Worktree clean at this HEAD. GEOAI-027 ACCEPTED.
+  GEOAI-028 READY under `harness/build/028-dxf-comparison.md`.

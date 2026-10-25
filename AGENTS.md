@@ -366,11 +366,13 @@ full gate passed 137 focused + 10 regression + six API tests. Exact
 feature/PR CI passed at `5880fea3b9341ba371baa429fab9364cb87a1aac`
 (push 40156349260, PR 40156351787). GEOAI-027 can proceed.
 
-GEOAI-027 local implementation is gate-passed with schema v8 and private,
+GEOAI-027 is accepted at `f618613` with schema v8 and private,
 owner-scoped reference DXF archive. Five focused archive tests and the
 full current gate (144 focused, 10 regression, six API) passed; verified
-HTTPS synthetic upload/download passed. Exact feature/PR CI is pending.
-No real references or rights records were supplied.
+HTTPS synthetic upload/download and exact push/PR CI
+40156949699/40156952551 passed. No real references or rights records
+were supplied. GEOAI-028 is READY with a bounded exact diagnostic
+comparison under `harness/build/028-dxf-comparison.md`.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
