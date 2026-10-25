@@ -87,7 +87,7 @@ mapping and DXF through the shared engine.
 | P3 | 018 | Quotas, retention and cleanup | 014–017 | ACCEPTED at 8ed5687 |
 | P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–018 | ACCEPTED at 897cf60 |
 | P3 | 020 | Web jobs, results and download | 014–019 | ACCEPTED at 91aeb53 |
-| P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | READY |
+| P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | LOCAL GATE PASSED; CI PENDING |
 | P4 | 022 | Reproducible staging, recovery and rollback | 021 | PROPOSED |
 | P5 | 023 | Browser plan viewer | 015, 020–021 | PROPOSED |
 | P5 | 024 | A/B line-connection candidates | 012, 023 | PROPOSED |

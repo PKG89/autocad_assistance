@@ -8,6 +8,7 @@ from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 
 from autocad_assistance.services.survey_parser import SurveyParseError, parse_survey_bytes
+from autocad_assistance.services.survey_contract import drawing_factor_for_plan_denominator
 from autocad_assistance.keyboard import (
     BUTTON_KML,
     BUTTON_NEW_DXF,
@@ -579,7 +580,7 @@ async def handle_scale_callback(update: Update, context: ContextTypes.DEFAULT_TY
         return STATE_SCALE
 
     scale_value = option.get("scale", BASE_SCALE)
-    scale_factor = max(scale_value / BASE_SCALE, 0.05)
+    scale_factor = drawing_factor_for_plan_denominator(scale_value)
     label = option.get("label", f"1:{scale_value}")
     context.user_data["scale_value"] = scale_value
     context.user_data["scale_label"] = label
@@ -608,7 +609,7 @@ async def handle_scale_text(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         )
         return STATE_SCALE
 
-    scale_factor = max(scale_value / BASE_SCALE, 0.05)
+    scale_factor = drawing_factor_for_plan_denominator(scale_value)
     label_lookup = next((opt["label"] for opt in SCALE_OPTIONS.values() if opt.get("scale") == scale_value), None)
     label = label_lookup or f"1:{scale_value}"
     context.user_data["scale_value"] = scale_value

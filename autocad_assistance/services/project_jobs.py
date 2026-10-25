@@ -14,7 +14,9 @@ from autocad_assistance.services.project_store import (
     DuplicateSubmissionError, ProjectIntegrityError, ProjectStore,
     ProjectStoreError, ResourceQuotaExceededError,
 )
-from autocad_assistance.services.survey_contract import SurveyContext, build_survey_dataset
+from autocad_assistance.services.survey_contract import (
+    SurveyContext, build_survey_dataset, drawing_factor_for_plan_denominator,
+)
 
 
 @dataclass(frozen=True)
@@ -75,7 +77,7 @@ class ProjectJobBridge:
         try:
             snapshot = self.manager.submit(
                 dataset.mapped_rows,
-                scale_factor=float(context.scale_factor),
+                scale_factor=drawing_factor_for_plan_denominator(context.scale_factor),
                 tin_settings=tin_settings,
                 on_admit=admit,
             )

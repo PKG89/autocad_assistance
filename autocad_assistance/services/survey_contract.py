@@ -50,6 +50,21 @@ class SurveyContext:
         object.__setattr__(self, "scale_factor", scale)
 
 
+PLAN_BASE_DENOMINATOR = 1000
+
+
+def drawing_factor_for_plan_denominator(value: object) -> float:
+    """Match the established Telegram 1:N DXF sizing, preserving measured XYZ."""
+    try:
+        denominator = Decimal(str(value))
+        numeric = float(denominator)
+    except (InvalidOperation, ValueError, OverflowError) as exc:
+        raise SurveyContractError("INVALID_SURVEY_CONTEXT", "Plan denominator must be finite and positive") from exc
+    if not denominator.is_finite() or denominator <= 0 or not math.isfinite(numeric):
+        raise SurveyContractError("INVALID_SURVEY_CONTEXT", "Plan denominator must be finite and positive")
+    return max(numeric / PLAN_BASE_DENOMINATOR, 0.05)
+
+
 @dataclass(frozen=True)
 class SurveyWarning:
     code: str

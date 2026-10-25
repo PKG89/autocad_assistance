@@ -941,3 +941,28 @@ Keep one concise entry per task. Do not paste full command output.
   starts with a new finite manifest. GEOAI-021's accepted base and
   frozen comparison criteria are in
   `harness/build/021-web-mvp-acceptance.md`.
+
+## GEOAI-021 — local parity and browser checks passed; CI pending
+
+- Base is accepted 020 at `91aeb53`; scope was frozen in
+  `harness/build/021-web-mvp-acceptance.md` at local HEAD `7446d4e`.
+  The same synthetic CSV with SHA-256 `b02424ae3df178448b4c9e620887b7e2c9e6fbba6401b5337a32e270221868e6`
+  passed real authenticated web upload/preview/import/job/download and
+  offline Telegram file/mapping/scale/generation handlers.
+- First comparison found the web 1:500 denominator passed as render
+  factor 500 versus Telegram's 0.5. Shared conversion now applies the
+  same factor to both; measured XYZ remain unchanged. A semantic DXF
+  inventory compares 25 entities, block scale, layers, text, point
+  geometry and ground TIN. A deliberate one-unit point change is
+  detected. Unsupported types: zero.
+- Final isolated sample: web 1.977219 s, Telegram 1.39428 s,
+  parent/child process peak RSS 296816 KiB each on Linux 6.12.107 /
+  Python 3.13.5. The full local gate passed 121 focused, 10 isolated
+  regression and six isolated API tests with zero blocked operations,
+  plus `pip check` and diff checks.
+  Measurements are evidence, not acceptance limits. Browser smoke used
+  the same fixed source and confirmed the completed job's download
+  returned HTTP 200. Its disposable server/tunnel stopped.
+- Full final local gate: `p4-021/final-gate-exact.log`; exact feature
+  commit and GitHub push/PR CI remain pending. No Telegram network,
+  production data, migration or deployment was used.

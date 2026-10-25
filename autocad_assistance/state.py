@@ -16,10 +16,13 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from autocad_assistance.keyboard import build_workflow_keyboard
+from autocad_assistance.services.survey_contract import (
+    PLAN_BASE_DENOMINATOR, drawing_factor_for_plan_denominator,
+)
 
 STATE_FILE, STATE_MAPPING, STATE_SCALE, STATE_WORKFLOW, STATE_KML_PROJECTION, STATE_KML_POINTS = range(6)
 
-BASE_SCALE = 1000
+BASE_SCALE = PLAN_BASE_DENOMINATOR
 
 
 def get_scale_value(context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -29,7 +32,7 @@ def get_scale_value(context: ContextTypes.DEFAULT_TYPE) -> int:
 
 def get_scale_factor(context: ContextTypes.DEFAULT_TYPE) -> float:
     """Return the scale factor ensuring a minimal positive value."""
-    return max(get_scale_value(context) / BASE_SCALE, 0.05)
+    return drawing_factor_for_plan_denominator(get_scale_value(context))
 
 
 def _build_workflow_text(context: ContextTypes.DEFAULT_TYPE, notice: str | None = None) -> str:
