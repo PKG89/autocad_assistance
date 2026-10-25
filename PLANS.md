@@ -171,10 +171,12 @@ The final local gate passed 131 focused, 10 isolated regression and
 six isolated API tests. Exact GitHub feature/PR runs
 40154016183/40154019673 passed at `cbcd0f3`; GEOAI-024 is ACCEPTED.
 GEOAI-025 is READY from this base under `harness/build/025-decisions.md`.
-GEOAI-025 is locally verified: versioned owner decisions and job-bound
+GEOAI-025 is accepted at `43fe740`: versioned owner decisions and job-bound
 accepted A/B orders passed 133 focused, 10 regression and six API
 checks plus disposable HTTPS DXF and browser controls. Exact GitHub
-feature/PR CI remains before acceptance. P5 checkpoint follows 025.
+feature/PR runs 40154708051/40154711826 passed. P5 checkpoint:
+023–025 accepted, original checkout unchanged, no production action.
+P6 manifest runs to 2026-10-25T06:33:23Z; GEOAI-026 is READY.
 After exact CI acceptance, P4 closes and GEOAI-023 can be frozen from
 the accepted base. No production publication is authorized.
 

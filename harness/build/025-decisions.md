@@ -1,6 +1,7 @@
 # GEOAI-025 — versioned decisions on line candidates
 
-Status: LOCAL VERIFIED; exact feature/PR CI pending. Base:
+Status: ACCEPTED at exact feature commit
+`43fe7403af521ffc80822dcba8ead3a5b5aee23b`. Base:
 `cbcd0f39174b8b25afc6771a2f6f5643c02dcee5`. P5 manifest:
 `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`; package deadline
 2026-10-25T05:58:12Z; task ceiling 90 minutes, one initial attempt and at
@@ -84,4 +85,6 @@ and exact blocker in shared memory.
   `0,1,2,100`; source bytes stayed byte-identical at SHA-256
   `1092bb2deb3ffb67d333746ea393699e77850926f6b7d8251873c211d56cc8d0`.
   Temporary HTTP/HTTPS servers and browser tab were closed. Exact
-  GitHub feature/PR CI remains pending.
+  GitHub push run 40154708051 and draft PR #6 run 40154711826 passed.
+  Full-branch bundle SHA-256 matched VM and Windows:
+  `9b444af3d03dbfb344616eaf3f1e57bc828063fafd503cd98da5f18a200f20c8`.

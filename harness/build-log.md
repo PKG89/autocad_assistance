@@ -1122,3 +1122,19 @@ Keep one concise entry per task. Do not paste full command output.
   A X=`0,100,1,2`, B X=`0,1,2,100`, source SHA-256
   `1092bb2deb3ffb67d333746ea393699e77850926f6b7d8251873c211d56cc8d0`.
   Temporary servers/tab stopped. Exact feature/PR CI pending.
+
+## GEOAI-025 — accepted; P5 checkpoint and P6 start
+
+- Exact feature HEAD `43fe7403af521ffc80822dcba8ead3a5b5aee23b`
+  passed GitHub push run 40154708051 and draft PR #6 run
+  40154711826. Full-branch bundle SHA-256
+  `9b444af3d03dbfb344616eaf3f1e57bc828063fafd503cd98da5f18a200f20c8`
+  matched VM/Windows. Worktree clean at this HEAD; original checkout
+  untouched. GEOAI-025 ACCEPTED.
+- P5 tasks 023–025 are accepted: plan viewer, explainable A/B
+  candidates, versioned decisions applied to new DXF jobs. Synthetic
+  HTTPS/browser checks and isolated gates passed; no real data,
+  production deployment or migration. P6 manifest deadline
+  2026-10-25T06:33:23Z; GEOAI-026 READY from accepted 025 under
+  `harness/build/026-line-edits.md`. GEOAI-027 needs explicit
+  reference provenance and permission before ingesting real examples.
