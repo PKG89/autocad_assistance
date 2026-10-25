@@ -1,5 +1,26 @@
 # AutoCAD Assistance GEO AI
 
+## Current GEOAI-039 handoff (2026-10-25)
+
+The owner reports a passed **synthetic user scenario** on the installed
+product `15374b5c856958fdf67c5efdce68db81e05ac92f` plus the separate
+operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`:
+import, preview, mapping, calculation, DXF download and opening, and
+reopening the project. The owner's remarks field was not filled in; record
+remarks as unspecified until clarified. This is user acceptance of that
+exact pair and scenario only, not of arbitrary real surveys.
+
+GEOAI-039 remains PARTIAL. The restored VM111 disk was checked offline
+without booting its OS, and the guest application dump and Proxmox VM backup
+run independently. A `TASK OK` VM archive is a VM-level backup only unless
+the matching recent successful application dump is independently verified.
+Missing/failed dumps must be visible and must not be reported as a completed
+coordinated application backup. Finish an isolated boot/recovery check with
+the copied NetBird identity removed, and enforce/verify this backup pairing
+before full 039 sign-off. Current feature/PR CI has passed; see
+`harness/build/039-release-acceptance.md`. GEOAI-040 stays BLOCKED.
+Do not merge PR #6, enable app/TLS boot autostart or expand access.
+
 ## VM110 user-pilot handoff (2026-10-25)
 
 The owner's current authorization installed the exact product
@@ -18,7 +39,8 @@ archive `vzdump-qemu-110-2026_10_25-18_40_45.vma.zst` succeeded; offline
 restore to VM111 succeeded. VM111 is stopped, has no network device and no
 autostart. The app-state restore also passed SQLite integrity checks.
 Small synthetic HTTPS auth/import/preview/mapping/job/DXF checks passed on the
-installed pair. GEOAI-039 remains PARTIAL until the owner's user acceptance.
+installed pair. The owner's bounded synthetic user acceptance is now recorded
+above; remaining operational recovery and dump-pairing gates keep 039 PARTIAL.
 The saved 100,000-point fixture is one measured case, not universal support.
 No real data or PR merge occurred. See `PLANS.md` and `harness/build-log.md`
 for exact status; certificate renewal still needs manual DNS-01 before

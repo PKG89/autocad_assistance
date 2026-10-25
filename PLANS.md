@@ -5,6 +5,34 @@ matching file under `harness/build/`.
 
 ## Current phase and execution order
 
+### GEOAI-039 owner scenario and remaining gates — 2026-10-25
+
+The owner passed the synthetic cabinet scenario on VM110: import, preview,
+mapping, calculation, DXF download and opening, and reopening the project.
+This accepts only that scenario and the installed product
+`15374b5c856958fdf67c5efdce68db81e05ac92f` plus separate operations
+package `71ab84cba999bcf2fd105b69917cdd1e8907671f`. Remarks were not
+specified in the owner's message; do not infer that there were none. No
+quality claim for arbitrary real surveys or all 100,000-point shapes follows.
+Current exact PR feature and pull-request CI checks completed successfully.
+
+GEOAI-039 stays **PARTIAL**. VM restore to isolated VM111 reconstructed the
+disk but did not boot the OS. The application dump timer and Proxmox VM
+backup jobs are independent; a successful VM task alone cannot prove a
+current successful application copy. Before full sign-off, perform an
+isolated boot/recovery check without the copied NetBird identity or working
+network, and make a missed/failed dump detectable and ineligible for a
+successful coordinated application-backup claim. Pair each VM archive with
+a verified recent dump and record both outcomes; a VM-only archive remains
+labelled VM-only if the dump is absent or invalid. Existing first-run and
+restore evidence is retained. No merge, boot autostart or wider access.
+
+GEOAI-040 remains **BLOCKED** by full 039 sign-off and separate explicit
+publication/operations authorization. Later 040 decisions include release
+promotion, whether/when to enable boot autostart, monitoring and response
+ownership, certificate renewal, rollback drill, access and any real-data
+approval/migration. None is implied by the synthetic user acceptance.
+
 ### VM110 target update — 2026-10-25
 
 The owner authorised VM110 preparation and a bounded synthetic session of
@@ -44,7 +72,8 @@ plus separate operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`.
 Both app and TLS services are active but disabled for boot; the old archives,
 config, overlay and primary state remain for rollback. Private HTTPS smoke
 passed login, import, preview, mapping, queue, result view and DXF download.
-GEOAI-039 remains PARTIAL pending the owner's user acceptance. No production
+GEOAI-039 remains PARTIAL after the owner's bounded synthetic acceptance,
+pending the recovery and backup-pairing gates above. No production
 data, public listener, router/DHCP or shared VPN policy change, PR merge or
 permanent monitoring occurred.
 GEOAI-040 production publication remains BLOCKED. Detailed evidence is in
@@ -59,8 +88,8 @@ The corrected product candidate `15374b5c856958fdf67c5efdce68db81e05ac92f`
 adds only the bounded 100k DXF fix. The separate `pilot_ops/` package
 implements the operational ASGI launcher, config checks, backup/restore
 and service/TLS templates; it is not part of either product archive.
-GEOAI-039 remains PARTIAL because technical success on one synthetic fixture
-and restored backups do not complete owner sign-off.
+GEOAI-039 remains PARTIAL: the exact synthetic user scenario is accepted,
+while isolated VM boot/recovery and enforced backup-pairing evidence remain.
 GEOAI-040 has no publication
 authorization. The fresh pilot state needed no production-data migration;
 project SQLite is user_version 8 and auth SQLite is user_version 1.
@@ -75,8 +104,8 @@ The staging manifest's schemaVersion 5 is a separate format.
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
 | BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
 | BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
-| PARTIAL | P11 039 | Corrected exact product plus separate overlay runs privately on VM110. The saved 100,000-point fixture, small HTTPS workflow, VM110 backup and offline VM restore passed. Owner acceptance remains open; one fixture does not prove all survey shapes. |
-| BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/migration authorization. No merge or production change now. |
+| PARTIAL | P11 039 | Exact corrected pair and the owner's synthetic import/preview/mapping/job/DXF/reopen scenario are accepted. VM disk restore was not booted; a missed or failed application dump is not yet coupled to the successful Proxmox VM task. Pair and verify both, then test recovery in isolation before full sign-off. No real-survey quality claim. |
+| BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/operations authorization. Decide promotion, boot autostart, observation/response, certificate renewal, access and any authorized real-data migration; no merge or production change now. |
 
 The unified material request is `harness/build/missing-materials.md`.
 Only independently ready tasks with defined requirements may proceed.
@@ -185,8 +214,8 @@ mapping and DXF through the shared engine.
 | P10 | 036 | Dataset-readiness audit | 025, 027–028 | ACCEPTED at e5663fa; reports not ready for training/evaluation |
 | P10 | 037 | Small offline recommendation model | 036 | BLOCKED by actual data readiness |
 | P10 | 038 | Reviewable model suggestions | 025, 037 | BLOCKED by 037 |
-| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: exact corrected pair installed, private smoke and VM backup/restore passed; owner user acceptance pending |
-| P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by full 039 and explicit authorization |
+| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: owner synthetic scenario accepted; VM restore lacks isolated OS boot and dump/VM-backup pairing is unverified |
+| P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by full 039 and explicit authorization; no merge, boot autostart or wider access |
 
 For a first limited site release, P1–P4 plus P11 are the main path. P5–P10
 can follow; the document package can move earlier if it does not depend on

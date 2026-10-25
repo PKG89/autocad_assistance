@@ -108,3 +108,55 @@ The proposed separate-VM pilot and no-migration decision for new empty
 state are in `harness/build/039-pilot-preparation.md`; their target
 measurements and owner decisions remain open. Project SQLite is
 user_version 8 and auth SQLite is user_version 1.
+
+## Exact corrected pair: owner scenario and current sign-off (2026-10-25)
+
+The current installed pilot is product
+`15374b5c856958fdf67c5efdce68db81e05ac92f` plus the separate
+operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`.
+This section supersedes the historical pending-owner statement above.
+The owner reports that the synthetic user scenario passed: import,
+preview, mapping, calculation, DXF download and opening, and reopening
+the project. The remarks placeholder was not completed; remarks are
+**unspecified**, not confirmed absent. This accepts only that installed
+pair and scenario. It does not establish quality for real surveys or
+all possible 100,000-point inputs.
+
+The direct target checks in `039-vm110-pilot-execution.md` covered the
+saved 100,000-point synthetic fixture, resource bounds, private HTTPS,
+owner/anonymous/foreign access, persistence, checksums and app-state
+recovery. The selected release excludes experimental 030 and incomplete
+031–035/037–038. On PR #6 head
+`183c974965df3df219a74e7a5f8587f0dd36127f`, both GitHub `tests`
+checks completed with `success` (Actions runs 40209218399 and
+40209213596). This CI result applies to that exact PR head; a later
+documentation commit requires its own CI result.
+
+**Overall GEOAI-039: PARTIAL, not closed.** The first Proxmox VM110 archive
+restored its 60 GiB disk into stopped, network-disconnected VM111, but the
+guest OS was never booted. An application-state copy separately restored
+with SQLite integrity checks. These are distinct recovery checks, not a
+booted end-to-end VM recovery. The guest dump timer and Proxmox jobs run
+at separate times without a hard dependency. `TASK OK` for a VM backup
+therefore counts only as a VM archive. A coordinated application backup
+requires a successful, verified, recent dump matched to that VM run. A
+missed/failed dump must produce an observable failure and cannot be counted
+as a successful coordinated copy even when the VM archive succeeds.
+
+Remaining acceptance checks:
+
+1. In isolation, boot a restored VM with the copied NetBird identity
+   removed and no route to the working network; verify app/state start,
+   synthetic owner/project/DXF, then stop the test VM. Preserve the
+   offline VM111 evidence and do not expose two identical VPN identities.
+2. Add and verify a VM110-specific dump/VM-backup pairing check or hard
+   pre-backup gate. Record dump identifier, validity/timestamp, VM archive
+   identifier and task result together; fail closed for a skipped or
+   failed dump, and make the failure visible to an operator. Test both
+   success and failure paths without changing other VM backup jobs.
+3. Resolve the unspecified owner remarks before recording them as `none`
+   or as tracked findings. The bounded synthetic user acceptance itself is
+   recorded above and does not need to be repeated.
+
+GEOAI-040 remains blocked. PR merge, boot autostart, public or wider VPN
+access, and real-data use are not authorized by this user check.
