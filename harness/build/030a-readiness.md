@@ -1,7 +1,9 @@
 # GEOAI-030A — readiness for explicit coded tracing
 
-Status: PROPOSED, not READY (2026-10-25). This is a bounded readiness
-record after accepted 029A, not an implementation or acceptance of 030A,
+Status: product integration PROPOSED, not READY (2026-10-25). This is a bounded
+readiness record after accepted 029A. A separate offline synthetic candidate
+experiment is PARTIAL; see `030a-modes-experiment.md`. This record is not
+acceptance of 030A,
 030B or aggregate 030. No pilot VM110 change.
 
 ## Existing evidence and boundary
@@ -23,6 +25,21 @@ offers reviewable A/B order; it does not establish DrawLine field-code
 semantics. Existing 030B is a separate review-only synthetic inference
 experiment with a known class regression. Neither is a valid fallback for
 missing explicit 030A rules.
+
+The owner supplied a private real TXT example, `Kirill VOLS U-P 20.10
+vse.txt` (27,907 bytes, SHA-256
+`8937c61583f29da94047fbbf26646324a10696b715d6454049dd623535686b60`).
+Read-only local inspection found 632 nonempty lines: 179 with four
+whitespace tokens, 450 with five and three with six. Sixteen apparent
+five-token lines contain a two-token point ID (`Рп` plus a suffix) rather
+than an extra code. Three six-token rows have two trailing code tokens.
+A naive first-token ID scan finds repeats, but cannot resolve them before
+the split-ID grammar is confirmed. The file has no identified receiver,
+timestamp or line-object column, and no approved matching finished DXF was
+provided. Its coordinates and raw rows were not copied to Git, VM109 or
+VM110; provenance and rights beyond owner provision remain unconfirmed.
+It is useful to validate the input format and identify parser ambiguities,
+not to score whether any proposed line connection is correct.
 
 ## Proposed conservative contract for owner decision
 

@@ -1846,3 +1846,10 @@ Keep one concise entry per task. Do not paste full command output.
   no geometry, generator, pilot, network or data were changed. Next step is
   the owner's/domain reviewer's choice of how object ID, action and order
   are supplied. 030B/031C and real-survey validation retain their gates.
+
+## GEOAI-030A two-mode offline synthetic experiment — 2026-10-25
+
+- The owner explained that multiple receivers can leave line boundaries unknown and requested approaches with explicit end markers and without them. Following the single-writer 90-minute/two-repair boundary, implemented a read-only candidate service based on accepted 029A. `explicit_end` uses separately supplied synthetic object/action/order annotations; `no_end_review` exposes source-row and per-receiver alternatives with mandatory review. Neither infers boundaries from ambiguous raw `0`/`1`, writes DXF/projects/jobs, or changes VM110.
+- Focused tests passed 4/4 after two fixture-only repairs. The isolated gate passed focused checks, 10/10 prior regressions, 6/6 API checks and `pip check`; `git diff --check` passed. Object isolation, endpoint inclusion, separate chains, abstentions, differing two-receiver alternatives, provenance and source immutability were checked. The offline experiment is PARTIAL; 030A product integration and full 030 acceptance remain unapproved.
+- Privately supplied `Kirill VOLS U-P 20.10 vse.txt` was read locally only: 27,907 bytes, SHA-256 `8937c61583f29da94047fbbf26646324a10696b715d6454049dd623535686b60`, 632 nonempty rows with mixed widths. It contains split apparent point IDs and multiple trailing tokens, but no identified receiver/time/object field or matching approved finished DXF. It was not transferred to Git, VM109 or VM110 and was not used in tests. Its rights/use scope and correct line connections remain unverified.
+- Next: secure an owner/domain-reviewed mapping for object and receiver identity, action/style and sequence semantics, plus authorized paired references, correct links/breaks and class criteria. The accepted VM110 pilot and blocked 040 are unchanged. Feature/PR CI must be verified on the exact published head.

@@ -21,6 +21,17 @@ direct exact XY matching did not recover a point-to-line mapping. It
 does not by itself clear any dataset or training gate. GEOAI-036 is
 accepted as an audit *that reports not ready*.
 
+On 2026-10-25 the owner pointed to another private TXT example,
+`Kirill VOLS U-P 20.10 vse.txt` (27,907 bytes, SHA-256
+`8937c61583f29da94047fbbf26646324a10696b715d6454049dd623535686b60`).
+It has 632 lines with mixed four/five/six-token shapes; 16 lines include
+a point ID split by whitespace, and three have two trailing code tokens.
+No corresponding approved final DXF, receiver mapping, line-object IDs,
+rights/use scope or reviewed correct connections were established. This
+file is a local read-only **format candidate**, not the missing source for
+the earlier completed DXF and not a training or evaluation pair. It was
+not copied to VM109/VM110 or the repository. See `030a-readiness.md`.
+
 ## Field-to-Finish clarification — 2026-10-25
 
 The full-030 and dependent-031 requests above apply to inference (030B),

@@ -5,17 +5,20 @@
 The owner first requested a roadmap amendment, then separately authorized
 the bounded 039/029A package. GEOAI-029A now has a frozen profile contract
 and passing local checks; see `harness/build/029a-profile-spec.md`.
-The next candidate 030A has a readiness record at
-`harness/build/030a-readiness.md`. Do not treat raw `0`/`1` as an
-unambiguous action or invent object IDs/order; obtain the agreed contract
-before implementation. No 030A product code has been started.
+030A has a readiness record at `harness/build/030a-readiness.md` and a
+bounded offline two-mode synthetic experiment at
+`harness/build/030a-modes-experiment.md`. Do not treat raw `0`/`1` as an
+unambiguous action or invent object IDs/order. The offline candidate service
+does not write projects/jobs/DXF and is not an accepted product feature.
 Read the current `PLANS.md` subtask registry and
 `harness/build/029a-031-field-to-finish-plan.md` before later P7 work.
-029 and 029A are accepted; 030A and 031A/031B remain PROPOSED. 030B carries
+029 and 029A are accepted; 030A is PARTIAL for synthetic offline candidates,
+while 031A/031B remain PROPOSED. 030B carries
 the prior synthetic inference experiment and remains blocked for full
 acceptance; 031C depends on its relevant accepted capability and class evidence.
 The new capability-specific dependencies supersede historical statements
-that all 031 work requires full 030. No task after 029A is READY or dispatched.
+that all 031 work requires full 030. No subsequent product integration is
+READY or dispatched.
 Keep source data/codes immutable and reuse the existing catalog, decisions,
 reference archive, comparison and DXF service. Local teaching files are
 unverified reference candidates, not approved ML data or freely licensed assets.

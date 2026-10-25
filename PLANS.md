@@ -31,9 +31,11 @@ require an ML dataset; real-survey quality
 acceptance still requires approved, correctly paired examples and criteria.
 030B/031C and 037/038 retain their evidence gates.
 The 030A readiness check is in `harness/build/030a-readiness.md`: the
-available format does not yet identify an object/string ID or an
-unambiguous action/order for all records. 030A remains PROPOSED pending a
-domain-approved contract; 031A has a separate asset/rule gate.
+available format does not identify an object/string ID or an unambiguous
+action/order for all records. A two-mode, read-only synthetic candidate
+experiment is PARTIAL, as recorded in `harness/build/030a-modes-experiment.md`.
+Product integration remains PROPOSED pending domain evidence; 031A has a
+separate asset/rule gate.
 
 Candidate teaching files belong in the existing 027 archive only after
 authorized ingestion, initially unverified with provenance and use scope.
@@ -140,7 +142,8 @@ The staging manifest's schemaVersion 5 is a separate format.
 | ACCEPTED | 007A/007B/007C, 008–011, P1 012–014, P2 015–017, P3 018–020, P4 021–022, P5 023–025, P6 026–028, P7 029 | Existing feature/PR CI and local acceptance passed; these are the selected release functions. |
 | ACCEPTED as an audit only | P10 036 | Reports `readyForTraining=false` and `readyForEvaluation=false` under current unverified evidence; outside chosen release. No training permission follows from this acceptance. |
 | ACCEPTED (bounded parser) | P7 029A | Versioned `drawcode-explicit-v1` profile reports point-code candidates, ambiguous line markers and unknown tokens, preserving raw input. No geometry, third-party assets or real-survey quality claim; absent rights remain unverified. |
-| PROPOSED | P7 030A, 031A/031B | Explicit coded tracing and coded objects need their own frozen specifications before READY. Synthetic development does not depend on ML readiness; real-survey acceptance needs reviewed source/reference pairs. No queue started. |
+| PARTIAL | P7 030A | Offline explicit-end and no-end synthetic candidates passed focused tests; no project/job/DXF integration. Real object/receiver mapping, reviewed source/reference pairs, rights and class criteria remain open. |
+| PROPOSED | P7 031A/031B | Coded objects need their own frozen specifications before READY. Synthetic development does not depend on ML readiness; real-survey acceptance needs reviewed source/reference pairs. No queue started. |
 | PARTIAL | P7 030 / 030B | Existing synthetic review-only inference candidate measured a class regression; 030B remains blocked for full acceptance by authorized object pairs, independent whole-object splits, correct links/breaks and agreed per-class criteria. New 030A acceptance cannot accept 030B or the whole 030. Keep the deployed generator unchanged. |
 | NOT ACCEPTED | P7 031 | Split by capability: 031A depends on 029A; 031B on 029A/030A and 028; 031C remains blocked by the relevant accepted 030B/class evidence. No blanket full-030 dependency for 031A/031B. |
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
@@ -151,8 +154,9 @@ The staging manifest's schemaVersion 5 is a separate format.
 
 The unified material request is `harness/build/missing-materials.md`.
 Only independently ready tasks with defined requirements may proceed.
-029A is accepted for its bounded parser contract. None of 030A/030B,
-031A–031C, 032–035 or 037–038 is currently READY for product work.
+029A is accepted for its bounded parser contract. The 030A offline experiment
+is PARTIAL; none of 030A/030B, 031A–031C, 032–035 or 037–038 is currently
+READY for product integration.
 PROPOSED subtask registration is not dispatch.
 The remaining READY statements in the chronological log below describe
 earlier checkpoints; this status snapshot is the current authority.
@@ -251,7 +255,7 @@ mapping and DXF through the shared engine.
 | P7 | 029 | Versioned object-code rules | 012, 028 | ACCEPTED at 79528bb |
 | P7 | 029A | Versioned field-coding profiles and provenance | 012, accepted 029; source/rights inventory | ACCEPTED for bounded parser at 9548fa5; no drawable assets or geometry |
 | P7 | 030 | Measured line-tracing improvement | 030A and 030B scopes below | PARTIAL: existing inference experiment only; full acceptance not implied by either subtask alone |
-| P7 | 030A | Explainable tracing from explicit field codes | 012, 025–026, 028, 029A | PROPOSED; object ID, action/style disambiguation and sequence rules require an approved contract; see `harness/build/030a-readiness.md` |
+| P7 | 030A | Explainable tracing from explicit field codes | 012, 025–026, 028, 029A | PARTIAL: two offline synthetic candidate modes only; object ID, action/style disambiguation, receiver evidence and real sequence rules remain unapproved; see `harness/build/030a-modes-experiment.md` |
 | P7 | 030B | Inference of connections with insufficient codes | 024–025, 028–029; authorized held-out objects and class criteria | BLOCKED for acceptance; retains prior synthetic experiment and regression |
 | P7 | 031 | Situation outlines and composite objects | Capability-specific 031A/031B/031C dependencies | NOT ACCEPTED; subtask acceptance does not imply whole-stage acceptance |
 | P7 | 031A | Point symbols, multiple objects per point and annotation | 012, 028, 029A; approved symbol assets/rules | PROPOSED; independent of 030B and ML |
