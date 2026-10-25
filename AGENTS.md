@@ -11,9 +11,12 @@ current services and remaining private-access/off-VM-backup gates. The VM110
 product and P6 rollback archives, overlay, Python lock, systemd templates and
 an empty pilot state are prepared; both application services remain stopped.
 VM110 NetBird is installed but needs login; no pilot HTTPS listener exists.
-The owner selected two NetBird client peers, `geoai.exitline.site`, ACME
-DNS-01 through Cloudflare, and Proxmox storage names. Setup key and DNS token
-must be supplied through root-only files, never chat or Git. Do not alter
+The owner selected two NetBird client peers, changed the pilot hostname to
+`geoai.froglight.ru` in the Reg.ru DNS zone, and selected Proxmox storage
+names. The VM110 config has been updated and passed `check` again. The
+Cloudflare-token request is obsolete. A one-use NetBird setup key must be
+supplied through a root-only file, never chat or Git. Public TLS now requires
+a DNS-01 TXT challenge in Reg.ru. Do not alter
 shared VPN policies or Proxmox schedules without a separate concrete approval.
 A synthetic off-VM restore passed on VM109; the selected Proxmox backup
 storages and retention are not yet configured. Do not start the pilot until

@@ -1646,3 +1646,17 @@ Keep one concise entry per task. Do not paste full command output.
   No shared VPN policy or Proxmox
   schedule was changed. Full target evidence and next gates are in
   `harness/build/039-vm110-pilot-execution.md`; GEOAI-039 remains PARTIAL.
+
+## GEOAI-039 private hostname correction — 2026-10-25
+
+- The owner confirmed `geoai.froglight.ru` in the Reg.ru-managed home DNS
+  zone, superseding the earlier `geoai.exitline.site`/Cloudflare plan.
+  Public NS for `froglight.ru` are `ns1.reg.ru` and `ns2.reg.ru`.
+  VM110 `/etc/geoai-pilot/config.json` was changed to the new HTTPS origin;
+  a pre-change copy was preserved and `geoai_pilot_ops check` passed again
+  with the exact 79528bb archive and lock. Pilot services remain inactive.
+- NetBird still reports `NeedsLogin`; the one-use setup key is not yet in
+  the root-only file, so the VM110 VPN IP is unknown. No A or ACME TXT
+  record was created. A manual Reg.ru DNS-01 challenge or separately
+  reviewed API method is required for a public certificate. The earlier
+  Cloudflare-token request is obsolete.

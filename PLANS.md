@@ -16,12 +16,19 @@ in netplan (earlier DHCP wording is superseded), NetBird installed but not
 enrolled, default-deny local firewall preserving LAN SSH, disabled pilot
 systemd units, and a new empty marked state. The owner approved the proposed
 technical thresholds and selected two client peers, private DNS/TLS and
-backup storage names. One-use NetBird and Cloudflare credentials, real VPN
+backup storage names. A one-use NetBird credential, real VPN
 IP/certificate, selected Proxmox backup scheduling and target acceptance
 metrics remain open. A temporary synthetic backup restored on VM109;
 GEOAI-039 is PARTIAL. No pilot service, public listener, production data,
 shared VPN policy, Proxmox schedule or PR merge has changed. GEOAI-040
 production publication remains BLOCKED.
+
+The owner then changed the approved pilot hostname from
+`geoai.exitline.site` to `geoai.froglight.ru`, served by Reg.ru. VM110's
+pilot config now uses the new HTTPS origin and passed the exact-release
+check again. The Cloudflare DNS token is no longer needed. NetBird
+enrollment, the observed VPN IP/A record and a Reg.ru DNS-01 TXT challenge
+remain before private HTTPS can start.
 
 ### Authoritative status snapshot — 2026-10-25
 
