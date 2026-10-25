@@ -23,7 +23,7 @@ PrivateTmp=yes
 ProtectHome=yes
 ProtectSystem=strict
 ReadWritePaths=/srv/geoai-pilot/states /srv/geoai-pilot/logs
-MemoryMax=3G
+MemoryMax=2560M
 TasksMax=64
 
 [Install]
