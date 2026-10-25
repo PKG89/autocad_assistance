@@ -7,62 +7,44 @@ matching file under `harness/build/`.
 
 ### VM110 target update — 2026-10-25
 
-The owner authorised VM110 preparation and a limited synthetic pilot after
-artifact, private-access and off-VM restore gates. Direct VM110 checks and
-actions are recorded in `harness/build/039-vm110-pilot-execution.md`. Exact
-product and separate overlay hashes, Python lock, target synthetic flow and
-P6 compatibility passed. VM110 has static guest address `192.168.1.162/24`
-in netplan (earlier DHCP wording is superseded), NetBird enrolled at
-`100.104.46.7`, default-deny local firewall preserving LAN SSH, disabled
-pilot systemd units, and a new empty marked state. The owner approved the
-technical thresholds and selected two client peers, private DNS/TLS and
-backup storage names. The VPN peer, A record and certificate are verified.
-Second client access, DNS resolution on approved clients, selected Proxmox
-backup scheduling and target metrics remain open. A temporary synthetic
-backup restored on VM109;
-GEOAI-039 is PARTIAL. No pilot service, public listener, production data,
-shared VPN policy, Proxmox schedule or PR merge has changed. GEOAI-040
-production publication remains BLOCKED.
+The owner authorised VM110 preparation and a bounded synthetic session of
+the exact `79528bb9f6070e458724886a915f9d035cdfd110` product plus the
+separate `7f5bbecbb05a9f86f9850ed7e045a49fde040b89` operational package.
+VM110 has static LAN address `192.168.1.162/24`, NetBird
+`100.104.46.7`, a private Caddy listener, and a default-deny firewall with
+an early guard for only the two selected peers on TCP 22/443. Both peers
+appeared in the VM110 policy; `DESKTOP-L4BB2VP` resolved
+`geoai.froglight.ru` and received HTTPS 200 without a TLS error. The
+Reg.ru DNS-01 certificate is valid until 2027-01-23 and needs manual renewal.
 
-The owner then changed the approved pilot hostname from
-`geoai.exitline.site` to `geoai.froglight.ru`, served by Reg.ru. VM110's
-pilot config now uses the new HTTPS origin and passed the exact-release
-check again. The Cloudflare DNS token is no longer needed. NetBird
-enrolled with VPN IP `100.104.46.7`; the owner added A `geoai` ->
-`100.104.46.7`, verified on both Reg.ru authoritative servers. The
-Reg.ru DNS-01 TXT challenge passed and Certbot issued a certificate
-valid until 2027-01-23. Manual renewal is required. VM110's router
-resolver did not yet return the private A address; client resolution
-and the second NetBird peer remain before private HTTPS can start.
+The bounded session passed HTTPS auth/ownership smoke, 100 API requests
+(p95 3.4 ms, zero 5xx), 20/20 small jobs, a ~1 MiB / 10,000-point job
+(5.35 s), restart persistence and a 136-file off-VM synthetic restore on
+VM109. The agreed 100,000-point, 10,000,026-byte input was admitted, but
+its DXF job failed after 23.81 s at the product's 25 MiB output file limit.
+Thus GEOAI-039 remains PARTIAL and the user acceptance gate is held. Both
+pilot services are stopped and disabled; SSH, nftables and NetBird remain
+active. Before resuming, the owner must choose a narrower verified pilot
+boundary or request a separately reviewed release that handles this input.
+The Proxmox backup schedules remain unconfigured; VM109 is only a temporary
+restore test site. No production data, public listener, router/DHCP or
+shared VPN policy change, PR merge or permanent monitoring occurred.
+GEOAI-040 production publication remains BLOCKED. Detailed evidence is in
+`harness/build/039-vm110-pilot-execution.md`.
 
-### Authoritative status snapshot — 2026-10-25
+### Release scope and status snapshot — 2026-10-25
 
-The chosen release candidate is exact commit
-`79528bb9f6070e458724886a915f9d035cdfd110`: it contains accepted
-P0–P6 and 029 and precedes the 030 experiment and 036 API. GEOAI-039
-has passed disposable synthetic staging checks but is PARTIAL until a
-target-specific load/operations review and release sign-off. GEOAI-040
-has no publication authorization. Detailed evidence and the proposed
-deployment sequence are in `harness/build/039-release-acceptance.md`
-and `harness/build/039-deployment-plan.md`. The closed-pilot proposal
-is `harness/build/039-pilot-preparation.md`; it recommends a new
-dedicated VM rather than VM109 or CT108, and marks every unmeasured
-capacity threshold as proposed. No pilot launch or running-service
-change is authorized. A new empty pilot state needs no data migration;
+The chosen product archive is exact commit
+`79528bb9f6070e458724886a915f9d035cdfd110`: accepted P0–P6 and 029,
+preceding the 030 experiment and 036 audit API. The separate `pilot_ops/`
+package implements the operational ASGI launcher, config checks,
+backup/restore and service/TLS templates; it is not part of that product
+archive. The bounded VM110 session above supersedes the earlier proposed
+target state. GEOAI-039 remains PARTIAL because its 100,000-point criterion
+failed and owner scope/sign-off is pending. GEOAI-040 has no publication
+authorization. The fresh pilot state needed no production-data migration;
 project SQLite is user_version 8 and auth SQLite is user_version 1.
 The staging manifest's schemaVersion 5 is a separate format.
-The separate `pilot_ops/` overlay now implements a fail-closed ASGI
-launcher, config checks, backup/restore and service/TLS templates.
-Its combination with 79528bb and P6 rollback passed synthetic
-loopback HTTPS checks; it is not part of the 79528bb product archive.
-Proxmox inventory could not be read because `pve1.netbird.cloud`
-has no route from the available hosts. The owner subsequently supplied
-a PVE1 report for running VM 110 `GEOAI` (Debian 13.7, 2 vCPU, 4 GiB,
-60 GiB, DHCP `192.168.1.162`), matching the proposed size. This is
-owner-reported, not independently verified. VM 110 has no NetBird,
-TLS proxy, public DNS or Proxmox backup schedule; IP persistence and
-off-VM backup remain open. GEOAI-039 stays PARTIAL for access,
-measured capacity and owner sign-off.
 
 | Status | Stages | Exact remaining gate |
 | --- | --- | --- |
@@ -73,7 +55,7 @@ measured capacity and owner sign-off.
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
 | BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
 | BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
-| PARTIAL | P11 039 | Candidate and separate overlay passed synthetic checks; owner reports dedicated VM 110 created. No migration for fresh state. VM access, stable IP, VPN/TLS, off-VM backup, target load, VPN clients, operator and sign-off remain open. |
+| PARTIAL | P11 039 | Exact candidate plus separate overlay ran on VM110 with private HTTPS and off-VM synthetic restore. Small workloads passed; 100,000-point input was admitted but its DXF job failed at the 25 MiB output limit. Owner scope decision, long-term backup schedule and sign-off remain open. |
 | BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/migration authorization. No merge or production change now. |
 
 The unified material request is `harness/build/missing-materials.md`.
@@ -183,7 +165,7 @@ mapping and DXF through the shared engine.
 | P10 | 036 | Dataset-readiness audit | 025, 027–028 | ACCEPTED at e5663fa; reports not ready for training/evaluation |
 | P10 | 037 | Small offline recommendation model | 036 | BLOCKED by actual data readiness |
 | P10 | 038 | Reviewable model suggestions | 025, 037 | BLOCKED by 037 |
-| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: isolated release tests passed, target sign-off pending |
+| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: VM110 bounded session passed small workload; 100k-point job failed at 25 MiB output limit; owner scope decision and sign-off pending |
 | P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by full 039 and explicit authorization |
 
 For a first limited site release, P1–P4 plus P11 are the main path. P5–P10

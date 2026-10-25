@@ -493,10 +493,21 @@ P0–P6 and 029 only; do not deploy the later development HEAD as this
 release. Its disposable synthetic gate passed 151 focused, 10 isolated
 regression and six API tests, verified HTTPS workflows, checksum-locked
 build, offline backup, fresh-root restore and compatible code rollback.
-039 remains PARTIAL pending target-specific load/operations review and
-owner sign-off. 040 publication, merge and production migration are not
-authorized. See `harness/build/039-release-acceptance.md`, the unified
-`harness/build/missing-materials.md`, and the review-only deployment plan.
+The bounded VM110 synthetic session passed private HTTPS from the approved
+desktop, 100 API requests, 20/20 small jobs, ~1 MiB/10k-point DXF, restart
+persistence and a 136-file off-VM restore. A 100k-point, 10,000,026-byte
+input was admitted but its DXF job failed at the exact product's 25 MiB
+output file limit (`WORKER_FAILED`). GEOAI-039 remains PARTIAL: the owner
+must choose a narrower verified pilot scope or a separately reviewed
+release, then sign off. Both pilot units are stopped/disabled; SSH,
+nftables and NetBird remain active. The root-only owner password is at
+`/etc/geoai-pilot/private/owner-password` on VM110; never print it in
+chat or Git. Do not treat VM109's temporary synthetic restore copy as the
+approved long-term backup destination. 040 publication, merge and
+production migration are not authorized. See
+`harness/build/039-vm110-pilot-execution.md`,
+`harness/build/039-release-acceptance.md` and
+`harness/build/missing-materials.md`.
 Do not repeat synthetic 030 experiments without a new falsifiable
 hypothesis; keep the current generator unchanged. Resume 030/031 or
 037/038 only when the evidence gates in `PLANS.md` are met.
