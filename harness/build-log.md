@@ -1280,3 +1280,29 @@ Keep one concise entry per task. Do not paste full command output.
   Verified localhost HTTPS passed 401 without login and exact
   `moln`, `gaz1`, `tower1` lookups. No real data or production action.
   Exact feature/PR CI pending; GEOAI-030 waits for acceptance.
+
+## GEOAI-029 — accepted
+
+- Exact feature HEAD `79528bb9f6070e458724886a915f9d035cdfd110`
+  passed GitHub push CI 40158200653 and draft PR CI 40158204850.
+  Complete branch bundle SHA-256
+  `25c91b6bd21aef2ce13e930e4e7a01188d06fdca5a65bfd1dfcf204b5e62cb07`
+  matched VM/Windows. Worktree clean at this HEAD; original checkout
+  untouched. Draft PR #6 description updated to current scope.
+- GEOAI-030 dependency accepted. Current evidence is only synthetic;
+  no authorized real held-out reference objects, class acceptance
+  criteria or domain-approved tracing tolerance were supplied. An
+  offline non-product candidate/benchmark can progress independently.
+
+## GEOAI-030 preflight — synthetic experiment only
+
+- Accepted 029 base `79528bb`. The current line baseline is anchored
+  nearest-neighbor ordering; A/B and append-only edits already support
+  explicit human decisions. No real reference corpus or class-level
+  regression criteria exist in-session. A bounded 2-opt uncrossing
+  suggestion and independent synthetic whole-object fixtures are
+  frozen by `harness/build/030-tracing-experiment.md` and
+  `harness/fixtures/030-synthetic-objects.json` before implementation.
+  Valid self-crossings are possible, so the candidate cannot alter
+  generated DXF or be called domain-validated. Full GEOAI-030 remains
+  dependent on authorized real held-out objects and criteria.

@@ -388,11 +388,18 @@ P7 manifest is active with one worker/worktree, at most two repairs
 per task, 90 minutes per task and deadline 2026-10-25T07:20:40Z.
 GEOAI-029 READY under `harness/build/029-object-catalog.md` from
 committed SinoKOD and generator config, with ambiguity preserved.
-GEOAI-029 local gate passed: immutable `object-code-v1` snapshot,
+GEOAI-029 is accepted at `79528bb`: immutable `object-code-v1` snapshot,
 75 SinoKOD rows, source hashes, explicit block/line/special settings,
 unmapped/ambiguous codes visible. Four catalog tests, 153 focused +
-10 regression + six API and verified HTTPS passed. Exact feature/PR
-CI is pending. No new object taxonomy was invented.
+10 regression + six API, verified HTTPS and exact push/PR CI
+40158200653/40158204850 passed. No new object taxonomy was invented.
+GEOAI-030 may run an offline synthetic experiment, but real held-out
+validation requires authorized reference objects and class criteria.
+GEOAI-030 has a bounded offline synthetic experiment READY under
+`harness/build/030-tracing-experiment.md`; its fixture is frozen by
+whole object in `harness/fixtures/030-synthetic-objects.json`.
+Keep the candidate out of production DXF/jobs. Full 030 acceptance
+needs authorized real held-out references and class-level criteria.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

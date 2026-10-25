@@ -1,6 +1,6 @@
 # GEOAI-029 — versioned catalog of existing object-code rules
 
-Status: LOCAL GATE PASSED; exact feature/PR CI pending from accepted GEOAI-028 at
+Status: ACCEPTED; exact feature/PR CI passed from accepted GEOAI-028 at
 `1ea061c1afb4b75b0aba06ae67d402b0a3e815a6`.
 P7 manifest deadline 2026-10-25T07:20:40Z; task ceiling 90 minutes,
 one initial attempt plus at most two repairs, one writable worktree,
@@ -64,4 +64,6 @@ of executable syntax and authenticated pagination. Final isolated
 gate passed 153 focused, 10 regression and six API tests, `pip check`,
 zero blocked operations and diff check. Verified localhost HTTPS
 showed 401 without login and mapped/line/dynamic lookups after login.
-No real data or production action. Exact feature/PR CI pending.
+No real data or production action. Exact HEAD
+`79528bb9f6070e458724886a915f9d035cdfd110` passed push CI
+40158200653 and draft PR CI 40158204850.

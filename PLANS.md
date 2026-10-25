@@ -95,8 +95,8 @@ mapping and DXF through the shared engine.
 | P6 | 026 | Reversible derived-geometry edits | 025 | ACCEPTED, correction at 5880fea |
 | P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
 | P6 | 028 | DXF comparison and quality measures | 027 | ACCEPTED at 1ea061c |
-| P7 | 029 | Versioned object-code rules | 012, 028 | READY |
-| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | PROPOSED |
+| P7 | 029 | Versioned object-code rules | 012, 028 | ACCEPTED at 79528bb |
+| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | SYNTHETIC EXPERIMENT READY; real validation pending |
 | P7 | 031 | Contours and composite situation objects | 028–030 | PROPOSED |
 | P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | PROPOSED |
 | P8 | 033 | Terrain contours and elevation checks | 032 | PROPOSED |
@@ -204,8 +204,15 @@ task, at most two repairs, one worktree/compute worker and $0
 external executor. GEOAI-029 is READY under
 `harness/build/029-object-catalog.md`; preserve ambiguous and
 unmapped codes without making up semantics.
-GEOAI-029 passed local full gate and verified HTTPS; exact feature/PR
-CI is pending. GEOAI-030 depends on its acceptance.
+GEOAI-029 passed local full gate, verified HTTPS and exact feature/PR
+CI at `79528bb` (40158200653/40158204850). GEOAI-030 depends on
+its acceptance; an offline experimental subtask can proceed with
+synthetic objects, while real held-out validation needs authorized
+reference objects and agreed class-level criteria.
+The bounded synthetic 030 experiment is READY under
+`harness/build/030-tracing-experiment.md` and frozen fixture
+`harness/fixtures/030-synthetic-objects.json`. It cannot change the
+generator or count as full 030 acceptance without real held-out data.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus
