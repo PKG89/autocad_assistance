@@ -1499,3 +1499,37 @@ Keep one concise entry per task. Do not paste full command output.
   proposed rollout/rollback steps are in
   `harness/build/039-deployment-plan.md`. Source HEAD before this
   documentation commit was clean `75b02eb`.
+
+## GEOAI-039 closed-pilot preparation — 2026-10-25
+
+- Scope was read-only infrastructure survey plus feature-branch
+  configuration/instructions. No pilot, deployment, merge, network,
+  secret, working-data or running-service change was authorized.
+  Worktree began clean at `108d6367b331908a178df0cbb4ad27af272d3969`
+  on `codex/geoai-current`.
+- VM109: Debian 13.7, 2 vCPU, about 3.9 GiB RAM and 50 GiB free;
+  active loopback development servers. CT108: Debian 13.6, 2 vCPU,
+  4.0 GiB RAM and 24 GiB free; NetBird, mail and MCP-ops in use.
+  Neither is selected for the pilot. No Docker found on either; the
+  repository Dockerfile/Compose/main workflow target the Telegram bot.
+  The actual bot host and hypervisor free capacity are unknown.
+- Proposal: new isolated Debian 13 VM, 2 vCPU, 4 GiB RAM, 60 GiB disk,
+  private HTTPS/VPN only, app bound to loopback, one owner/two browser
+  sessions and one compute child. Exact VM/IP, capacity, DNS/TLS,
+  clients and operator await owner confirmation. Candidate tar contains
+  144 tracked files, 8,570,880 bytes; commit, archive and lock SHA are
+  in `harness/pilot/release-79528bb.json`. The existing tar remains
+  outside Git on VM109 and was not sent to a pilot target.
+- New empty pilot state needs no migration. Code check corrected the
+  earlier ambiguous "schema v5": projects SQLite is user_version 8,
+  auth SQLite is user_version 1; v5 names the staging manifest format.
+  Compatible P6 code rollback on a copy was previously verified; no
+  new migration or rollback test was repeated.
+- Measured synthetic smoke 2.441 s and sampled server VmHWM 331,564
+  kB are explicitly separated from proposed target p95, concurrency,
+  memory, disk and error thresholds in
+  `harness/build/039-pilot-preparation.md`. Existing product gates
+  were not rerun because no product code or candidate archive changed.
+  The pilot ASGI adapter/TLS/unit, target load result, responsible
+  operator and final sign-off remain open. GEOAI-039 is PARTIAL and
+  GEOAI-040 BLOCKED.

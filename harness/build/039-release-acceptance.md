@@ -64,7 +64,8 @@ action. A failed criterion leaves 039 PARTIAL/BLOCKED with exact evidence.
   HEAD and had successful push/PR CI 40158200653/40158204850.
   Rebuilt Git archive SHA-256
   `cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81`
-  matched. Python 3.13.5, schema v5, and package-lock SHA-256
+  matched. Python 3.13.5, staging-manifest schemaVersion 5 (not the
+  SQLite database version), and package-lock SHA-256
   `d8d2cf3756f29f64246f133f694ee61aa9711f8eb8e95c4fd2039734d381c351`
   matched. 030 and 036 code are absent from the candidate.
 - The first test run wrote a Telegram shutdown log into a staged
@@ -103,3 +104,7 @@ Final 039 sign-off still needs a named target/environment, acceptable
 capacity/error thresholds, monitoring and on-call owner, reviewed
 migration/no-migration decision, and release-owner approval. These
 cannot be inferred from the disposable test. GEOAI-040 remains blocked.
+The proposed separate-VM pilot and no-migration decision for new empty
+state are in `harness/build/039-pilot-preparation.md`; their target
+measurements and owner decisions remain open. Project SQLite is
+user_version 8 and auth SQLite is user_version 1.

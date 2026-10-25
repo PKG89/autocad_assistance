@@ -1,0 +1,18 @@
+{
+  "purpose": "closed-pilot-candidate-only",
+  "git_commit": "79528bb9f6070e458724886a915f9d035cdfd110",
+  "git_archive_format": "tar",
+  "git_archive_file": "79528bb9f6070e458724886a915f9d035cdfd110.tar",
+  "git_archive_bytes": 8570880,
+  "git_archive_sha256": "cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81",
+  "tracked_files": 144,
+  "requirements_lock_path": "harness/staging/requirements.lock",
+  "requirements_lock_sha256": "d8d2cf3756f29f64246f133f694ee61aa9711f8eb8e95c4fd2039734d381c351",
+  "python_version": "3.13.5",
+  "project_sqlite_user_version": 8,
+  "auth_sqlite_user_version": 1,
+  "staging_manifest_schema_version": 5,
+  "scope": "accepted P0-P6 plus GEOAI-029",
+  "excluded": ["GEOAI-030", "GEOAI-031-035", "GEOAI-036", "GEOAI-037-038"],
+  "status": "preparation-only; no pilot deployment authorized"
+}

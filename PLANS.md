@@ -14,7 +14,13 @@ has passed disposable synthetic staging checks but is PARTIAL until a
 target-specific load/operations review and release sign-off. GEOAI-040
 has no publication authorization. Detailed evidence and the proposed
 deployment sequence are in `harness/build/039-release-acceptance.md`
-and `harness/build/039-deployment-plan.md`.
+and `harness/build/039-deployment-plan.md`. The closed-pilot proposal
+is `harness/build/039-pilot-preparation.md`; it recommends a new
+dedicated VM rather than VM109 or CT108, and marks every unmeasured
+capacity threshold as proposed. No pilot launch or running-service
+change is authorized. A new empty pilot state needs no data migration;
+project SQLite is user_version 8 and auth SQLite is user_version 1.
+The staging manifest's schemaVersion 5 is a separate format.
 
 | Status | Stages | Exact remaining gate |
 | --- | --- | --- |
@@ -25,7 +31,7 @@ and `harness/build/039-deployment-plan.md`.
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
 | BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
 | BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
-| PARTIAL | P11 039 | Candidate/staging verification passed. Target, load threshold, observability, migration/no-migration decision and release owner sign-off remain open. |
+| PARTIAL | P11 039 | Candidate/staging verification passed; dedicated VM and private access proposed, no migration for fresh empty state. Target provisioning/capacity, measured load thresholds, observability owner and release sign-off remain open. |
 | BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/migration authorization. No merge or production change now. |
 
 The unified material request is `harness/build/missing-materials.md`.

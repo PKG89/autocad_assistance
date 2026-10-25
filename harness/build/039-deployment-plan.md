@@ -12,8 +12,10 @@ and changes to working data remain unauthorized.
   Accepted GEOAI-036 is outside this selected release and does not
   certify dataset readiness. No AI training or recommendation service.
 - Runtime: Python 3.13 with exact `harness/staging/requirements.lock`.
-  The verified Git archive, manifest and schema version 5 are the
-  artifacts to promote; rebuilds must match checksums.
+  The verified Git archive and lock are the artifacts to promote;
+  rebuilds must match checksums. Staging manifest schemaVersion 5 is
+  not a database version: project SQLite uses user_version 8 and auth
+  SQLite uses user_version 1.
 - `scripts/geoai_staging.py` deliberately accepts synthetic mode and
   loopback HTTPS only. It is an acceptance/recovery tool, not a
   production deployment command. GEOAI-040 must specify and review
@@ -27,6 +29,15 @@ and changes to working data remain unauthorized.
 
 ## Approval inputs before GEOAI-040
 
+The target-specific closed-pilot proposal, measured/proposed thresholds,
+no-migration decision and operator sequence are in
+`harness/build/039-pilot-preparation.md`. This proposal does not authorize
+launch or a change to the running bot.
+
+The proposed closed-pilot target is a new dedicated Debian 13 VM
+(2 vCPU, 4 GiB RAM, 60 GiB disk), not VM109 or CT108. For its fresh
+empty state, no working-data migration or production backup is needed.
+Its exact VM ID, capacity, address and access still need owner approval.
 Owner chooses the target host/environment, hostname and TLS source,
 operator, access path, production secrets mechanism, data directories,
 backup location/retention, maintenance window, monitoring recipient,
@@ -39,10 +50,10 @@ separate authorization for production publication and any migration.
 1. Record approved commit, archive SHA-256, package lock SHA-256,
    schema and operator in a release record. Verify a clean artifact and
    target capacity; deny mismatched hashes or dependencies.
-2. Snapshot production data using an approved backup method while
-   writes are stopped or under a verified consistent DB checkpoint.
-   Verify the backup manifest/checksums and a restore to a separate
-   location before touching the live environment.
+2. For a fresh isolated pilot, verify empty pilot roots and never touch
+   production data. Only if a later, separately approved migration is
+   required: take a consistent source backup and verify a restore to a
+   separate location before touching the source environment.
 3. Prepare a new release directory with the exact archive and isolated
    runtime. Apply only reviewed environment settings and secrets.
    Do not copy synthetic credentials or test data.
