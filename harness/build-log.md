@@ -502,3 +502,17 @@ Keep one concise entry per task. Do not paste full command output.
   survey, production DB, `.env`, deployment or geometry change.
 - GitHub feature/PR checks are pending. Next: commit exact reviewed files,
   push only `codex/geoai-current`, inspect both CI runs, then freeze 014.
+
+## GEOAI-013 — remote gate passed; GEOAI-014 ready
+
+- Exact reviewed commit `66b8dcc3c651c08baf5d14be2370d0d73ea0f773`
+  was pushed only to `codex/geoai-current`; VM `origin` remains the local
+  bare store. Verified branch bundle SHA-256:
+  `c4ba7adea57a515ddd24fbbdbdead8ff880237fc16f7322ba23a3b914147663e`;
+  matching off-VM copy exists on Windows.
+- GitHub `GEO AI checks` push run 40146687136 and draft PR #6 run
+  40146689779 both succeeded at that exact SHA. Only the feature/PR
+  check workflow ran; no production workflow or deployment.
+- Dependency 013 is ACCEPTED. Next: use the frozen 014 specification for
+  one bounded compute worker, queue, timeout, cancellation, retry and
+  crash recovery. P1 manifest remains active and within its deadline.

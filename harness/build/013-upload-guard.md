@@ -1,6 +1,6 @@
 # GEOAI-013 — bounded uploads and safe file access
 
-Status: LOCAL ACCEPTED; remote CI pending. Base: accepted GEOAI-012 feature commit
+Status: ACCEPTED at `66b8dcc` after local and GitHub push/PR CI. Base: accepted GEOAI-012 feature commit
 `608a8e3ff84178470dbad6663fcca27fef5508b9`.
 Dependency 012 passed local and remote push/PR checks.
 
