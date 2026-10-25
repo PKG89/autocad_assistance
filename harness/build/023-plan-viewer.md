@@ -1,6 +1,6 @@
 # GEOAI-023 — browser plan viewer
 
-Status: READY. Base: accepted GEOAI-022 feature commit
+Status: LOCAL VERIFIED; exact GitHub feature/PR CI pending. Base: accepted GEOAI-022 feature commit
 `211cf1812224c0d77803837f96db8ef60aaaebe1`; all P4 local and
 exact GitHub feature/PR checks passed. P5 run manifest:
 `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`, started
@@ -63,3 +63,34 @@ Budget: one initial attempt and at most two repairs, 90 minutes for
 four-hour P5 ceiling. Stop on deadline, exhausted repairs, unexpected
 edits, lost test isolation, required domain decision or production
 action. Record HEAD, diff, checks and blocker before pausing.
+
+## Local implementation and evidence (2026-10-25)
+
+- `dxf_plan.py` projects an integrity-checked owner result into bounded
+  JSON for POINT, LINE, plain LWPOLYLINE/POLYLINE, 3DFACE, CIRCLE,
+  segmented ARC, TEXT/MTEXT and nested INSERT geometry. DXF arc
+  approximations are marked; bulged polylines and mesh/curve polylines
+  are explicitly unsupported instead of being shown as straight lines.
+  Viewer caps are 8 MiB, 10,000 expanded entities, 50,000 vertices,
+  four block levels and 64 displayed text characters. API has safe
+  401/404/413/422 responses, no-store output and existing owner guard.
+- The synthetic HTTPS result from the fixed 021 CSV returned 25
+  model-space objects, 46 expanded objects and eight layers. Plan
+  result SHA-256 matched the DXF download:
+  `6f356b6fa75fc44c317b8dae4dccd35fdef33261a7c7ee80cb5491504d4b56cc`.
+  Browser used a disposable HTTP-only static harness with that
+  authenticated API's JSON. The self-signed HTTPS API was checked
+  separately with certificate verification; no browser certificate
+  warning was bypassed. In the browser, block selection exposed its
+  layer, scale, rotation and XYZ; fit/zoom/pan and layer toggling worked.
+  Shifting the fixture by +1,000,000 X and +2,000,000 Y preserved the
+  visible geometry and exposed the shifted exact coordinates. Console
+  errors: zero. All disposable servers/tunnels stopped.
+- Focused parser and owner/job API tests passed, including no source
+  mutation, unsupported bulge, over-limit/corrupt DXF and foreign owner.
+  The final local gate `p5-023/final-gate-repaired.log` passed 127
+  focused, 10 isolated regression and six isolated API tests, zero
+  blocked operations, `pip check` and `git diff --check`. `node --check`
+  passed both browser scripts on Windows Node 24. Exact GitHub feature
+  and PR CI remain pending. No schema, Telegram, geodetic algorithm
+  or production state change.

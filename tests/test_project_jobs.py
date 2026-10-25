@@ -10,6 +10,7 @@ from pathlib import Path
 import sys
 import tempfile
 import time
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 from uuid import uuid4
@@ -17,6 +18,7 @@ from uuid import uuid4
 import httpx
 
 from autocad_assistance.api import create_app
+from autocad_assistance.services.dxf_plan import PlanInvalidError, PlanLimitError
 from autocad_assistance.services.auth_store import AuthStore
 from autocad_assistance.services.calculation_jobs import CalculationJobManager
 from autocad_assistance.services.project_jobs import ProjectJobBridge
@@ -103,6 +105,25 @@ class ProjectJobsTests(unittest.IsolatedAsyncioTestCase):
             result = await client.get(f"/api/v1/jobs/{job_id}/result")
             self.assertEqual(result.status_code, 200, result.text[:100])
             self.assertIn(b"SECTION", result.content)
+            plan = await client.get(f"/api/v1/jobs/{job_id}/plan")
+            self.assertEqual(plan.status_code, 200, plan.text[:100])
+            self.assertEqual(plan.json()["jobId"], job_id)
+            self.assertTrue(plan.json()["localCoordinates"])
+            self.assertTrue(plan.json()["entities"])
+            self.assertEqual(plan.headers["cache-control"], "no-store")
+            self.assertEqual((await client.get(f"/api/v1/jobs/{job_id}/result")).content, result.content)
+            with patch("autocad_assistance.api.owned_files.project_plan", side_effect=PlanLimitError()):
+                too_large = await client.get(f"/api/v1/jobs/{job_id}/plan")
+            self.assertEqual(too_large.status_code, 413)
+            self.assertEqual(too_large.json()["error"]["code"], "PLAN_TOO_LARGE")
+            with patch("autocad_assistance.api.owned_files.project_plan", side_effect=PlanInvalidError()):
+                corrupt = await client.get(f"/api/v1/jobs/{job_id}/plan")
+            self.assertEqual(corrupt.status_code, 422)
+            self.assertEqual(corrupt.json()["error"]["code"], "PLAN_UNAVAILABLE")
+            self.assertEqual((await client.get("/app/plan-viewer.js")).status_code, 200)
+            foreign = SimpleNamespace(user=SimpleNamespace(user_id=str(uuid4())))
+            with patch.object(AuthStore, "authenticate", return_value=foreign):
+                self.assertEqual((await client.get(f"/api/v1/jobs/{job_id}/plan")).status_code, 404)
             listing = await client.get(f"/api/v1/projects/{self.project_id}/jobs")
             self.assertEqual([item["jobId"] for item in listing.json()["data"]], [job_id])
             self.assertEqual((await client.get(f"/api/v1/jobs/{uuid4()}")).status_code, 404)
@@ -120,6 +141,10 @@ class ProjectJobsTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual((await client.get(f"/api/v1/jobs/{job_id}/result")).content, result.content)
         with self.assertRaises(ProjectNotFoundError):
             self.store.assert_job_owner(str(uuid4()), job_id)
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=restarted), base_url=ORIGIN) as fresh:
+            self.assertEqual((await fresh.get(f"/api/v1/jobs/{job_id}/plan")).status_code, 401)
+            await self.login(fresh)
+            self.assertEqual((await fresh.get(f"/api/v1/jobs/{uuid4()}/plan")).status_code, 404)
 
     async def test_admission_failure_leaves_no_job_or_claim(self):
         transport = httpx.ASGITransport(app=self.app, raise_app_exceptions=False)

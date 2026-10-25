@@ -1030,3 +1030,31 @@ Keep one concise entry per task. Do not paste full command output.
   GEOAI-023 is READY from this accepted base under
   `harness/build/023-plan-viewer.md`; next step is bounded DXF plan
   extraction plus owner-scoped API and browser inspection.
+
+## GEOAI-023 — local viewer/API checks; CI pending
+
+- Accepted base: 022 at `211cf18`. Scope frozen in
+  `harness/build/023-plan-viewer.md` and P5 manifest before code.
+  One writable feature worktree, one compute worker and $0 external
+  executor. No production data or deployment.
+- Owner-scoped plan API projects verified DXF bytes with 8 MiB,
+  10,000 expanded-entity and 50,000-vertex caps; no schema or DXF
+  algorithm change. Unsupported bulged and curved/mesh polylines are
+  reported rather than drawn inaccurately. Missing/foreign result,
+  over-limit and invalid DXF use safe API responses.
+- Synthetic HTTPS owner/job result returned 25 model-space, 46
+  expanded entities on eight layers. DXF and plan hash match:
+  `6f356b6fa75fc44c317b8dae4dccd35fdef33261a7c7ee80cb5491504d4b56cc`.
+  Browser static fixture taken from that API demonstrated fit/zoom,
+  pan, layer toggle, block selection/attributes and +1,000,000/
+  +2,000,000 coordinate offsets with preserved shape. Console errors
+  were zero. Browser used disposable HTTP static fixture; HTTPS API
+  was verified separately with its self-signed certificate. The
+  browser warning was not bypassed. Servers and tunnels stopped.
+- Initial full local gate passed; one correctness repair added
+  explicit unsupported handling for curved polylines. Final gate
+  `p5-023/final-gate-repaired.log` passed 127 focused, 10 isolated
+  regression and six isolated API tests with zero blocked operations,
+  `pip check` and `git diff --check`. Both browser scripts passed
+  Windows Node 24 syntax checks. Exact feature/PR GitHub CI remains
+  before acceptance and GEOAI-024 scope freeze.

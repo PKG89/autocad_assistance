@@ -31,5 +31,24 @@ li { overflow-wrap: anywhere; }
 .job-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .job-actions button, .job-actions a { font-size: .9rem; padding: 7px 11px; }
 .job-actions a { border-radius: 8px; background: #e5f4ef; color: #124f45; font-weight: 650; text-decoration: none; }
+.plan-panel { margin-top: 20px; border-top: 1px solid #dae5e0; padding-top: 16px; }
+.plan-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.plan-toolbar h3 { margin: 0 auto 0 0; }
+.plan-toolbar button { padding: 7px 12px; }
+.plan-layout { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 14px; }
+.plan-svg { width: 100%; min-height: 430px; border: 1px solid #b8cbc5; border-radius: 8px; background: #fcfefd; cursor: grab; touch-action: none; user-select: none; }
+.plan-svg:active { cursor: grabbing; }
+.plan-entity { fill: none; stroke: #205d58; stroke-width: .13%; cursor: pointer; }
+.plan-entity circle[data-layer] { fill: #fff; }
+.plan-entity text { stroke: none; fill: #285d56; }
+.plan-entity.selected { stroke: #d15c22; stroke-width: .25%; }
+.plan-entity.selected text { fill: #c34c14; }
+.plan-sidebar { border: 1px solid #dae5e0; border-radius: 8px; padding: 12px; min-width: 0; }
+.plan-sidebar h3 { margin: 0 0 8px; }
+.plan-sidebar h3:not(:first-child) { margin-top: 20px; }
+.plan-sidebar ul { margin: 0; padding-left: 18px; font-size: .9rem; }
+.plan-layers { display: grid; gap: 6px; max-height: 180px; overflow: auto; }
+.plan-layer { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: .9rem; font-weight: 500; }
+.plan-layer input { width: auto; margin: 0; }
 [hidden] { display: none !important; }
-@media (max-width: 640px) { .shell { padding: 12px; } .card { padding: 18px; } .topbar div { display: grid; gap: 3px; } }
+@media (max-width: 640px) { .shell { padding: 12px; } .card { padding: 18px; } .topbar div { display: grid; gap: 3px; } .plan-layout { grid-template-columns: 1fr; } .plan-svg { min-height: 320px; } }

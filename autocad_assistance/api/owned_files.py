@@ -8,6 +8,9 @@ from autocad_assistance.services.project_store import (
     ProjectIntegrityError, ProjectNotFoundError, ProjectStore, ProjectStoreError,
 )
 from autocad_assistance.services.project_jobs import ProjectJobBridge
+from autocad_assistance.services.dxf_plan import (
+    PlanInvalidError, PlanLimitError, project_plan,
+)
 
 
 def _not_found() -> JSONResponse:
@@ -49,5 +52,30 @@ def create_owned_files_router(store: ProjectStore, bridge: ProjectJobBridge | No
             headers={"Content-Disposition": 'attachment; filename="drawing.dxf"',
                      "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
         )
+
+    @router.get("/jobs/{job_id}/plan")
+    async def plan(job_id: str, request: Request):
+        owner_id = request.scope["geoai.owner_id"]
+        try:
+            if bridge is not None:
+                await run_in_threadpool(bridge.get, owner_id, job_id)
+            raw = await run_in_threadpool(store.read_result_for, owner_id, job_id)
+        except ProjectNotFoundError:
+            return _not_found()
+        except (ProjectIntegrityError, ProjectStoreError):
+            return JSONResponse(status_code=422, content={"error": {
+                "code": "RESULT_UNAVAILABLE", "message": "Result unavailable",
+            }})
+        try:
+            projected = await run_in_threadpool(project_plan, raw, job_id)
+        except PlanLimitError:
+            return JSONResponse(status_code=413, content={"error": {
+                "code": "PLAN_TOO_LARGE", "message": "Plan exceeds viewer limits; download the DXF",
+            }})
+        except PlanInvalidError:
+            return JSONResponse(status_code=422, content={"error": {
+                "code": "PLAN_UNAVAILABLE", "message": "Plan cannot be displayed",
+            }})
+        return JSONResponse(content=projected, headers={"Cache-Control": "no-store"})
 
     return router

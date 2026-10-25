@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GEO AI — проекты и расчёт DXF</title>
   <link rel="stylesheet" href="/app/styles.css">
+  <script src="/app/plan-viewer.js" defer></script>
   <script src="/app/app.js" defer></script>
 </head>
 <body>
@@ -78,6 +79,24 @@
         <button id="job-submit" type="button" disabled>Начать расчёт</button>
         <h3>Задания проекта</h3>
         <ul id="job-list"></ul>
+        <div id="plan-panel" class="plan-panel" hidden>
+          <div class="plan-toolbar">
+            <h3>План DXF</h3>
+            <button id="plan-fit" type="button">Вписать</button>
+            <button id="plan-zoom-in" type="button" aria-label="Приблизить">+</button>
+            <button id="plan-zoom-out" type="button" aria-label="Отдалить">−</button>
+            <button id="plan-close" type="button">Закрыть</button>
+          </div>
+          <p id="plan-summary" class="hint"></p>
+          <div class="plan-layout">
+            <svg id="plan-svg" class="plan-svg" role="img" aria-label="Чертёж в локальных координатах"></svg>
+            <aside class="plan-sidebar">
+              <h3>Слои</h3><div id="plan-layers" class="plan-layers"></div>
+              <h3>Выбранный объект</h3><ul id="plan-attributes"><li>Выберите объект на плане.</li></ul>
+            </aside>
+          </div>
+          <p class="hint">Колесо мыши — масштаб, перетаскивание пустой области — перемещение. Координаты объектов показаны в локальной системе съёмки.</p>
+        </div>
       </section>
     </div>
   </main>

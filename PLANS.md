@@ -89,7 +89,7 @@ mapping and DXF through the shared engine.
 | P3 | 020 | Web jobs, results and download | 014–019 | ACCEPTED at 91aeb53 |
 | P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | ACCEPTED at eecaad8 |
 | P4 | 022 | Reproducible staging, recovery and rollback | 021 | ACCEPTED |
-| P5 | 023 | Browser plan viewer | 015, 020–021 | READY |
+| P5 | 023 | Browser plan viewer | 015, 020–021 | LOCAL VERIFIED; CI pending |
 | P5 | 024 | A/B line-connection candidates | 012, 023 | PROPOSED |
 | P5 | 025 | Confirmed decisions and review history | 017, 023–024 | PROPOSED |
 | P6 | 026 | Reversible derived-geometry edits | 025 | PROPOSED |
@@ -145,6 +145,15 @@ P4 is complete. P5 has a finite manifest at
 `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`; GEOAI-023
 is READY from this accepted base under
 `harness/build/023-plan-viewer.md`. No publication or deployment.
+
+GEOAI-023 local candidate adds bounded DXF plan JSON and the cabinet
+viewer. Fixed synthetic HTTPS result returned 25 top-level/46 expanded
+objects on eight layers; browser selection, fit, zoom, pan and layer
+toggles worked, including coordinates shifted by 1–2 million units.
+Owner/API limits and unsupported geometry have focused checks. The
+final local gate passed 127 focused, 10 isolated regression and six
+isolated API tests; exact GitHub feature/PR CI is pending; then
+freeze 024 from the accepted base.
 After exact CI acceptance, P4 closes and GEOAI-023 can be frozen from
 the accepted base. No production publication is authorized.
 

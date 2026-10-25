@@ -308,6 +308,15 @@ draft PR #6 checks passed. P4 is complete. GEOAI-023 is READY under
 owner-scoped result integrity and measured local XYZ while adding the
 browser plan viewer. No production publication is authorized.
 
+GEOAI-023 is locally verified from accepted 022: bounded DXF plan
+JSON, owner-scoped `/api/v1/jobs/{job_id}/plan`, SVG layer/selection/
+zoom/pan viewer and explicit unsupported geometry. The synthetic
+HTTPS API and browser rendering both passed; large local XYZ remained
+visible and unchanged. The final local gate passed 127 focused, 10
+isolated regression and six isolated API tests; exact GitHub
+feature/PR checks are pending. Details and numerical bounds are in
+`harness/build/023-plan-viewer.md`. No production state was touched.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

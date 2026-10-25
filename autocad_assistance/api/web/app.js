@@ -58,6 +58,7 @@ async function busy(button, action, retainOnSuccess = false) {
 function showLogin() {
   clearTimeout(jobPoll);
   jobPoll = null;
+  window.GeoaiPlanViewer.hide();
   csrfToken = null;
   uploadId = null;
   $("login-panel").hidden = false;
@@ -179,6 +180,13 @@ async function loadJobs() {
       }));
     }
     if (job.resultReady) {
+      actions.append(jobAction("Просмотреть план", async () => {
+        const plan = await api(`/api/v1/jobs/${job.jobId}/plan`);
+        if ($("project-select").value === projectId) {
+          window.GeoaiPlanViewer.show(plan);
+          $("plan-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      }));
       const link = document.createElement("a");
       link.href = `/api/v1/jobs/${job.jobId}/result`;
       link.textContent = "Скачать DXF";
@@ -276,6 +284,7 @@ $("project-form").addEventListener("submit", (event) => {
 });
 
 $("project-select").addEventListener("change", () => {
+  window.GeoaiPlanViewer.hide();
   submitIntent = null;
   retryIntents.clear();
   loadRevisions().catch((error) => message(error.message, true));

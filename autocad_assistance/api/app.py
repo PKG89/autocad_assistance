@@ -161,6 +161,10 @@ def create_app(
         async def web_script() -> FileResponse:
             return FileResponse(web_root / "app.js", media_type="text/javascript", headers=web_headers)
 
+        @app.get("/app/plan-viewer.js", include_in_schema=False)
+        async def plan_script() -> FileResponse:
+            return FileResponse(web_root / "plan-viewer.js", media_type="text/javascript", headers=web_headers)
+
         @app.get("/app/styles.css", include_in_schema=False)
         async def web_style() -> FileResponse:
             return FileResponse(web_root / "styles.css", media_type="text/css", headers=web_headers)
