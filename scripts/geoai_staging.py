@@ -293,6 +293,9 @@ def run(root_value: str) -> None:
         if private_key.stat().st_mode & 0o077:
             raise StageError("TLS private key must not be group/world readable")
         sys.path.insert(0, str(root / "releases" / commit))
+        # The isolated calculation worker is a child Python process. Keep
+        # bytecode caches out of the checksum-verified release in both.
+        os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
         sys.dont_write_bytecode = True
         from autocad_assistance.api import create_app
         import uvicorn
