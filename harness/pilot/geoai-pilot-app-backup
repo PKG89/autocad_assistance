@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+exec 9>/run/lock/geoai-pilot-app-backup.lock
+flock -n 9
+config=/etc/geoai-pilot/config.json
+root=/srv/geoai-pilot/backups
+python=/srv/geoai-pilot/venv/bin/python
+overlay=/srv/geoai-pilot/pilot_ops
+was_active=0
+tls_was_active=0
+if systemctl is-active --quiet geoai-pilot-tls; then
+  tls_was_active=1
+fi
+if systemctl is-active --quiet geoai-pilot; then
+  was_active=1
+  systemctl stop geoai-pilot
+fi
+finish() {
+  if (( was_active )); then
+    systemctl start geoai-pilot
+    if (( tls_was_active )); then
+      systemctl start geoai-pilot-tls
+    fi
+  fi
+}
+trap finish EXIT
+name="scheduled-$(date -u +%Y%m%d-%H%M%S)-$$"
+runuser -u geoai-pilot -- env PYTHONPATH="$overlay" "$python" -m geoai_pilot_ops backup --config "$config" --name "$name"
+test -s "$root/$name/manifest.json"
+"$python" - "$root" <<'PY'
+import json, pathlib, shutil, sys
+root = pathlib.Path(sys.argv[1]).resolve(strict=True)
+entries = []
+for child in root.iterdir():
+    if not child.is_dir() or child.is_symlink():
+        continue
+    manifest = child / "manifest.json"
+    if not manifest.is_file():
+        raise RuntimeError(f"unrecognized backup directory: {child.name}")
+    json.loads(manifest.read_text(encoding="utf-8"))
+    entries.append(child)
+entries.sort(key=lambda p: p.stat().st_mtime_ns, reverse=True)
+for old in entries[2:]:
+    if old.resolve().parent != root:
+        raise RuntimeError("backup path escaped backup root")
+    shutil.rmtree(old)
+    print(f"pruned local backup: {old.name}")
+print("retained local backups:", ", ".join(p.name for p in entries[:2]))
+PY

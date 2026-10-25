@@ -1,29 +1,28 @@
 # AutoCAD Assistance GEO AI
 
-## VM110 pilot execution handoff (2026-10-25)
+## VM110 user-pilot handoff (2026-10-25)
 
-The owner authorised a limited synthetic closed pilot of the exact product
-`79528bb9f6070e458724886a915f9d035cdfd110` plus the separate
-`7f5bbecbb05a9f86f9850ed7e045a49fde040b89` operational package.
-Direct SSH access to VM110 is `ssh geoai-pilot`. Read
-`harness/build/039-vm110-pilot-execution.md` for verified target changes,
-current services and remaining private-access/backup-storage gates. The VM110
-product and P6 rollback archives, overlay, Python lock, systemd templates and
-an empty pilot state are prepared; both application services remain stopped.
-VM110 NetBird is enrolled at `100.104.46.7`; the one-use key was deleted.
-The Caddyfile is rendered for the VPN IP and a public DNS-01 certificate
-was issued/validated; no pilot HTTPS listener exists. The certificate
-expires 2027-01-23 and requires manual DNS-01 renewal.
-The owner selected two NetBird client peers, changed the pilot hostname to
-`geoai.froglight.ru` in the Reg.ru DNS zone, and selected Proxmox storage
-names. The VM110 config has been updated and passed `check` again. The
-Cloudflare-token request is obsolete. Only the desktop NetBird peer was
-visible initially; the second selected peer still needs policy verification.
-Public TLS was issued after a Reg.ru TXT challenge. Do not alter
-shared VPN policies or Proxmox schedules without a separate concrete approval.
-A synthetic off-VM restore passed on VM109; the selected Proxmox backup
-storages and retention are not yet configured. Do not start the pilot until
-both selected client access paths and DNS resolution are verified.
+The owner's current authorization installed the exact product
+`15374b5c856958fdf67c5efdce68db81e05ac92f` and the separately
+versioned operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`
+on VM110. Both `geoai-pilot` and `geoai-pilot-tls` are running but disabled
+for boot; private HTTPS is `https://geoai.froglight.ru` on NetBird IP
+`100.104.46.7`. The original `79528bb` archive, old overlay, config and
+primary state remain available for rollback. Do not deploy the PR HEAD.
+Direct SSH access is `ssh geoai-pilot`. The root-only owner password is at
+`/etc/geoai-pilot/private/owner-password`; never print it in chat or Git.
+Proxmox PVE1 now has VM110-only daily `backup-fast-nfs` and weekly
+`backup-weekly-nfs` jobs with keep-last 7/4. A guest timer copies application
+state before those jobs, retaining at most two local copies. The first VM
+archive `vzdump-qemu-110-2026_10_25-18_40_45.vma.zst` succeeded; offline
+restore to VM111 succeeded. VM111 is stopped, has no network device and no
+autostart. The app-state restore also passed SQLite integrity checks.
+Small synthetic HTTPS auth/import/preview/mapping/job/DXF checks passed on the
+installed pair. GEOAI-039 remains PARTIAL until the owner's user acceptance.
+The saved 100,000-point fixture is one measured case, not universal support.
+No real data or PR merge occurred. See `PLANS.md` and `harness/build-log.md`
+for exact status; certificate renewal still needs manual DNS-01 before
+2027-01-23.
 
 ## Closed-pilot preparation handoff (2026-10-25)
 

@@ -30,13 +30,23 @@ On VM110 the exact saved synthetic fixture completed via HTTPS in 33.34 s:
 78,585,786-byte DXF, 925.7 MiB application cgroup peak, one worker and a
 2.5 GiB service cap. The result survived restart and a 150-file offline
 backup/restore. This is evidence for this fixture, not for arbitrary surveys
-of 100,000 points. GEOAI-039 remains PARTIAL pending owner acceptance and
-operational backup arrangements. Both pilot services are stopped and disabled;
-SSH, nftables and NetBird remain active. The old `79528bb` config/overlay
-were restored after the candidate session and passed their exact check.
-The Proxmox backup schedules remain unconfigured; VM109 is only a temporary
-restore test site. No production data, public listener, router/DHCP or
-shared VPN policy change, PR merge or permanent monitoring occurred.
+of 100,000 points. The owner then authorized VM110-only backup and user-pilot
+startup. PVE1 now runs separate VM110 jobs: daily 05:30 Moscow time on
+`backup-fast-nfs` with keep-last 7, weekly Monday 01:30 Moscow time on
+`backup-weekly-nfs` with keep-last 4. The guest copies application state at
+02:00 UTC daily and 22:00 UTC Sunday, 30 minutes before each VM job, keeping
+two local successful copies. The first off-VM VM archive succeeded and was
+restored offline as stopped VM111 with its NIC removed and autostart disabled;
+an application-state restore passed SQLite integrity checks.
+
+VM110 now runs the exact corrected product `15374b5c856958fdf67c5efdce68db81e05ac92f`
+plus separate operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`.
+Both app and TLS services are active but disabled for boot; the old archives,
+config, overlay and primary state remain for rollback. Private HTTPS smoke
+passed login, import, preview, mapping, queue, result view and DXF download.
+GEOAI-039 remains PARTIAL pending the owner's user acceptance. No production
+data, public listener, router/DHCP or shared VPN policy change, PR merge or
+permanent monitoring occurred.
 GEOAI-040 production publication remains BLOCKED. Detailed evidence is in
 `harness/build/039-vm110-pilot-execution.md`.
 
@@ -50,7 +60,7 @@ adds only the bounded 100k DXF fix. The separate `pilot_ops/` package
 implements the operational ASGI launcher, config checks, backup/restore
 and service/TLS templates; it is not part of either product archive.
 GEOAI-039 remains PARTIAL because technical success on one synthetic fixture
-does not complete owner sign-off or the Proxmox backup arrangement.
+and restored backups do not complete owner sign-off.
 GEOAI-040 has no publication
 authorization. The fresh pilot state needed no production-data migration;
 project SQLite is user_version 8 and auth SQLite is user_version 1.
@@ -65,7 +75,7 @@ The staging manifest's schemaVersion 5 is a separate format.
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
 | BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
 | BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
-| PARTIAL | P11 039 | Corrected candidate plus separate overlay passed the saved 100,000-point synthetic HTTPS check within 120 s and 2.5 GiB, with restart and backup/restore. Owner acceptance, broader survey evidence and Proxmox backup schedule remain open. |
+| PARTIAL | P11 039 | Corrected exact product plus separate overlay runs privately on VM110. The saved 100,000-point fixture, small HTTPS workflow, VM110 backup and offline VM restore passed. Owner acceptance remains open; one fixture does not prove all survey shapes. |
 | BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/migration authorization. No merge or production change now. |
 
 The unified material request is `harness/build/missing-materials.md`.
@@ -175,7 +185,7 @@ mapping and DXF through the shared engine.
 | P10 | 036 | Dataset-readiness audit | 025, 027–028 | ACCEPTED at e5663fa; reports not ready for training/evaluation |
 | P10 | 037 | Small offline recommendation model | 036 | BLOCKED by actual data readiness |
 | P10 | 038 | Reviewable model suggestions | 025, 037 | BLOCKED by 037 |
-| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: corrected candidate passed saved 100k synthetic fixture; owner sign-off and long-term backup schedule pending |
+| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: exact corrected pair installed, private smoke and VM backup/restore passed; owner user acceptance pending |
 | P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by full 039 and explicit authorization |
 
 For a first limited site release, P1–P4 plus P11 are the main path. P5–P10

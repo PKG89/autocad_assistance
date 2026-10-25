@@ -1,0 +1,9 @@
+[Unit]
+Description=GEO AI consistent application state copy before VM110 backup
+RequiresMountsFor=/srv/geoai-pilot/backups
+ConditionPathExists=/etc/geoai-pilot/config.json
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/geoai-pilot-app-backup
+TimeoutStartSec=20min
