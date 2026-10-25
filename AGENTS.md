@@ -289,6 +289,18 @@ evidence. GEOAI-022 is READY under
 the verified Python runtime and only disposable synthetic staging
 roots. No system package, production service or real data operation.
 
+GEOAI-022 is locally verified at candidate `922dc0d`: a clean Git
+archive and exact Python lock built disposable loopback HTTPS staging;
+an authenticated synthetic import produced a DXF. Offline backup,
+compatible 021 code rollback, and fresh-root restore preserved owner,
+project, source and result checksums. A tampered backup and a backup
+attempt during active service were rejected. The test server is stopped.
+The repaired-commit gate passed 124 focused, 10 isolated regression
+and six isolated API tests; exact GitHub feature/PR checks are pending.
+See `harness/build/022-staging-recovery.md`; on acceptance,
+close P4 and freeze GEOAI-023 from the accepted base. No production
+deployment or real-data operation is authorized.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

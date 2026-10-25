@@ -981,3 +981,32 @@ Keep one concise entry per task. Do not paste full command output.
   accepted base under `harness/build/022-staging-recovery.md`, with
   the same one-worker, two-repair and zero-spend bounds. No production
   service, migration, real credential or deployment was used.
+
+## GEOAI-022 — local staging/recovery verified; remote CI pending
+
+- From accepted 021 base and frozen 022 scope, candidate commits are
+  `6e89cbf` and `922dc0d`. One repair fixed child-process bytecode
+  writes into the checksum-verified release after the first backup
+  correctly rejected release drift. The second staging root was clean.
+- Exact Python 3.13.5 package lock SHA-256:
+  `d8d2cf3756f29f64246f133f694ee61aa9711f8eb8e95c4fd2039734d381c351`.
+  Rebuilding clean commit `922dc0d` reproduced archive SHA-256
+  `6e487390aff13ba4517f7d542484c50f1bfd8a80f5bd8f0efb448883e7cc5684`.
+  The compatible 021 archive SHA-256 was
+  `f4d43b95bcb1b1367a56c401cd7d6c7544ec78c2e17f1c221ce12da64025a8c3`.
+- Loopback HTTPS at localhost:18444 passed health 200 and anonymous
+  projects 401. A synthetic owner imported the fixed 021 CSV, created
+  a project/revision and retrieved DXF SHA-256
+  `b07df55f418a0da843793302aab9f6629966e38283b40d68e0e6bab4d6ef13db`.
+  Backup while active was refused; the server then stopped.
+- The offline 254-file backup succeeded. Activating the 021 code on
+  the same schema v5 state passed health, owner/project, source and
+  result checks. A corrupted copied backup was rejected with no
+  restore target; the good backup restored into a fresh root and
+  passed the same HTTPS owner/project/source/result checks. Both
+  staging servers stopped. No application log files, production data,
+  Docker install, system change or deployment.
+- Final repaired-commit gate `p4-022/final-gate-repaired.log` passed 124
+  focused, 10 isolated regression and six isolated API tests, zero
+  blocked operations, `pip check` and `git diff --check`. Exact
+  feature/PR GitHub CI remains before acceptance and the P4 checkpoint.
