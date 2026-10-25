@@ -1404,3 +1404,33 @@ Keep one concise entry per task. Do not paste full command output.
   blocked pending these inputs.
 - Current feature HEAD after 036 is `e5663fa`; next commit contains
   only checkpoint documentation. No production action or real data.
+
+## GEOAI-030 — owner DXF intake; full validation remains blocked
+
+- Owner supplied one completed DXF used in an engineering-geodetic
+  report, and confirmed that its original field TXT is unavailable.
+  The file is 202,633,692 bytes, AutoCAD DXF `AC1027`; its Windows
+  and private VM109 copies matched SHA-256
+  `3b1fa964d205b774967855211e2a43b8fe0b56566dcbff272eaf0232811f98df`.
+  The copy and constant-memory inventory are stored outside Git under
+  private VM109 staging with directory mode 700 and files mode 600.
+- Read-only scan completed with zero malformed group-code pairs and
+  counted 457,748 entities: 42,718 POINT, 9,268 LWPOLYLINE,
+  163,447 LINE, 97,385 3DFACE, plus other entities. It emitted only
+  aggregate metadata; no coordinates, labels or raw drawing bytes
+  were committed or published.
+- The DXF can support a reviewed output inventory, but no independent
+  source-to-reference mapping or whole-object held-out benchmark can
+  be derived responsibly from this single final drawing. Original
+  point codes, object labels, class regression criteria and rights for
+  model training/publication are not established. The synthetic 030
+  candidate stays review-only; full 030/031 and 037/038 remain blocked.
+  Feature base was clean `dcc00b7` before this documentation update.
+- A second private, read-only two-pass scan compared exact XY equality
+  without a tolerance or coordinate export. There were 42,716 unique
+  `POINT` XY pairs; among major plan layers, only 1 of 38,898 road
+  `LINE` endpoints and 4 of 289,196 ordinary contour polyline
+  vertices coincided exactly with a `POINT` XY. This diagnostic does
+  not prove source provenance, but rules out assuming that the final
+  drawing directly labels the survey-point sequence. Its private
+  aggregate report remains outside Git.

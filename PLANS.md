@@ -241,6 +241,17 @@ from domain acceptance: current `surface.py` has unconstrained SciPy
 Delaunay and decorative breaklines; library/license, boundary/mask
 rules and analytical/reference sites need agreement. P9 034/035 are
 blocked pending supplied document forms, units and rounding rules.
+Owner supplied a completed real DXF for P7 030; a private, read-only
+inventory passed with matching transfer SHA-256 and no raw data in
+Git. It has 42,718 POINT, 9,268 LWPOLYLINE, 163,447 LINE and
+97,385 3DFACE entities. Original field TXT/CSV is unavailable, and
+class labels, independent object-family splits, use rights and
+regression criteria have not been confirmed. The file supports DXF
+inventory and future reviewed comparisons, not full 030 acceptance or
+training readiness. Continue with 030/031 blocked pending evidence.
+An exact XY diagnostic found just 1 of 38,898 road LINE endpoints
+equal to a DXF POINT coordinate, and 4 of 289,196 ordinary contour
+LWPOLYLINE vertices; no direct point-to-line truth mapping is established.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

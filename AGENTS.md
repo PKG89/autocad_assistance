@@ -429,6 +429,16 @@ SciPy Delaunay triangulates the points without constraints. Do not
 claim a constrained TIN until a suitable licensed implementation,
 analytical/reference surfaces and specialist review are available.
 P9 034/035 require owner-provided document forms and numerical rules.
+An owner-provided completed real DXF was received for GEOAI-030 and
+inspected read-only in private VM109 staging outside Git. The 202.6 MB
+ASCII DXF is internally parseable and contains survey/terrain and plan
+entities, but the original TXT/CSV is unavailable. Do not treat this
+DXF alone as an independent source/reference pair or as permission for
+training/publication. Full 030/031 still need source-to-object mapping,
+approved comparison use, whole-object splits and class criteria.
+Private exact XY inspection found that finished plan vertices almost
+never coincide with `POINT` entities on major layers. Do not infer a
+field-source mapping or any positional tolerance from this alone.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
