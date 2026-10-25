@@ -1072,3 +1072,26 @@ Keep one concise entry per task. Do not paste full command output.
   under `harness/build/023-plan-viewer.md`. No production server or
   real data used. GEOAI-024 is READY from this base under
   `harness/build/024-line-candidates.md`.
+
+## GEOAI-024 — local A/B comparison passed; CI pending
+
+- Accepted 023 base `24dad9c`; P5 scope frozen under
+  `harness/build/024-line-candidates.md` at `c0a3727`. The only
+  algorithm refactor exposes the existing exact line-code grouping
+  and anchored nearest-neighbor order; direct old/current synthetic
+  DXF semantics matched. No change to measured coordinates or DXF
+  decisions.
+- Fixed synthetic HTTPS request gave group `k1`: A P1,P2,P3,P4,
+  B P1,P3,P4,P2, lengths 200 m and 100 m as descriptive features.
+  Repeated GETs matched, source SHA-256
+  `1092bb2deb3ffb67d333746ea393699e77850926f6b7d8251873c211d56cc8d0`
+  and source bytes were unchanged; no job/decision created. Browser
+  static fixture showed both variants and no accepted choice, with
+  zero console errors. Authenticated HTTPS API was checked separately.
+- Focused tests covered stable tie, duplicate/empty IDs, every count
+  bound, invalid source/settings/length, owner boundary and safe API
+  413/422. One repair covered malformed CSV and overflow handling.
+  Final local gate `p5-024/final-gate-repaired.log` passed 131
+  focused, 10 isolated regression and six isolated API tests,
+  zero blocked operations, `pip check`, `git diff --check` and JS
+  syntax on Windows Node 24. Exact GitHub feature/PR CI remains.

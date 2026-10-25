@@ -23,6 +23,9 @@ from autocad_assistance.services.survey_contract import (
 )
 from autocad_assistance.services.survey_parser import SurveyParseError
 from autocad_assistance.services.uploads import UploadTooLargeError
+from autocad_assistance.services.line_candidates import (
+    LineCandidateInvalidError, LineCandidateLimitError, build_line_candidates,
+)
 
 
 ALGORITHM_VERSION = "geoai-dxf-v1"
@@ -209,5 +212,20 @@ def create_project_router(store: ProjectStore, upload_root: str | Path) -> APIRo
                 code=warning.code, message=warning.message, rowIndex=warning.row_index,
             ) for warning in dataset.warnings],
         )
+
+    @router.get("/{project_id}/revisions/{revision_id}/line-candidates")
+    async def line_candidates(project_id: UUID, revision_id: UUID, request: Request):
+        try:
+            comparison = await run_in_threadpool(
+                build_line_candidates, store, request.scope["geoai.owner_id"],
+                str(project_id), str(revision_id),
+            )
+        except ProjectNotFoundError:
+            return _error(404, "RESOURCE_NOT_FOUND", "Resource not found")
+        except LineCandidateLimitError:
+            return _error(413, "CANDIDATES_TOO_LARGE", "Line comparison exceeds viewer limits")
+        except (LineCandidateInvalidError, ProjectIntegrityError, ProjectStoreError):
+            return _error(422, "CANDIDATES_UNAVAILABLE", "Line comparison cannot be displayed")
+        return JSONResponse(content=comparison, headers={"Cache-Control": "no-store"})
 
     return router

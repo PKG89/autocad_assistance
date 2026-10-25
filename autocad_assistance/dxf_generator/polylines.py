@@ -10,6 +10,14 @@ from ..config import polyline_layer_mapping, sm_controller_config
 logger = logging.getLogger(__name__)
 
 
+def polyline_group_key(code: object) -> str | None:
+    """Use exactly the controller-code grouping accepted by the DXF builder."""
+    code_raw = str(code).strip().lower()
+    match = re.fullmatch(r"(?P<prefix>[a-zA-Z]+)\d+", code_raw)
+    allowed_prefixes = {prefix.lower() for prefix in sm_controller_config.get("polyline_prefixes", set())}
+    return code_raw if match and match.group("prefix") in allowed_prefixes else None
+
+
 def get_polyline_properties(doc, polyline_code: str) -> Dict[str, object]:
     """Return DXF layer attributes for a polyline code."""
     layer_table = doc.layers if doc else None
@@ -30,17 +38,11 @@ def get_polyline_properties(doc, polyline_code: str) -> Dict[str, object]:
 
 
 def _collect_polyline_groups(final_data) -> Dict[str, List[Tuple[int, Tuple[float, float, float, str]]]]:
-    allowed_prefixes = {p.lower() for p in sm_controller_config.get("polyline_prefixes", set())}
-    pattern = re.compile(r"^(?P<prefix>[a-zA-Z]+)(?P<number>\d+)$")
     groups: Dict[str, List[Tuple[int, Tuple[float, float, float, str]]]] = {}
 
     for index, row in final_data.iterrows():
-        code_raw = str(row["Code"]).strip().lower()
-        match = pattern.match(code_raw)
-        if not match:
-            continue
-        prefix = match.group("prefix")
-        if prefix not in allowed_prefixes:
+        code_raw = polyline_group_key(row["Code"])
+        if code_raw is None:
             continue
 
         try:
@@ -55,15 +57,16 @@ def _collect_polyline_groups(final_data) -> Dict[str, List[Tuple[int, Tuple[floa
     return groups
 
 
-def _order_polyline_points(points: Sequence[Tuple[int, Tuple[float, float, float, str]]]) -> List[Tuple[float, float, float, str]]:
+def order_polyline_pairs(points: Sequence[tuple[int, tuple]]) -> list[tuple[int, tuple]]:
+    """Legacy anchored nearest-neighbor order, retaining source row keys."""
     if not points:
         return []
     ordered_pairs = sorted(points, key=lambda item: item[0])
     if len(ordered_pairs) < 2:
-        return [ordered_pairs[0][1]]
+        return ordered_pairs
 
     remaining = list(ordered_pairs[1:])
-    ordered: List[Tuple[float, float, float, str]] = [ordered_pairs[0][1]]
+    ordered: list[tuple[int, tuple]] = [ordered_pairs[0]]
     current_point = ordered_pairs[0][1][:3]
 
     while remaining:
@@ -71,11 +74,15 @@ def _order_polyline_points(points: Sequence[Tuple[int, Tuple[float, float, float
             remaining,
             key=lambda item: math.hypot(item[1][0] - current_point[0], item[1][1] - current_point[1]),
         )
-        ordered.append(next_item[1])
+        ordered.append(next_item)
         current_point = next_item[1][:3]
         remaining.remove(next_item)
 
     return ordered
+
+
+def _order_polyline_points(points: Sequence[Tuple[int, Tuple[float, float, float, str]]]) -> List[Tuple[float, float, float, str]]:
+    return [item[1] for item in order_polyline_pairs(points)]
 
 
 def extract_structural_breaklines(final_data) -> List[List[Tuple[float, float, float]]]:

@@ -19,10 +19,11 @@ import httpx
 
 from autocad_assistance.api import create_app
 from autocad_assistance.services.dxf_plan import PlanInvalidError, PlanLimitError
+from autocad_assistance.services.line_candidates import LineCandidateInvalidError, LineCandidateLimitError
 from autocad_assistance.services.auth_store import AuthStore
 from autocad_assistance.services.calculation_jobs import CalculationJobManager
 from autocad_assistance.services.project_jobs import ProjectJobBridge
-from autocad_assistance.services.project_store import ProjectNotFoundError, ProjectStore
+from autocad_assistance.services.project_store import ProjectIntegrityError, ProjectNotFoundError, ProjectStore
 from autocad_assistance.services.survey_contract import SurveyContext
 from autocad_assistance.services.uploads import store_upload
 
@@ -156,6 +157,34 @@ class ProjectJobsTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(response.status_code, 500)
             self.assertEqual(self.store.list_jobs_for(self.owner, self.project_id), ())
             self.assertEqual(list((self.root / "jobs").glob("*/state.json")), [])
+
+    async def test_line_candidate_revision_boundary_and_safe_errors(self):
+        path = f"/api/v1/projects/{self.project_id}/revisions/{self.revision_id}/line-candidates"
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app), base_url=ORIGIN) as client:
+            self.assertEqual((await client.get(path)).status_code, 401)
+            await self.login(client)
+            response = await client.get(path)
+            self.assertEqual(response.status_code, 200, response.text)
+            self.assertEqual(response.json()["groups"], [])
+            self.assertEqual(response.headers["cache-control"], "no-store")
+            self.assertEqual((await client.get("/app/line-candidates.js")).status_code, 200)
+            foreign = SimpleNamespace(user=SimpleNamespace(user_id=str(uuid4())))
+            with patch.object(AuthStore, "authenticate", return_value=foreign):
+                self.assertEqual((await client.get(path)).status_code, 404)
+            with patch("autocad_assistance.api.projects.build_line_candidates",
+                       side_effect=LineCandidateLimitError()):
+                response = await client.get(path)
+            self.assertEqual(response.status_code, 413)
+            self.assertEqual(response.json()["error"]["code"], "CANDIDATES_TOO_LARGE")
+            with patch("autocad_assistance.api.projects.build_line_candidates",
+                       side_effect=LineCandidateInvalidError()):
+                response = await client.get(path)
+            self.assertEqual(response.status_code, 422)
+            self.assertEqual(response.json()["error"]["code"], "CANDIDATES_UNAVAILABLE")
+            with patch.object(ProjectStore, "read_source_for", side_effect=ProjectIntegrityError("tampered")):
+                response = await client.get(path)
+            self.assertEqual(response.status_code, 422)
+            self.assertNotIn("tampered", response.text)
 
     async def test_concurrent_claim_cancel_retry_and_tampered_result(self):
         worker = self.root / "fake_worker.py"

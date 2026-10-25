@@ -6,6 +6,7 @@
   <title>GEO AI — проекты и расчёт DXF</title>
   <link rel="stylesheet" href="/app/styles.css">
   <script src="/app/plan-viewer.js" defer></script>
+  <script src="/app/line-candidates.js" defer></script>
   <script src="/app/app.js" defer></script>
 </head>
 <body>
@@ -70,6 +71,13 @@
       <section class="card">
         <h2>Версии выбранного проекта</h2>
         <ul id="revision-list"></ul>
+        <button id="candidate-load" type="button" disabled>Сравнить варианты линий для выбранной версии</button>
+        <div id="candidate-panel" class="candidate-panel" hidden>
+          <h3>Варианты соединений A/B</h3>
+          <p id="candidate-summary" class="hint"></p>
+          <p class="hint">Длина — описательный признак, не геодезическое решение. Выбор и подтверждение появятся на следующем этапе.</p>
+          <div id="candidate-groups"></div>
+        </div>
       </section>
 
       <section id="job-panel" class="card" hidden>

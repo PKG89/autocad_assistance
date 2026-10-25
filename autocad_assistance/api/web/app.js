@@ -59,6 +59,7 @@ function showLogin() {
   clearTimeout(jobPoll);
   jobPoll = null;
   window.GeoaiPlanViewer.hide();
+  window.GeoaiLineCandidates.hide();
   csrfToken = null;
   uploadId = null;
   $("login-panel").hidden = false;
@@ -92,6 +93,7 @@ async function loadProjects(preferredId = null) {
 }
 
 async function loadRevisions() {
+  window.GeoaiLineCandidates.hide();
   const list = $("revision-list");
   list.replaceChildren();
   const revisionSelect = $("job-revision");
@@ -101,6 +103,7 @@ async function loadRevisions() {
   if (!projectId) {
     list.append(item("Сначала выберите проект."));
     $("job-submit").disabled = true;
+    $("candidate-load").disabled = true;
     await loadJobs();
     return;
   }
@@ -118,6 +121,7 @@ async function loadRevisions() {
     revisionSelect.value = response.data[0].revisionId;
   }
   $("job-submit").disabled = !revisionSelect.value;
+  $("candidate-load").disabled = !revisionSelect.value;
   await loadJobs();
 }
 
@@ -285,6 +289,7 @@ $("project-form").addEventListener("submit", (event) => {
 
 $("project-select").addEventListener("change", () => {
   window.GeoaiPlanViewer.hide();
+  window.GeoaiLineCandidates.hide();
   submitIntent = null;
   retryIntents.clear();
   loadRevisions().catch((error) => message(error.message, true));
@@ -293,7 +298,20 @@ $("project-select").addEventListener("change", () => {
 $("job-revision").addEventListener("change", () => {
   submitIntent = null;
   $("job-submit").disabled = !$("job-revision").value;
+  $("candidate-load").disabled = !$("job-revision").value;
+  window.GeoaiLineCandidates.hide();
 });
+
+$("candidate-load").addEventListener("click", (event) => busy(event.currentTarget, async () => {
+  const projectId = $("project-select").value;
+  const revisionId = $("job-revision").value;
+  if (!projectId || !revisionId) throw new Error("Выберите проект и версию съёмки");
+  const comparison = await api(`/api/v1/projects/${projectId}/revisions/${revisionId}/line-candidates`);
+  if ($("project-select").value === projectId && $("job-revision").value === revisionId) {
+    window.GeoaiLineCandidates.show(comparison);
+    $("candidate-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}));
 
 $("job-submit").addEventListener("click", (event) => busy(event.currentTarget, async () => {
   const revisionId = $("job-revision").value;

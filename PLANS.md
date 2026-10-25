@@ -90,7 +90,7 @@ mapping and DXF through the shared engine.
 | P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | ACCEPTED at eecaad8 |
 | P4 | 022 | Reproducible staging, recovery and rollback | 021 | ACCEPTED |
 | P5 | 023 | Browser plan viewer | 015, 020–021 | ACCEPTED |
-| P5 | 024 | A/B line-connection candidates | 012, 023 | READY |
+| P5 | 024 | A/B line-connection candidates | 012, 023 | LOCAL VERIFIED; CI pending |
 | P5 | 025 | Confirmed decisions and review history | 017, 023–024 | PROPOSED |
 | P6 | 026 | Reversible derived-geometry edits | 025 | PROPOSED |
 | P6 | 027 | Reference-object archive | 015, 017, 025 | PROPOSED |
@@ -162,6 +162,14 @@ branch bundle SHA-256:
 P5 continues with GEOAI-024 READY under
 `harness/build/024-line-candidates.md`; no selected line geometry or
 production data is changed by generating candidates.
+
+GEOAI-024 local candidate compares two explicit line sequences from
+the same immutable revision, returns reasons/provenance and never
+chooses one. The synthetic zigzag gave A=P1,P2,P3,P4 and
+B=P1,P3,P4,P2; direct accepted-023/current DXF line semantics matched.
+The final local gate passed 131 focused, 10 isolated regression and
+six isolated API tests. Exact GitHub feature/PR CI is pending; after
+acceptance freeze GEOAI-025 from the verified base.
 After exact CI acceptance, P4 closes and GEOAI-023 can be frozen from
 the accepted base. No production publication is authorized.
 

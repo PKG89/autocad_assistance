@@ -50,5 +50,11 @@ li { overflow-wrap: anywhere; }
 .plan-layers { display: grid; gap: 6px; max-height: 180px; overflow: auto; }
 .plan-layer { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: .9rem; font-weight: 500; }
 .plan-layer input { width: auto; margin: 0; }
+.candidate-panel { border-top: 1px solid #dae5e0; margin-top: 18px; padding-top: 16px; }
+.candidate-panel details { border: 1px solid #dae5e0; border-radius: 8px; padding: 10px 14px; margin: 9px 0; }
+.candidate-panel summary { cursor: pointer; font-weight: 650; }
+.candidate-panel ol { padding-left: 23px; }
+.candidate-option { margin: 12px 0; overflow-wrap: anywhere; }
+.candidate-option p { margin: 5px 0; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) { .shell { padding: 12px; } .card { padding: 18px; } .topbar div { display: grid; gap: 3px; } .plan-layout { grid-template-columns: 1fr; } .plan-svg { min-height: 320px; } }

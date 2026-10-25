@@ -1,6 +1,6 @@
 # GEOAI-024 — explainable A/B line-connection candidates
 
-Status: READY. Base: accepted GEOAI-023 feature commit
+Status: LOCAL VERIFIED; exact GitHub feature/PR CI pending. Base: accepted GEOAI-023 feature commit
 `24dad9cddfb90c9d4f5cad9d1dfed3415bfea534`; 012, 015, 020–023
 dependencies passed local and exact GitHub feature/PR checks. P5
 manifest: `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`;
@@ -58,3 +58,32 @@ One initial attempt and at most two repairs; one writable worktree,
 one compute worker, $0 external executor. Stop on time/repair budget,
 unexpected edits, lost isolation, missing domain decision or production
 action; record HEAD, diff, checks and exact blocker.
+
+## Local implementation and evidence (2026-10-25)
+
+- The existing builder now exposes its unchanged code grouping and
+  first-point-anchored nearest-neighbor order to a read-only candidate
+  service. A is source-row order; B is that exact builder order. Both
+  carry point IDs, row indexes, exact XYZ source text, descriptive 2D
+  length, reordered-position count and reason codes, with revision,
+  source/settings hashes and algorithm versions. Empty/duplicate IDs
+  abstain; 200-group, 500-point/group and 5,000-total caps return 413.
+  A malformed source/settings or non-finite length returns safe 422.
+- Authenticated synthetic zigzag API result: group `k1`, A
+  `P1→P2→P3→P4` (200 m), B `P1→P3→P4→P2` (100 m), source SHA-256
+  `1092bb2deb3ffb67d333746ea393699e77850926f6b7d8251873c211d56cc8d0`.
+  Repeated GETs were identical, the source download was byte-identical
+  and no job was created. A disposable browser static fixture from
+  that verified HTTPS JSON showed both orders/reasons and no accepted
+  decision; console errors: zero. The HTTPS API was checked separately
+  with certificate verification, without bypassing a browser warning.
+- A direct comparison of accepted 023's and candidate 024's
+  `build_polyline_by_code` on the same synthetic zigzag produced the
+  same LWPOLYLINE coordinates, breaklines and entity types/layers.
+  The final gate `p5-024/final-gate-repaired.log` passed 131 focused,
+  10 isolated regression and six isolated API tests, zero blocked
+  operations, `pip check` and `git diff --check`; Windows Node 24
+  syntax checks passed both changed browser scripts. One repair
+  covered CSV parse errors and length overflow with safe API errors.
+  No decision, database schema, DXF generation or production state
+  was changed. Exact GitHub feature/PR CI is pending.

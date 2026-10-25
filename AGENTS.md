@@ -325,6 +325,15 @@ for eligible code groups, returning explicit A/B candidates and
 reasons without accepting either or changing measured XYZ/DXF. P5
 bounds remain in `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`.
 
+GEOAI-024 is locally verified: A uses immutable survey-row order and
+B reuses the existing line builder's anchored nearest-neighbor order.
+The owner-scoped comparison carries provenance, point IDs/XYZ,
+descriptive lengths and reasons; it cannot select or persist a
+decision. The fixed zigzag, browser comparison, old/new DXF semantic
+parity and 131 focused + 10 regression + six API tests passed. Exact
+GitHub feature/PR CI is pending; see
+`harness/build/024-line-candidates.md`. No production data changed.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local
