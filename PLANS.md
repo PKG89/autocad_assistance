@@ -11,8 +11,8 @@ The owner passed the synthetic cabinet scenario on VM110: import, preview,
 mapping, calculation, DXF download and opening, and reopening the project.
 This accepts only that scenario and the installed product
 `15374b5c856958fdf67c5efdce68db81e05ac92f` plus separate operations
-package `71ab84cba999bcf2fd105b69917cdd1e8907671f`. Remarks were not
-specified in the owner's message; do not infer that there were none. No
+package `71ab84cba999bcf2fd105b69917cdd1e8907671f`. The owner later
+confirmed **no remarks**. No
 quality claim for arbitrary real surveys or all 100,000-point shapes follows.
 Current exact PR feature and pull-request CI checks completed successfully.
 

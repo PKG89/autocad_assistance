@@ -117,8 +117,8 @@ operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`.
 This section supersedes the historical pending-owner statement above.
 The owner reports that the synthetic user scenario passed: import,
 preview, mapping, calculation, DXF download and opening, and reopening
-the project. The remarks placeholder was not completed; remarks are
-**unspecified**, not confirmed absent. This accepts only that installed
+the project. The owner later confirmed that there were **no remarks**.
+This accepts only that installed
 pair and scenario. It does not establish quality for real surveys or
 all possible 100,000-point inputs.
 
@@ -154,9 +154,8 @@ Remaining acceptance checks:
    identifier and task result together; fail closed for a skipped or
    failed dump, and make the failure visible to an operator. Test both
    success and failure paths without changing other VM backup jobs.
-3. Resolve the unspecified owner remarks before recording them as `none`
-   or as tracked findings. The bounded synthetic user acceptance itself is
-   recorded above and does not need to be repeated.
+The owner has confirmed there were no remarks on the bounded synthetic
+scenario. This does not remove the two technical recovery checks above.
 
 GEOAI-040 remains blocked. PR merge, boot autostart, public or wider VPN
 access, and real-data use are not authorized by this user check.

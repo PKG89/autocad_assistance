@@ -6,8 +6,8 @@ The owner reports a passed **synthetic user scenario** on the installed
 product `15374b5c856958fdf67c5efdce68db81e05ac92f` plus the separate
 operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`:
 import, preview, mapping, calculation, DXF download and opening, and
-reopening the project. The owner's remarks field was not filled in; record
-remarks as unspecified until clarified. This is user acceptance of that
+reopening the project. The owner later clarified that there were no remarks.
+This is user acceptance of that
 exact pair and scenario only, not of arbitrary real surveys.
 
 GEOAI-039 remains PARTIAL. The restored VM111 disk was checked offline
