@@ -1,7 +1,6 @@
 # GEOAI-029A — one bounded field-code profile
 
-Status: ACCEPTED for the bounded parser contract, subject to recording the
-exact PR-head CI result below. Frozen implementation
+Status: ACCEPTED for the bounded parser contract. Frozen implementation
 base: `ca87c06f7187a698ff1da6417a9e1409750e6bae` on
 `codex/geoai-current`; the same tree was published at `db485c4` on
 `codex/geoai-current` in draft PR #6. 012 and 029 are accepted. One writer,
@@ -98,8 +97,10 @@ Focused 029A plus 029 catalog tests passed 8/8. The current isolated
 `scripts/geoai-ci-checks.sh` gate passed all focused tests, protected
 regressions 10/10, API bootstrap 6/6 and `pip check`, with zero blocked
 network/dotenv/write/process operations in the two bootstrap reports.
-The subsequent character-control tightening passed the focused 8/8 again;
-exact PR-head CI remains to be recorded after push. Synthetic parser results
+The subsequent character-control tightening passed the focused 8/8 again.
+Published implementation head `6236df112d448f4502e276672d675f5fb3cc6478`
+passed both GitHub `tests` checks (Actions runs 40228038941 and
+40228035964), and its Git tree matched VM109. Synthetic parser results
 do not validate actual field coding, symbol placement, line construction or
 asset rights. The next candidate is a separate 030A or 031A specification;
 neither is automatically READY.

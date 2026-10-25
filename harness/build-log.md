@@ -1812,13 +1812,16 @@ Keep one concise entry per task. Do not paste full command output.
   `scripts/geoai-ci-checks.sh` gate passed all focused tests, protected
   regressions 10/10, API bootstrap 6/6 and `pip check`. After tightening
   control-character rejection, focused tests passed again 8/8; exact
-  GitHub PR-head CI remains to be checked after publication.
+  Published GitHub implementation head
+  `6236df112d448f4502e276672d675f5fb3cc6478` passed both exact-head
+  `tests` checks (Actions runs 40228038941 and 40228035964). Its Git tree
+  `7df1a6f74e2262523c75982f9f5aa2a7373cc085` matched VM109 exactly.
   `git diff --check` passed. Implementation commit
   `9548fa5d465f052c314dd00740091baa36534561` follows 039 commit
   `71bd62c158b72e694eef2160b9864d7721b64d57` in the VM109 feature
   checkout. The current local branch has not been deployed to VM110.
-- GEOAI-029A is accepted for this synthetic parser contract, subject to
-  exact PR-head CI. It does not establish field interpretation of real
+- GEOAI-029A is accepted for this synthetic parser contract with exact
+  implementation-head CI. It does not establish field interpretation of real
   surveys, block placement, line tracing, or reuse rights. Next: prepare
   one bounded 030A or 031A specification; neither is READY or authorized
   to auto-run in this package. 030B/031C and 037–038 blockers remain.
