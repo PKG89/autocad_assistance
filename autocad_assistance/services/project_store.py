@@ -26,6 +26,8 @@ MAX_RESULT_BYTES = 25 * 1024 * 1024
 MAX_SETTINGS_BYTES = 64 * 1024
 MAX_DECISION_BYTES = 1024 * 1024
 MAX_DECISION_EVENTS_PER_REVISION = 2_000
+MAX_LINE_EDIT_BYTES = 1024 * 1024
+MAX_LINE_EDIT_EVENTS_PER_REVISION = 2_000
 JOB_STATUSES = frozenset({"queued", "running", "cancelling", "cancelled", "failed", "succeeded"})
 
 
@@ -59,6 +61,10 @@ class DuplicateSubmissionError(ProjectStoreError):
 
 class LineDecisionConflictError(ProjectStoreError):
     """A stale version or reused request key conflicts with saved history."""
+
+
+class LineEditConflictError(ProjectStoreError):
+    """A stale line model or reused edit request key conflicts."""
 
 
 @dataclass(frozen=True)
@@ -155,6 +161,20 @@ class LineDecisionRecord:
     created_at: str
 
 
+@dataclass(frozen=True)
+class LineEditRecord:
+    event_id: str
+    revision_id: str
+    version: int
+    request_id: str
+    request_sha256: str
+    operation_json: str
+    model_json: str
+    model_sha256: str
+    author_id: str
+    created_at: str
+
+
 def _uuid(value: str) -> str:
     try:
         normalized = str(UUID(value))
@@ -212,7 +232,7 @@ class ProjectStore:
         self.db_path = self.root / "projects.sqlite3"
         with self._db() as db:
             current = db.execute("PRAGMA user_version").fetchone()[0]
-            if current not in (0, 1, 2, 3, 4, 5, 6):
+            if current not in (0, 1, 2, 3, 4, 5, 6, 7):
                 raise ProjectStoreError(f"Unsupported project schema version: {current}")
             if current == 0:
                 db.executescript(
@@ -289,7 +309,22 @@ class ProjectStore:
                 );
                 CREATE INDEX IF NOT EXISTS line_decision_revision_group
                     ON line_decision_events(revision_id, group_code, version);
-                PRAGMA user_version = 6;
+                CREATE TABLE IF NOT EXISTS line_edit_events (
+                    event_id TEXT PRIMARY KEY,
+                    revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+                    version INTEGER NOT NULL,
+                    request_id TEXT NOT NULL UNIQUE,
+                    request_sha256 TEXT NOT NULL,
+                    operation_json TEXT NOT NULL,
+                    model_json TEXT NOT NULL,
+                    model_sha256 TEXT NOT NULL,
+                    author_id TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(revision_id, version)
+                );
+                CREATE INDEX IF NOT EXISTS line_edit_revision_version
+                    ON line_edit_events(revision_id, version);
+                PRAGMA user_version = 7;
                 """
                 )
             elif current == 1:
@@ -381,6 +416,30 @@ class ProjectStore:
                     db.execute("""CREATE INDEX line_decision_revision_group
                         ON line_decision_events(revision_id, group_code, version)""")
                     db.execute("PRAGMA user_version = 6")
+                    db.execute("COMMIT")
+                    current = 6
+                except Exception:
+                    db.execute("ROLLBACK")
+                    raise
+            if current == 6:
+                db.execute("BEGIN IMMEDIATE")
+                try:
+                    db.execute("""CREATE TABLE line_edit_events (
+                        event_id TEXT PRIMARY KEY,
+                        revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+                        version INTEGER NOT NULL,
+                        request_id TEXT NOT NULL UNIQUE,
+                        request_sha256 TEXT NOT NULL,
+                        operation_json TEXT NOT NULL,
+                        model_json TEXT NOT NULL,
+                        model_sha256 TEXT NOT NULL,
+                        author_id TEXT NOT NULL,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        UNIQUE(revision_id, version)
+                    )""")
+                    db.execute("""CREATE INDEX line_edit_revision_version
+                        ON line_edit_events(revision_id, version)""")
+                    db.execute("PRAGMA user_version = 7")
                     db.execute("COMMIT")
                 except Exception:
                     db.execute("ROLLBACK")
@@ -947,6 +1006,130 @@ class ProjectStore:
                                  (event_id,)).fetchone()
                 db.execute("COMMIT")
                 return self._line_decision(row)
+            except Exception:
+                db.execute("ROLLBACK")
+                raise
+
+    @staticmethod
+    def _line_edit(row: sqlite3.Row) -> LineEditRecord:
+        if _digest(row["model_json"].encode("utf-8")) != row["model_sha256"]:
+            raise ProjectIntegrityError("Saved line model checksum is invalid")
+        return LineEditRecord(**{field: row[field] for field in LineEditRecord.__dataclass_fields__})
+
+    @staticmethod
+    def _line_edit_request(
+        revision_id: str, expected_version: int, operation: Mapping[str, object],
+    ) -> tuple[str, str]:
+        if type(expected_version) is not int or expected_version < 0:
+            raise ProjectStoreError("Line edit version is invalid")
+        try:
+            rendered = json.dumps({"revisionId": revision_id, "expectedVersion": expected_version,
+                                   "operation": operation}, ensure_ascii=False, sort_keys=True,
+                                  separators=(",", ":"), allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise ProjectStoreError("Line edit operation is invalid") from exc
+        if len(rendered.encode("utf-8")) > MAX_SETTINGS_BYTES:
+            raise ProjectStoreError("Line edit operation is too large")
+        return rendered, _digest(rendered.encode("utf-8"))
+
+    def find_line_edit_request_for(
+        self, owner_id: str, revision_id: str, request_id: str,
+        *, expected_version: int, operation: Mapping[str, object],
+    ) -> LineEditRecord | None:
+        owner_id, revision_id, request_id = _uuid(owner_id), _uuid(revision_id), _uuid(request_id)
+        self.assert_revision_owner(owner_id, revision_id)
+        _, request_hash = self._line_edit_request(revision_id, expected_version, operation)
+        with self._db() as db:
+            row = db.execute("SELECT * FROM line_edit_events WHERE request_id=?", (request_id,)).fetchone()
+        if row is None:
+            return None
+        if (row["revision_id"], row["author_id"], row["request_sha256"]) != (
+            revision_id, owner_id, request_hash,
+        ):
+            raise LineEditConflictError("Edit request key was reused")
+        return self._line_edit(row)
+
+    def latest_line_edit_for(self, owner_id: str, revision_id: str) -> LineEditRecord | None:
+        owner_id, revision_id = _uuid(owner_id), _uuid(revision_id)
+        self.assert_revision_owner(owner_id, revision_id)
+        with self._db() as db:
+            row = db.execute("""SELECT * FROM line_edit_events WHERE revision_id=?
+                ORDER BY version DESC LIMIT 1""", (revision_id,)).fetchone()
+        return self._line_edit(row) if row is not None else None
+
+    def line_edit_version_for(self, owner_id: str, revision_id: str, version: int) -> LineEditRecord:
+        owner_id, revision_id = _uuid(owner_id), _uuid(revision_id)
+        self.assert_revision_owner(owner_id, revision_id)
+        with self._db() as db:
+            row = db.execute("SELECT * FROM line_edit_events WHERE revision_id=? AND version=?",
+                             (revision_id, version)).fetchone()
+        if row is None:
+            raise ProjectNotFoundError(str(version))
+        return self._line_edit(row)
+
+    def list_line_edit_events_for(
+        self, owner_id: str, revision_id: str, *, page: int = 1, page_size: int = 50,
+    ) -> tuple[tuple[LineEditRecord, ...], int]:
+        owner_id, revision_id = _uuid(owner_id), _uuid(revision_id)
+        self.assert_revision_owner(owner_id, revision_id)
+        if page < 1 or not 1 <= page_size <= 50:
+            raise ProjectStoreError("Line edit page is invalid")
+        with self._db() as db:
+            total = db.execute("SELECT COUNT(*) FROM line_edit_events WHERE revision_id=?",
+                               (revision_id,)).fetchone()[0]
+            rows = db.execute("""SELECT * FROM line_edit_events WHERE revision_id=?
+                ORDER BY version DESC LIMIT ? OFFSET ?""",
+                (revision_id, page_size, (page - 1) * page_size))
+            return tuple(self._line_edit(row) for row in rows), total
+
+    def record_line_edit_for(
+        self, owner_id: str, revision_id: str, request_id: str,
+        *, expected_version: int, operation: Mapping[str, object],
+        model: Mapping[str, object],
+    ) -> LineEditRecord:
+        owner_id, revision_id, request_id = _uuid(owner_id), _uuid(revision_id), _uuid(request_id)
+        operation_json, request_hash = self._line_edit_request(revision_id, expected_version, operation)
+        try:
+            model_json = json.dumps(model, ensure_ascii=False, sort_keys=True,
+                                    separators=(",", ":"), allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise ProjectStoreError("Line edit model is invalid") from exc
+        if len(model_json.encode("utf-8")) > MAX_LINE_EDIT_BYTES:
+            raise ResourceQuotaExceededError("Line edit model is too large")
+        model_hash = _digest(model_json.encode("utf-8"))
+        with self._db() as db:
+            db.execute("BEGIN IMMEDIATE")
+            try:
+                owned = db.execute("""SELECT 1 FROM revisions r JOIN projects p
+                    ON p.project_id=r.project_id WHERE r.revision_id=? AND p.owner_id=?""",
+                    (revision_id, owner_id)).fetchone()
+                if owned is None:
+                    raise ProjectNotFoundError(revision_id)
+                existing = db.execute("SELECT * FROM line_edit_events WHERE request_id=?",
+                                      (request_id,)).fetchone()
+                if existing is not None:
+                    if (existing["revision_id"], existing["author_id"], existing["request_sha256"]) != (
+                        revision_id, owner_id, request_hash,
+                    ):
+                        raise LineEditConflictError("Edit request key was reused")
+                    db.execute("COMMIT")
+                    return self._line_edit(existing)
+                current = db.execute("SELECT MAX(version) FROM line_edit_events WHERE revision_id=?",
+                                     (revision_id,)).fetchone()[0] or 0
+                if current != expected_version:
+                    raise LineEditConflictError("Line model changed; reload edits")
+                count = db.execute("SELECT COUNT(*) FROM line_edit_events WHERE revision_id=?",
+                                   (revision_id,)).fetchone()[0]
+                if count >= MAX_LINE_EDIT_EVENTS_PER_REVISION:
+                    raise ResourceQuotaExceededError("Line edit history limit exceeded")
+                event_id = str(uuid4())
+                db.execute("""INSERT INTO line_edit_events
+                    (event_id,revision_id,version,request_id,request_sha256,operation_json,model_json,model_sha256,author_id)
+                    VALUES (?,?,?,?,?,?,?,?,?)""", (event_id, revision_id, current + 1,
+                    request_id, request_hash, operation_json, model_json, model_hash, owner_id))
+                row = db.execute("SELECT * FROM line_edit_events WHERE event_id=?", (event_id,)).fetchone()
+                db.execute("COMMIT")
+                return self._line_edit(row)
             except Exception:
                 db.execute("ROLLBACK")
                 raise

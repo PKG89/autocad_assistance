@@ -97,14 +97,53 @@ def _order_polyline_points(
     return [by_row[index] for index in source_order]
 
 
-def extract_structural_breaklines(final_data, line_orders: dict[str, list[int]] | None = None) -> List[List[Tuple[float, float, float]]]:
-    """Return ordered sequences of 3D points usable as structural breaklines."""
-    breaklines: List[List[Tuple[float, float, float]]] = []
+def _line_sequences(final_data, line_orders=None, line_model=None):
+    """Return exact line sequences; edited rows are validated against the source."""
     groups = _collect_polyline_groups(final_data)
     if line_orders and not set(line_orders).issubset(groups):
         raise ValueError("Accepted line group is absent from source")
+    if line_model is None:
+        return [(code, _order_polyline_points(points, (line_orders or {}).get(code)))
+                for code, points in groups.items()]
+    if not isinstance(line_model, dict):
+        raise ValueError("Line edit model is invalid")
+    codes = line_model.get("editableGroupCodes")
+    source_rows = line_model.get("sourceRowIndexes")
+    segments = line_model.get("segments")
+    if (not isinstance(codes, list) or len(codes) > 200 or len(set(codes)) != len(codes)
+            or not set(codes).issubset(groups) or not isinstance(source_rows, list)
+            or not isinstance(segments, list) or len(segments) > 500):
+        raise ValueError("Line edit model groups are invalid")
+    by_row = {index + 1: point for code in codes for index, point in groups[code]}
+    if (len(by_row) > 5_000 or source_rows != sorted(by_row)
+            or any(type(index) is not int for index in source_rows)):
+        raise ValueError("Line edit source rows changed")
+    sequences = []
+    used = []
+    for segment in segments:
+        if not isinstance(segment, dict) or segment.get("groupCode") not in codes:
+            raise ValueError("Line edit segment code is invalid")
+        order = segment.get("rowIndexes")
+        if not isinstance(order, list) or not order or len(order) > 500 or any(type(index) is not int for index in order):
+            raise ValueError("Line edit segment rows are invalid")
+        used.extend(order)
+        try:
+            sequences.append((segment["groupCode"], [by_row[index] for index in order]))
+        except KeyError as exc:
+            raise ValueError("Line edit point is absent from source") from exc
+    if len(used) != len(by_row) or len(set(used)) != len(used) or set(used) != set(by_row):
+        raise ValueError("Line edit duplicates or drops source points")
     for code, points in groups.items():
-        ordered = _order_polyline_points(points, (line_orders or {}).get(code))
+        if code not in codes:
+            sequences.append((code, _order_polyline_points(points, (line_orders or {}).get(code))))
+    return sequences
+
+
+def extract_structural_breaklines(final_data, line_orders: dict[str, list[int]] | None = None,
+                                  line_model: dict | None = None) -> List[List[Tuple[float, float, float]]]:
+    """Return ordered sequences of 3D points usable as structural breaklines."""
+    breaklines: List[List[Tuple[float, float, float]]] = []
+    for _, ordered in _line_sequences(final_data, line_orders, line_model):
         if len(ordered) < 2:
             continue
         breaklines.append([(x, y, z) for x, y, z, _ in ordered])
@@ -112,19 +151,13 @@ def extract_structural_breaklines(final_data, line_orders: dict[str, list[int]] 
 
 
 def build_polyline_by_code(final_data, msp, doc=None, scale_factor: float = 1.0, text_scale: float = 1.6,
-                           line_orders: dict[str, list[int]] | None = None) -> List[List[Tuple[float, float, float]]]:
+                           line_orders: dict[str, list[int]] | None = None,
+                           line_model: dict | None = None) -> List[List[Tuple[float, float, float]]]:
     """Create LWPOLYLINE entities grouped by controller code and return ordered 3D breaklines."""
     line_text_height = 1.6 * scale_factor
     breaklines: List[List[Tuple[float, float, float]]] = []
 
-    groups = _collect_polyline_groups(final_data)
-    if line_orders and not set(line_orders).issubset(groups):
-        raise ValueError("Accepted line group is absent from source")
-    for group_key, points in groups.items():
-        if len(points) < 2:
-            continue
-
-        ordered_points = _order_polyline_points(points, (line_orders or {}).get(group_key))
+    for group_key, ordered_points in _line_sequences(final_data, line_orders, line_model):
         if len(ordered_points) < 2:
             continue
         breaklines.append([(x, y, z) for x, y, z, _ in ordered_points])

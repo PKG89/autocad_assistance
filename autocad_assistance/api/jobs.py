@@ -18,6 +18,7 @@ from autocad_assistance.services.project_store import (
     ProjectIntegrityError, ProjectNotFoundError, ProjectStoreError,
     ResourceQuotaExceededError, SubmissionConflictError,
 )
+from autocad_assistance.services.project_store import LineEditConflictError
 from autocad_assistance.services.survey_contract import SurveyContractError
 from autocad_assistance.services.survey_parser import SurveyParseError
 
@@ -55,6 +56,8 @@ def _failure(exc: Exception) -> JSONResponse:
         return _error(404, "RESOURCE_NOT_FOUND", "Resource not found")
     if isinstance(exc, SubmissionConflictError):
         return _error(409, "IDEMPOTENCY_CONFLICT", "Idempotency key belongs to a different request")
+    if isinstance(exc, LineEditConflictError):
+        return _error(409, "LINE_EDIT_CONFLICT", "Line edits use stale decisions; reset before submitting")
     if isinstance(exc, JobCapacityError):
         return _error(429, "JOB_CAPACITY", "Job queue is full")
     if isinstance(exc, ResourceQuotaExceededError):

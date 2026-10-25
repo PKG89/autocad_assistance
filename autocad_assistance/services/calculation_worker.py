@@ -46,6 +46,7 @@ def main() -> int:
         scale_factor=request["scale_factor"],
         tin_settings=request["tin_settings"],
         line_orders=request.get("line_orders"),
+        line_model=request.get("line_model"),
         jobs_root=job_dir,
     )
     if len(rendered) > output_bytes:

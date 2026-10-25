@@ -1,6 +1,6 @@
 # GEOAI-026 — controlled line edits over immutable measurements
 
-Status: READY after exact GEOAI-025 feature and PR CI passed. Base:
+Status: LOCAL VERIFIED; exact feature/PR CI pending. Base:
 `43fe7403af521ffc80822dcba8ead3a5b5aee23b`.
 Package P6 manifest: `/home/geoai/dev-data/geoai-autonomy/p6-run-manifest.json`,
 deadline 2026-10-25T06:33:23Z. One
@@ -62,3 +62,39 @@ review controls, focused tests, this spec and shared memory.
 Stop on budget, unexpected edits, lost isolation, missing domain
 decision or production action. Record HEAD, diff, checks and exact
 blocker in shared memory.
+
+## Local implementation and evidence (2026-10-25)
+
+- Project schema v7 adds append-only, owner-scoped line-edit events with
+  expected revision model version, request UUID, operation, complete
+  model snapshot and SHA-256, author and UTC time. Existing v6
+  projects migrate without losing records; history is paged at 50
+  events and capped at 2,000 per revision. A replay returns the same
+  event; a stale or reused request returns 409.
+- The initial model uses accepted A/B order if present, otherwise the
+  existing B order, and marks which it used. Only groups with
+  unambiguous candidate IDs enter the editable model. Explicit
+  reorder, split, join with chosen target code, move between lines,
+  undo and reset conserve the set of original survey row indexes.
+  The source point IDs, codes and XYZ are never changed. A later A/B
+  decision makes an existing edit model stale; new edits/jobs return
+  409 until an explicit reset to current decisions.
+- New project jobs snapshot the edit event/version/model hash plus
+  exact line segments; the worker and generator validate source row
+  membership and 200-group/500-line/500-vertices-per-line/5,000-row
+  limits before drawing. Previous job requests/results remain fixed.
+  Direct upload and Telegram DXF use the legacy path. Browser controls
+  show source IDs, lines, operations, current version and history.
+- Synthetic focused tests verified reorder, split, cross-code move,
+  join, undo, stale/foreign owner, invalid target/missing row, history,
+  idempotency, v6 migration, tampered model, unchanged source and
+  frozen old jobs. A direct breakline check matched the edited split.
+  Authenticated localhost HTTPS with certificate verification produced
+  three expected LWPOLYLINE sequences after a split; source SHA-256
+  `ac8ee8cb0781c34932a9fd0c68b08f40eaf4ebae38012761b8b09de8cb24750a`.
+  The disposable browser showed reorder v3 and original point IDs,
+  with zero console errors. Temporary HTTP/HTTPS servers and tab were
+  closed. The full gate `p6-026/final-gate-bounded.log` passed 137
+  focused, 10 isolated regression and six isolated API tests, zero
+  blocked operations, `pip check` and `git diff --check`. JS syntax
+  passed Windows Node 24. Exact GitHub feature/PR CI remains pending.

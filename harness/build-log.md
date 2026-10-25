@@ -1138,3 +1138,25 @@ Keep one concise entry per task. Do not paste full command output.
   2026-10-25T06:33:23Z; GEOAI-026 READY from accepted 025 under
   `harness/build/026-line-edits.md`. GEOAI-027 needs explicit
   reference provenance and permission before ingesting real examples.
+
+## GEOAI-026 — local verification passed; CI pending
+
+- Accepted 025 base `43fe740`; P6 scope frozen at `29dffdd`.
+  Project schema v7 stores append-only edit events with CAS,
+  idempotency and SHA-256 model snapshot. Controlled reorder, split,
+  explicit join code, point membership move, undo and reset preserve
+  measured source rows and reject stale/foreign access. A/B changes
+  invalidate an edit model until explicit reset.
+- New jobs snapshot exact edited segments and event/version; worker
+  validates source membership and limits. Focused tests showed
+  reordered/split/joined DXF and breaklines, old job result/request
+  unchanged, v6 migration, invalid code/row, history and tampered
+  model failures. Synthetic HTTPS (verified certificate) split DXF
+  returned three expected line sequences; source SHA-256
+  `ac8ee8cb0781c34932a9fd0c68b08f40eaf4ebae38012761b8b09de8cb24750a`.
+  Browser showed saved reorder v3 and point IDs; console errors zero.
+- Final bounded gate `p6-026/final-gate-bounded.log`: 137 focused,
+  10 isolated regression, six isolated API, zero blocked operations,
+  `pip check`, `git diff --check`; Windows Node 24 syntax passed.
+  Disposable servers/tab stopped; no real data or production action.
+  Exact GitHub feature/PR CI pending.

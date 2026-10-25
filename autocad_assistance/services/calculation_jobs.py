@@ -186,6 +186,7 @@ class CalculationJobManager:
         scale_factor: float = 1.0,
         tin_settings: Mapping[str, object] | None = None,
         line_orders: Mapping[str, Sequence[int]] | None = None,
+        line_model: Mapping[str, object] | None = None,
         on_admit: Callable[[str], None] | None = None,
     ) -> JobSnapshot:
         if not 0 < len(mapped_rows) <= 100_000:
@@ -218,12 +219,34 @@ class CalculationJobManager:
                         or any(type(index) is not int or not 1 <= index <= len(mapped_rows) for index in order)
                         or len(set(order)) != len(order)):
                     raise ValueError("Accepted line order is invalid")
+        if line_model is not None:
+            if not isinstance(line_model, Mapping):
+                raise ValueError("Line model is invalid")
+            segments = line_model.get("segments")
+            source_rows = line_model.get("sourceRowIndexes")
+            codes = line_model.get("editableGroupCodes")
+            if (not isinstance(segments, list) or len(segments) > 500
+                    or not isinstance(source_rows, list) or len(source_rows) > 5_000
+                    or not isinstance(codes, list) or len(codes) > 200):
+                raise ValueError("Line model exceeds limits")
+            all_rows = []
+            for segment in segments:
+                if (not isinstance(segment, dict) or segment.get("groupCode") not in codes
+                        or not isinstance(segment.get("rowIndexes"), list)
+                        or not segment["rowIndexes"] or len(segment["rowIndexes"]) > 500):
+                    raise ValueError("Line segment is invalid")
+                all_rows.extend(segment["rowIndexes"])
+            if (any(type(index) is not int or not 1 <= index <= len(mapped_rows) for index in all_rows)
+                    or sorted(all_rows) != source_rows or len(set(all_rows)) != len(all_rows)
+                    or len(set(codes)) != len(codes)):
+                raise ValueError("Line model does not conserve source rows")
         request = {
             "version": 1,
             "rows": [dict(row) for row in mapped_rows],
             "scale_factor": scale_factor,
             "tin_settings": dict(tin_settings or {}),
             "line_orders": {code: list(order) for code, order in (line_orders or {}).items()},
+            "line_model": dict(line_model) if line_model is not None else None,
         }
         # Encode before queue admission so malformed request objects never
         # consume a slot or leave a half-created job directory.

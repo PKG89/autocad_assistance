@@ -60,6 +60,7 @@ function showLogin() {
   jobPoll = null;
   window.GeoaiPlanViewer.hide();
   window.GeoaiLineCandidates.hide();
+  window.GeoaiLineEdits.hide();
   csrfToken = null;
   uploadId = null;
   $("login-panel").hidden = false;
@@ -94,6 +95,7 @@ async function loadProjects(preferredId = null) {
 
 async function loadRevisions() {
   window.GeoaiLineCandidates.hide();
+  window.GeoaiLineEdits.hide();
   const list = $("revision-list");
   list.replaceChildren();
   const revisionSelect = $("job-revision");
@@ -104,6 +106,7 @@ async function loadRevisions() {
     list.append(item("Сначала выберите проект."));
     $("job-submit").disabled = true;
     $("candidate-load").disabled = true;
+    $("edit-load").disabled = true;
     await loadJobs();
     return;
   }
@@ -122,6 +125,7 @@ async function loadRevisions() {
   }
   $("job-submit").disabled = !revisionSelect.value;
   $("candidate-load").disabled = !revisionSelect.value;
+  $("edit-load").disabled = !revisionSelect.value;
   await loadJobs();
 }
 
@@ -290,6 +294,7 @@ $("project-form").addEventListener("submit", (event) => {
 $("project-select").addEventListener("change", () => {
   window.GeoaiPlanViewer.hide();
   window.GeoaiLineCandidates.hide();
+  window.GeoaiLineEdits.hide();
   submitIntent = null;
   retryIntents.clear();
   loadRevisions().catch((error) => message(error.message, true));
@@ -299,7 +304,9 @@ $("job-revision").addEventListener("change", () => {
   submitIntent = null;
   $("job-submit").disabled = !$("job-revision").value;
   $("candidate-load").disabled = !$("job-revision").value;
+  $("edit-load").disabled = !$("job-revision").value;
   window.GeoaiLineCandidates.hide();
+  window.GeoaiLineEdits.hide();
 });
 
 async function loadCandidateReview() {
@@ -331,6 +338,35 @@ async function loadCandidateReview() {
 }
 
 $("candidate-load").addEventListener("click", (event) => busy(event.currentTarget, loadCandidateReview));
+
+async function loadLineEdits() {
+  const projectId = $("project-select").value;
+  const revisionId = $("job-revision").value;
+  if (!projectId || !revisionId) throw new Error("Выберите проект и версию съёмки");
+  const root = `/api/v1/projects/${projectId}/revisions/${revisionId}`;
+  const [state, history, comparison] = await Promise.all([
+    api(`${root}/line-edits/current`), api(`${root}/line-edits/history`),
+    api(`${root}/line-candidates`),
+  ]);
+  if ($("project-select").value !== projectId || $("job-revision").value !== revisionId) return;
+  window.GeoaiLineEdits.show(state, history, comparison, async (operation) => {
+    try {
+      await api(`${root}/line-edits`, { method: "POST", body: JSON.stringify({
+        requestId: crypto.randomUUID(), expectedVersion: state.version, operation,
+      }) });
+      await loadLineEdits();
+      message("Версия правок сохранена. Новое задание DXF учтёт её.");
+    } catch (error) {
+      if (error.status === 409) {
+        try { await loadLineEdits(); } catch { /* Keep the original conflict message. */ }
+      }
+      message(error.message || "Не удалось сохранить правку", true);
+    }
+  });
+  $("edit-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+$("edit-load").addEventListener("click", (event) => busy(event.currentTarget, loadLineEdits));
 
 $("job-submit").addEventListener("click", (event) => busy(event.currentTarget, async () => {
   const revisionId = $("job-revision").value;

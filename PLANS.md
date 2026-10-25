@@ -177,8 +177,13 @@ checks plus disposable HTTPS DXF and browser controls. Exact GitHub
 feature/PR runs 40154708051/40154711826 passed. P5 checkpoint:
 023–025 accepted, original checkout unchanged, no production action.
 P6 manifest runs to 2026-10-25T06:33:23Z; GEOAI-026 is READY.
-After exact CI acceptance, P4 closes and GEOAI-023 can be frozen from
-the accepted base. No production publication is authorized.
+GEOAI-026 is locally verified: saved line edits reproduce in new DXF,
+preserve source measurements, reject stale/foreign writes and keep
+prior jobs fixed. The final local gate passed 137 focused, 10
+regression and six API tests; synthetic HTTPS/browser checks passed.
+Exact feature/PR CI is required before acceptance. GEOAI-027 needs
+explicit reference provenance and use permission for real examples.
+No production publication is authorized.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

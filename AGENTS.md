@@ -348,6 +348,15 @@ passed. P5 tasks 023–025 are accepted. GEOAI-026 is READY under
 requires explicit reference provenance and data rights; no production
 migration or deploy.
 
+GEOAI-026 is locally verified from accepted 025: an owner-scoped,
+versioned line-edit model supports explicit reorder/split/join/move,
+undo and reset, with unchanged source XYZ and code. New project jobs
+snapshot the saved segments; stale A/B decisions require explicit
+reset, and prior jobs remain fixed. Synthetic HTTPS DXF, browser,
+breakline and 137 focused + 10 isolated regression + six API tests
+passed. Exact feature/PR CI is pending; details and bounds are in
+`harness/build/026-line-edits.md`. No production action.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

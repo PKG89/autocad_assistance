@@ -30,6 +30,11 @@ from autocad_assistance.services.line_decisions import (
     LineDecisionInvalidError, history as line_decision_history, record_decision,
 )
 from autocad_assistance.services.project_store import LineDecisionConflictError
+from autocad_assistance.services.project_store import LineEditConflictError
+from autocad_assistance.services.line_edits import (
+    LineEditInvalidError, apply_edit, current_model as current_line_model,
+    history as line_edit_history, version_view as line_edit_version,
+)
 
 
 ALGORITHM_VERSION = "geoai-dxf-v1"
@@ -103,6 +108,13 @@ class LineDecisionRequest(BaseModel):
     sourceSha256: str = Field(pattern="^[0-9a-f]{64}$")
     settingsSha256: str = Field(pattern="^[0-9a-f]{64}$")
     candidateVersion: str = Field(min_length=1, max_length=100)
+
+
+class LineEditRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    requestId: UUID
+    expectedVersion: int = Field(ge=0)
+    operation: dict[str, object]
 
 
 def _error(status_code: int, code: str, message: str) -> JSONResponse:
@@ -281,6 +293,65 @@ def create_project_router(store: ProjectStore, upload_root: str | Path) -> APIRo
         except (LineDecisionInvalidError, LineCandidateInvalidError,
                 ProjectIntegrityError, ProjectStoreError):
             return _error(422, "INVALID_DECISION", "Line decision cannot be saved")
+        return JSONResponse(content=result, headers={"Cache-Control": "no-store"})
+
+    @router.get("/{project_id}/revisions/{revision_id}/line-edits/current")
+    async def get_line_model(project_id: UUID, revision_id: UUID, request: Request):
+        try:
+            result = await run_in_threadpool(current_line_model, store,
+                request.scope["geoai.owner_id"], str(project_id), str(revision_id))
+        except ProjectNotFoundError:
+            return _error(404, "RESOURCE_NOT_FOUND", "Resource not found")
+        except LineCandidateLimitError:
+            return _error(413, "LINE_MODEL_TOO_LARGE", "Line model exceeds limits")
+        except (LineEditInvalidError, LineCandidateInvalidError, ProjectIntegrityError, ProjectStoreError):
+            return _error(422, "LINE_MODEL_UNAVAILABLE", "Line model is unavailable")
+        return JSONResponse(content=result, headers={"Cache-Control": "no-store"})
+
+    @router.get("/{project_id}/revisions/{revision_id}/line-edits/history")
+    async def get_line_edit_history(project_id: UUID, revision_id: UUID, request: Request,
+                                    page: Annotated[int, Query(ge=1)] = 1,
+                                    pageSize: Annotated[int, Query(ge=1, le=50)] = 50):
+        try:
+            result = await run_in_threadpool(line_edit_history, store,
+                request.scope["geoai.owner_id"], str(project_id), str(revision_id),
+                page=page, page_size=pageSize)
+        except ProjectNotFoundError:
+            return _error(404, "RESOURCE_NOT_FOUND", "Resource not found")
+        return JSONResponse(content=result, headers={"Cache-Control": "no-store"})
+
+    @router.get("/{project_id}/revisions/{revision_id}/line-edits/versions/{version}")
+    async def get_line_edit_version(project_id: UUID, revision_id: UUID, version: int, request: Request):
+        if version < 0:
+            return _error(422, "INVALID_VERSION", "Version must be nonnegative")
+        try:
+            result = await run_in_threadpool(line_edit_version, store,
+                request.scope["geoai.owner_id"], str(project_id), str(revision_id), version)
+        except ProjectNotFoundError:
+            return _error(404, "RESOURCE_NOT_FOUND", "Resource not found")
+        except LineCandidateLimitError:
+            return _error(413, "LINE_MODEL_TOO_LARGE", "Line model exceeds limits")
+        except (LineEditInvalidError, LineCandidateInvalidError, ProjectIntegrityError, ProjectStoreError):
+            return _error(422, "LINE_MODEL_UNAVAILABLE", "Line model is unavailable")
+        return JSONResponse(content=result, headers={"Cache-Control": "no-store"})
+
+    @router.post("/{project_id}/revisions/{revision_id}/line-edits")
+    async def save_line_edit(project_id: UUID, revision_id: UUID, request: Request,
+                             payload: LineEditRequest):
+        try:
+            result = await run_in_threadpool(apply_edit, store,
+                request.scope["geoai.owner_id"], str(project_id), str(revision_id),
+                expected_version=payload.expectedVersion, request_id=str(payload.requestId),
+                operation=payload.operation)
+        except ProjectNotFoundError:
+            return _error(404, "RESOURCE_NOT_FOUND", "Resource not found")
+        except LineEditConflictError:
+            return _error(409, "LINE_EDIT_CONFLICT", "Line model changed; reload before editing")
+        except (LineCandidateLimitError, ResourceQuotaExceededError):
+            return _error(413, "LINE_MODEL_TOO_LARGE", "Line model exceeds limits")
+        except (LineEditInvalidError, LineCandidateInvalidError,
+                ProjectIntegrityError, ProjectStoreError, TypeError):
+            return _error(422, "INVALID_LINE_EDIT", "Line edit cannot be saved")
         return JSONResponse(content=result, headers={"Cache-Control": "no-store"})
 
     return router
