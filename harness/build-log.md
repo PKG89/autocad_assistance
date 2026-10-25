@@ -1373,3 +1373,34 @@ Keep one concise entry per task. Do not paste full command output.
 - No real reference corpus or independently verified rights was used.
   GEOAI-037/038 remain blocked pending a passing later readiness audit.
   Exact feature push and draft PR CI are pending for 036.
+
+## GEOAI-036 — accepted; P10 checkpoint
+
+- Exact HEAD `e5663faec664e270da4ec21af004e9d5e6e5f792` passed
+  feature push CI 40159298332 and draft PR CI 40159301340. Full
+  bundle SHA-256 `0ed004d3d23dd5db59254178b34c5f7796972eadf154ed4bd585454d96619bee`
+  matched on VM109 and Windows. Draft PR #6 description was updated.
+  Feature worktree was clean; original checkout remains untouched.
+- P10 036 accepted as a precise not-ready audit, not as approval to
+  train. 037/038 are blocked by absent approved real examples, rights
+  review, independent whole-object splits and class metrics.
+
+## Independent package preflight after P10
+
+- P8 032: `autocad_assistance/dxf_generator/surface.py` currently draws
+  breaklines as polylines but calls point-only `scipy.spatial.Delaunay`;
+  breaklines cannot affect those triangles. SciPy's published API
+  accepts points without constrained segments. The `triangle` wrapper
+  supports segments and holes, but the underlying author's licensing
+  page says inclusion in commercial products needs a license. Shapely
+  constrained triangulation accepts polygonal input and requires GEOS
+  3.10; interior breakline handling still needs a design. No alternate
+  library is installed in the clean venv. No geodetically validated
+  reference sites, boundary/mask decisions or specialist acceptance
+  are in-session. P8 is PROPOSED and not started.
+- P9 034/035: the roadmap explicitly requires provided document forms,
+  units, rounding and mandatory-field rules. None are supplied in the
+  worktree or session; no forms or values have been invented. P9 is
+  blocked pending these inputs.
+- Current feature HEAD after 036 is `e5663fa`; next commit contains
+  only checkpoint documentation. No production action or real data.

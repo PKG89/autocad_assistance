@@ -421,7 +421,14 @@ focused, 10 isolated regression and six API tests, `pip check`, zero
 blocked operations and diff check. Verified HTTPS synthetic smoke
 passed authentication, privacy and not-ready checks. User permission
 assertions are not independent verification; both readiness flags remain
-false. Exact feature push and PR CI are required before acceptance.
+false. Exact feature push and PR CI 40159298332/40159301340
+passed at `e5663fa`; GEOAI-036 is accepted. P10 037/038 remain
+blocked pending real approved examples and a passing later audit.
+P8 032 preflight found `surface.py` only draws breaklines, while
+SciPy Delaunay triangulates the points without constraints. Do not
+claim a constrained TIN until a suitable licensed implementation,
+analytical/reference surfaces and specialist review are available.
+P9 034/035 require owner-provided document forms and numerical rules.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

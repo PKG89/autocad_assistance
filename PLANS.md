@@ -233,7 +233,14 @@ reference review, priority class coverage, independent splits,
 per-class criteria and byte-integrity verification. The API does not
 export reference bytes or permission text. Both training and
 evaluation readiness remain false. Exact feature push and PR CI
-remain before acceptance; 037/038 still blocked.
+passed at `e5663fa` (40159298332/40159301340), so 036 is
+ACCEPTED. P10 checkpoint: clean feature worktree; 037/038 blocked
+until real rights, labels, independent object-family splits and agreed
+class metrics permit a passing audit. P8 032 is PROPOSED and blocked
+from domain acceptance: current `surface.py` has unconstrained SciPy
+Delaunay and decorative breaklines; library/license, boundary/mask
+rules and analytical/reference sites need agreement. P9 034/035 are
+blocked pending supplied document forms, units and rounding rules.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus
