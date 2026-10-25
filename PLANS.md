@@ -59,7 +59,8 @@ P1 run manifest: `/home/geoai/dev-data/geoai-autonomy/p1-run-manifest.json`.
 GEOAI-012 was accepted after local and remote checks.
 GEOAI-013 is accepted at `66b8dcc` after local and GitHub feature/PR checks.
 Its fixed bounds and safe-read contract are in `harness/build/013-upload-guard.md`.
-GEOAI-014 is next; its frozen scope is in `harness/build/014-bounded-jobs.md`.
+GEOAI-014 passed its local gate; GitHub feature/PR CI is pending. Its
+frozen scope is in `harness/build/014-bounded-jobs.md`.
 
 ## Proposed product roadmap — not queued
 
@@ -73,7 +74,7 @@ mapping and DXF through the shared engine.
 | --- | --- | --- | --- | --- |
 | P1 | 012 | Survey model, coordinates and provenance | 007A, 008–011 | ACCEPTED at 608a8e3 |
 | P1 | 013 | Safe uploads and file paths | 012 | ACCEPTED at 66b8dcc |
-| P1 | 014 | Bounded calculation jobs | 013 | READY |
+| P1 | 014 | Bounded calculation jobs | 013 | LOCAL ACCEPTED; remote CI pending |
 | P2 | 015 | Versioned project storage | 012–014 | PROPOSED |
 | P2 | 016 | Owner authentication | 015 | PROPOSED |
 | P2 | 017 | Project, job and file ownership checks | 015–016 | PROPOSED |

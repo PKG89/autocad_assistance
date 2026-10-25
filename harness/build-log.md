@@ -516,3 +516,30 @@ Keep one concise entry per task. Do not paste full command output.
 - Dependency 013 is ACCEPTED. Next: use the frozen 014 specification for
   one bounded compute worker, queue, timeout, cancellation, retry and
   crash recovery. P1 manifest remains active and within its deadline.
+
+## GEOAI-014 — local gate passed; remote gate pending
+
+- Base: accepted 013 at `66b8dcc`, followed by frozen-scope documentation
+  commit `7c13d6c`. One writable feature worktree, no second worker,
+  system install, external queue, production data or deployment.
+- Added a framework-independent local DXF job coordinator and disposable
+  child entry point. Linux file lock guarantees one coordinator per jobs
+  root. Queue holds at most four waiting jobs, with one child process,
+  120-second wall timeout, 25 MiB result cap, 32 MiB serialized request
+  cap and two explicit retries. Child memory is capped at 1.5 GiB and
+  dies with its parent on Linux. States/input live under UUID paths;
+  completed DXF is published atomically after validation.
+- Cancellation terminates work and clears temporary renderer files;
+  interrupted jobs are failed with `INTERRUPTED` on restart for explicit
+  retry. Results survive restart and are read through bounded no-follow
+  descriptors. The synchronous HTTP/Telegram DXF paths and geometry
+  engine were not changed; web job routes remain for GEOAI-020.
+- Local gate at `/home/geoai/dev-data/geoai-autonomy/p1-014-accepted.log`:
+  84 focused, 10 isolated regression and six isolated API tests passed;
+  zero blocked network, dotenv, write and process operations in both
+  isolated suites. `pip check` and `git diff --check` passed. Negative
+  tests cover full queue, cancellation, timeout, crash, invalid result,
+  retry ceiling, missing/nonfinite height, symlinked result and restart.
+- Next: commit exact reviewed files, push only `codex/geoai-current`,
+  inspect push and PR checks, then make the three-task P1 checkpoint
+  (012–014) before freezing 015.

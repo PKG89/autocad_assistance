@@ -1,6 +1,6 @@
 # GEOAI-014 — bounded calculation jobs
 
-Status: READY. Base: accepted GEOAI-013 feature commit
+Status: LOCAL ACCEPTED; remote CI pending. Base: accepted GEOAI-013 feature commit
 `66b8dcc3c651c08baf5d14be2370d0d73ea0f773`. Dependency 013 passed
 local and GitHub push/PR checks.
 
@@ -10,9 +10,13 @@ Add a framework-independent local job coordinator for the existing shared
 DXF engine. Accept only validated mapped survey rows and explicit rendering
 settings. At most one child compute process may run and at most four jobs
 may wait. Each job has a 120-second wall timeout, 25 MiB output cap and
-one initial attempt plus at most two explicit retries. A job ID is server
-generated. Input, parameters, state and result live under an isolated
-server-owned jobs root; no Telegram bot database or production path.
+one initial attempt plus at most two explicit retries. The serialized
+request is capped at 32 MiB. A job ID is server generated. Input,
+parameters, state and result live under an isolated
+server-owned jobs root; no Telegram bot database or production path. A
+Linux file lock prevents a second coordinator from using the same root;
+the child exits if its parent dies. Result reads use bounded, no-follow
+descriptors.
 
 The coordinator must return immediately on submit. Cancellation removes a
 waiting job or terminates a running child and frees the slot. Timeout or

@@ -195,6 +195,15 @@ is READY under `harness/build/014-bounded-jobs.md`. The
 P1 deadline is 2026-10-25T04:12:17Z, with one worker and no external
 executor spend.
 
+GEOAI-014 passed its local gate. The local DXF job coordinator uses one
+Linux-locked compute process, four waiting slots, a 120-second timeout,
+25 MiB result cap, 32 MiB request cap and at most two explicit retries.
+It cancels/terminates child work, records interrupted jobs for explicit
+retry after restart, and publishes results atomically. The final gate
+passed 84 focused, 10 isolated regression and six isolated API tests,
+with zero blocked operations, plus pip and diff checks. GitHub CI remains
+pending; keep 015 PROPOSED until 014 is remotely accepted.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local
