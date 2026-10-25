@@ -1,5 +1,6 @@
 {
   "status": "technical-candidate-only",
+  "canonicalBuildEnvironment": "Linux VM109 (Debian 13.7), Git 2.47.3; both git archive commands were repeated there with identical SHA-256. Git for Windows 2.55 produced different tar bytes for the same commits and is not the canonical archive builder.",
   "baseProduct": {
     "commit": "79528bb9f6070e458724886a915f9d035cdfd110",
     "archiveSha256": "cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81"
