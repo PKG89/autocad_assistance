@@ -1,6 +1,6 @@
 # GEOAI-014 — bounded calculation jobs
 
-Status: LOCAL ACCEPTED; remote CI pending. Base: accepted GEOAI-013 feature commit
+Status: ACCEPTED at `0ad1e0a` after local and GitHub push/PR CI. Base: accepted GEOAI-013 feature commit
 `66b8dcc3c651c08baf5d14be2370d0d73ea0f773`. Dependency 013 passed
 local and GitHub push/PR checks.
 

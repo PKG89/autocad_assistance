@@ -543,3 +543,22 @@ Keep one concise entry per task. Do not paste full command output.
 - Next: commit exact reviewed files, push only `codex/geoai-current`,
   inspect push and PR checks, then make the three-task P1 checkpoint
   (012–014) before freezing 015.
+
+## Three-task checkpoint: GEOAI-012, 013 and 014
+
+- GEOAI-014 exact reviewed commit
+  `0ad1e0a7955adde286d23cefa2731d17c70ac57b` was pushed only to
+  `codex/geoai-current`. GitHub `GEO AI checks` push run 40147083698
+  and draft PR #6 run 40147086595 both succeeded at that SHA. The
+  production workflow did not run. Verified VM/Windows bundle SHA-256:
+  `c590db274824cfc775e0d4b48b514ca3868ff0d5b04bfeb5df80213b31beaa02`.
+- 012, 013 and 014 are ACCEPTED; P1 manifest completed at
+  2026-10-25T00:33:23Z, before its 04:12:17Z deadline. VM code worktree
+  was clean at `0ad1e0a`; original checkout and inherited workflow edit
+  remain untouched. No second worker, external executor spend,
+  production data, main push, merge or deployment.
+- P2 manifest starts 2026-10-25T00:33:23Z, deadline 04:33:23Z,
+  90 minutes per task, at most two repairs, one writable tree/worker,
+  zero external executor spend. GEOAI-015 is READY on accepted 012–014;
+  its service-only storage scope and checks are frozen in
+  `harness/build/015-project-storage.md`. GEOAI-016/017 stay PROPOSED.

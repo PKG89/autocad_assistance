@@ -195,14 +195,17 @@ is READY under `harness/build/014-bounded-jobs.md`. The
 P1 deadline is 2026-10-25T04:12:17Z, with one worker and no external
 executor spend.
 
-GEOAI-014 passed its local gate. The local DXF job coordinator uses one
+GEOAI-014 is accepted at `0ad1e0a`. The local DXF job coordinator uses one
 Linux-locked compute process, four waiting slots, a 120-second timeout,
 25 MiB result cap, 32 MiB request cap and at most two explicit retries.
 It cancels/terminates child work, records interrupted jobs for explicit
 retry after restart, and publishes results atomically. The final gate
 passed 84 focused, 10 isolated regression and six isolated API tests,
-with zero blocked operations, plus pip and diff checks. GitHub CI remains
-pending; keep 015 PROPOSED until 014 is remotely accepted.
+with zero blocked operations, plus pip and diff checks. GitHub push run
+40147083698 and PR run 40147086595 succeeded. P1 is complete; the
+012–014 checkpoint is in the build log. GEOAI-015 is READY under
+`harness/build/015-project-storage.md`. P2 deadline is
+2026-10-25T04:33:23Z with one worker and zero external executor spend.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
