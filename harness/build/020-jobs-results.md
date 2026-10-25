@@ -1,6 +1,6 @@
 # GEOAI-020 — durable web jobs, result downloads and retry
 
-Status: LOCAL GATE PASSED; FEATURE/PR CI PENDING. Base: accepted GEOAI-019 feature commit
+Status: ACCEPTED at `91aeb53ad410abdc071498a4d22e561db3684dbe`. Base: accepted GEOAI-019 feature commit
 `897cf600e916207fa2a8f6a9797e3bc8729fe642`. Dependencies
 014–019 passed local and GitHub feature/PR checks. P3 deadline is
 2026-10-25T05:01:04Z.
@@ -100,5 +100,8 @@ and exact blocker.
   revealed the DXF link and retained both history and link on reload.
   Its server and SSH tunnel were stopped. No real survey or production
   identity was used.
-- GitHub feature/PR checks are pending. No production migration,
-  cleanup or deployment ran.
+- GitHub `GEO AI checks` push run 40151146814 and draft PR #6 run
+  40151149754 passed at the exact commit. Full branch bundle SHA-256
+  `3301fc0570f992407ad168f77b7612b3388757a1dcdb957c43762f049582055e`
+  matched on VM and Windows. No production migration, cleanup or
+  deployment ran.

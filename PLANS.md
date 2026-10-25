@@ -86,8 +86,8 @@ mapping and DXF through the shared engine.
 | P2 | 017 | Project, job and file ownership checks | 015–016 | ACCEPTED at f3bee9c |
 | P3 | 018 | Quotas, retention and cleanup | 014–017 | ACCEPTED at 8ed5687 |
 | P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–018 | ACCEPTED at 897cf60 |
-| P3 | 020 | Web jobs, results and download | 014–019 | LOCAL GATE PASSED; CI PENDING |
-| P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | PROPOSED |
+| P3 | 020 | Web jobs, results and download | 014–019 | ACCEPTED at 91aeb53 |
+| P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | READY |
 | P4 | 022 | Reproducible staging, recovery and rollback | 021 | PROPOSED |
 | P5 | 023 | Browser plan viewer | 015, 020–021 | PROPOSED |
 | P5 | 024 | A/B line-connection candidates | 012, 023 | PROPOSED |
@@ -113,6 +113,14 @@ can follow; the document package can move earlier if it does not depend on
 terrain. Stage 031 must be split by object class. ML needs a verified,
 object-separated dataset and an independent comparison with the old algorithm.
 No automated publication is authorized by this roadmap.
+
+P3 checkpoint: GEOAI-018, 019 and 020 are accepted with exact feature
+and PR checks; package complete. GEOAI-020 is accepted at `91aeb53`
+after 120 focused, 10 isolated regression and six isolated API tests;
+GitHub push run 40151146814 and PR run 40151149754 succeeded.
+P4 run manifest is `/home/geoai/dev-data/geoai-autonomy/p4-run-manifest.json`.
+GEOAI-021 is READY under `harness/build/021-web-mvp-acceptance.md`;
+022 remains PROPOSED until 021 is accepted.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

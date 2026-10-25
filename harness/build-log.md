@@ -921,3 +921,23 @@ Keep one concise entry per task. Do not paste full command output.
 - Final local gate log: `p3-020/accepted-gate.log`. Next: inspect exact
   staged diff, commit, push only `codex/geoai-current`, require feature
   and PR CI, then record acceptance and P3 checkpoint.
+
+## GEOAI-020 — accepted; P3 checkpoint and P4 start
+
+- Exact feature commit `91aeb53ad410abdc071498a4d22e561db3684dbe`
+  passed GitHub `GEO AI checks` push run 40151146814 and draft PR #6
+  run 40151149754. Branch bundle SHA-256
+  `3301fc0570f992407ad168f77b7612b3388757a1dcdb957c43762f049582055e`
+  matched on VM and Windows. The feature worktree was clean at that
+  HEAD before this acceptance update; the original checkout and
+  inherited workflow edit remain untouched.
+- Final local gate passed 120 focused, 10 isolated regression and six
+  isolated API tests, zero blocked network/dotenv/write/process
+  operations, `pip check`, `git diff --check` and `node --check`.
+  One repair cycle addressed the v5 migration/cleanup CLI checks;
+  concurrent publication was covered by a dedicated passing test.
+- P3 tasks 018–020 are accepted. The P3 deadline was not exceeded;
+  no production worker, migration, cleanup or deployment ran. P4
+  starts with a new finite manifest. GEOAI-021's accepted base and
+  frozen comparison criteria are in
+  `harness/build/021-web-mvp-acceptance.md`.

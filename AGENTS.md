@@ -266,14 +266,16 @@ No production deployment occurred. GEOAI-020 is READY under
 014's one bounded child process and requires an explicit jobs root;
 submission/retry need a durable, client-owned idempotency key.
 
-GEOAI-020 implementation is under local review in the same feature
-worktree. The opt-in jobs root starts one coordinator; schema v5 binds
+GEOAI-020 is accepted at `91aeb53` after local and GitHub feature/PR
+checks. The opt-in jobs root starts one coordinator; schema v5 binds
 owner, revision, exact request hash and client UUID to one job before
 queue admission. Status, explicit cancel/retry and verified DXF results
 are exposed to the authenticated cabinet. A disposable browser run
 confirmed one job after a double click and preserved history after reload.
-The final local gate and exact GitHub feature/PR CI must pass before
-acceptance; no production worker or deployment is authorized.
+P3 is complete; P4's finite manifest and GEOAI-021 frozen scope are in
+`/home/geoai/dev-data/geoai-autonomy/p4-run-manifest.json` and
+`harness/build/021-web-mvp-acceptance.md`. No production worker or
+deployment is authorized.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
