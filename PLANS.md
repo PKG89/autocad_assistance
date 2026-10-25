@@ -23,13 +23,86 @@ matching file under `harness/build/`.
   `b78b1f591244f04c6652c9fe857b93d282f134ec`; its Issue is closed.
   Both Telegram and API use the isolated shared DXF service. The protected
   package 008–011 is complete; the dispatcher and broker are stopped.
-- Next decision: separately define GEOAI-007A/007B if still wanted, fix the
-  inherited CI test invocation under a new scope, and plan authentication,
-  retention, quotas and deployment before exposing the API. No new Issue is
-  eligible for the package-specific queue.
-- GEOAI-007A/007B definitions are absent and outside this package.
-- Inherited CI uses direct unittest discovery, incompatible with the required
-  isolation bootstrap. Local baseline success is not CI/deployment readiness.
+- P0 is authorized and in progress. GEOAI-007A local evidence reconciliation
+  is complete (see `harness/build/007a-local-record.md`); the independent
+  off-VM copy is not confirmed. GEOAI-007B is specified but not started.
+  No new Issue is eligible for the stopped 008–011 queue.
+- The inherited CI edit is preserved separately. It uses direct unittest
+  discovery, and the isolation bootstraps contain VM-specific output paths.
+  Local baseline success is not CI/deployment readiness.
+
+## P0 — local record and CI preparation
+
+- GEOAI-007A: LOCAL COMPLETE on 2026-10-25. Accepted product commits 008–011
+  are ancestors of final local code/documentation HEAD
+  `bbf6f660985db3e519b06deec52e7ef39b9678a3`. The final bundle passed
+  verification. The difference from product commit `b78b1f5` is a
+  documentation commit. The inherited uncommitted CI workflow has a separate
+  copy and SHA-256 under `/home/geoai/dev-data/geoai-autonomy/p0-007a/`.
+- GEOAI-007B: READY under the owner's 2026-10-25 scope. Prepare a clean, isolated regression/API
+  and focused-test job; prove a failing test makes CI red; keep PR/feature
+  checks separate from image publishing and deployment; inspect main branch
+  rules. Remote completion needs an authorized push and successful GitHub run.
+  Scope and checks are in `harness/build/007b-ci-github.md`.
+- The owner now authorizes the scoped CI edit, exact origin, feature push and
+  draft PR for 007B; branch-rule changes and deployment remain excluded.
+  The prior 30-minute/task and two-hour/package controller settings applied
+  only to 008–011. The current P0 run manifest is under
+  `/home/geoai/dev-data/geoai-autonomy/p0-run-manifest.json`.
+
+## Proposed product roadmap — not queued
+
+Numbers 012–040 were checked against this plan on 2026-10-25: none were
+assigned here. Each row below is PROPOSED and needs a frozen task specification,
+base HEAD, file scope, tests, budget and package authorization before dispatch.
+The first product milestone is a private web cabinet for upload, preview,
+mapping and DXF through the shared engine.
+
+| Package | ID | Outcome | Depends on | Status |
+| --- | --- | --- | --- | --- |
+| P1 | 012 | Survey model, coordinates and provenance | 007A, 008–011 | PROPOSED |
+| P1 | 013 | Safe uploads and file paths | 012 | PROPOSED |
+| P1 | 014 | Bounded calculation jobs | 013 | PROPOSED |
+| P2 | 015 | Versioned project storage | 012–014 | PROPOSED |
+| P2 | 016 | Owner authentication | 015 | PROPOSED |
+| P2 | 017 | Project, job and file ownership checks | 015–016 | PROPOSED |
+| P3 | 018 | Quotas, retention and cleanup | 014–017 | PROPOSED |
+| P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–017 | PROPOSED |
+| P3 | 020 | Web jobs, results and download | 014–019 | PROPOSED |
+| P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | PROPOSED |
+| P4 | 022 | Reproducible staging, recovery and rollback | 021 | PROPOSED |
+| P5 | 023 | Browser plan viewer | 015, 020–021 | PROPOSED |
+| P5 | 024 | A/B line-connection candidates | 012, 023 | PROPOSED |
+| P5 | 025 | Confirmed decisions and review history | 017, 023–024 | PROPOSED |
+| P6 | 026 | Reversible derived-geometry edits | 025 | PROPOSED |
+| P6 | 027 | Reference-object archive | 015, 017, 025 | PROPOSED |
+| P6 | 028 | DXF comparison and quality measures | 027 | PROPOSED |
+| P7 | 029 | Versioned object-code rules | 012, 028 | PROPOSED |
+| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | PROPOSED |
+| P7 | 031 | Contours and composite situation objects | 028–030 | PROPOSED |
+| P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | PROPOSED |
+| P8 | 033 | Terrain contours and elevation checks | 032 | PROPOSED |
+| P9 | 034 | Report data model and templates | 012, 015 | PROPOSED |
+| P9 | 035 | Versioned deliverable package | 034; 033 if terrain included | PROPOSED |
+| P10 | 036 | Verified dataset readiness | 025, 027–028 | PROPOSED |
+| P10 | 037 | Small offline recommendation model | 036 | PROPOSED |
+| P10 | 038 | Reviewable model suggestions | 025, 037 | PROPOSED |
+| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PROPOSED |
+| P11 | 040 | Authorized publication and operations | 039, release authorization | PROPOSED |
+
+For a first limited site release, P1–P4 plus P11 are the main path. P5–P10
+can follow; the document package can move earlier if it does not depend on
+terrain. Stage 031 must be split by object class. ML needs a verified,
+object-separated dataset and an independent comparison with the old algorithm.
+No automated publication is authorized by this roadmap.
+
+Proposed future execution bounds: one implementation agent and one compute
+worker, at most three prepared tasks per package, one initial attempt plus
+at most two repairs, up to 90 minutes per task and four hours per package.
+Set an executor spending limit before any run. These are proposals, not
+current Symphony settings. Stop on exhausted limits, unexpected changes,
+lost test isolation, missing data, unaccepted dependencies or work outside
+the package scope; record HEAD, diff, checks and reason.
 
 ## Foundation
 
@@ -55,8 +128,9 @@ Support explicit mapping for Point, X, Y, Z, Code, and Comments.
 Expose existing DXF generation through one isolated core service shared by web
 and Telegram adapters.
 
-## Later
+## Architectural notes for later packages
 
-Project storage, authentication, ownership, cleanup, PostGIS, line-review A/B,
-web editing, terrain improvements, and document generation. Introduce ML only
+Project storage, authentication and ownership precede the private web
+cabinet. PostGIS is not required merely to store a project list. Preserve
+measured coordinates separately from derived geometry. Introduce ML only
 after a verified dataset of topographer decisions exists.

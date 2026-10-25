@@ -23,10 +23,13 @@ Allowed without additional approval:
 - Run unit, regression, API, lint, and static checks.
 - Write task reports only under `/home/geoai/dev-data/`.
 
-Always require explicit approval for push, merge, rebase, remotes,
-`main`, `.github/workflows/`, CI/CD, production access, Proxmox, firewall,
-VLAN/networking, Docker daemon configuration, secrets, `.env`, database
-migrations, reset, clean, data deletion, system packages, or `sudo`.
+The owner's 2026-10-25 continuous-roadmap authorization below explicitly
+permits scoped workflow/CI edits, adding the exact GitHub origin if absent,
+feature push and draft PR. Other remotes, main/master push, force-push,
+merge, rebase, branch-rule changes, production deployment/access,
+Proxmox, firewall, VLAN/networking, Docker daemon configuration, secrets,
+`.env`, production database/migrations, reset, clean, data deletion,
+system packages and `sudo` remain outside this authorization.
 
 Never read or copy production secrets or `.env`; run the production Telegram
 bot or database; send survey data to external services without approval;
@@ -42,9 +45,11 @@ For each approved task:
 4. Make the smallest change.
 5. Run focused tests, then the regression baseline.
 6. Run `git diff --check` and report changed files and limitations.
-7. Stop unless the approved autonomous controller has independently accepted
-   and preserved the result. For the approved 008–011 package, it may then
-   dispatch the next task in order. Never expand the package automatically.
+7. Record the exact accepted revision and make a scoped local commit. For
+   the authorized roadmap, continue to the next dependency-ready task
+   after updating shared memory and checking the remaining run budget.
+   After every three tasks, record a checkpoint and continue. Never treat
+   a PROPOSED row as ready without a frozen task specification.
 
 Use `scripts/geoai-preflight.sh` and `scripts/geoai-verify.sh` when applicable.
 A task is done only when criteria and target tests pass, the regression result
@@ -59,8 +64,7 @@ jobs or install large ML frameworks without a separate decision.
 
 Read `PLANS.md` and the approved `harness/build/` phase instead of re-auditing
 the repository. Use focused search, one task at a time, short factual reports,
-and no extra agents except the single approved Cursor executor managed by
-the autonomous controller.
+one writable worktree and one compute worker. Do not spawn extra agents.
 
 ## Skill usage
 
@@ -88,8 +92,8 @@ use `git log -1` for later documentation-only state commits.
 Both are recoverable from the verified bundle/bare store under
 `/home/geoai/dev-data/geoai-autonomy/`. No Git remote is configured. The
 inherited `.github/workflows/cicd.yml` edit remains uncommitted and must be
-preserved. GEOAI-007A/007B specifications are absent; they are outside the
-approved autonomous package.
+preserved. GEOAI-007A/007B specifications were absent at that point and
+outside the approved autonomous package.
 
 Use isolated bootstrap runners via `scripts/geoai-verify.sh`. Direct unittest
 discovery is incompatible with the regression isolation guard. The inherited
@@ -101,8 +105,8 @@ The local passing baseline does not establish CI or deployment readiness.
 The owner authorized local commits, user-local official tool installation, an
 isolated pilot and sequential GEOAI-008–011 execution, with Codex accepting
 Cursor's implementation. This overrides the earlier one-phase stop rule only
-for this agreed package. GEOAI-007A/007B have no recorded acceptance criteria
-and are not in this package. Production deployment, publishing code, merge to
+for this agreed package. GEOAI-007A/007B had no recorded acceptance criteria
+for that package and were not included. Production deployment, publishing code, merge to
 main, destructive data changes and sending survey data externally remain out
 of scope. No `.env` or production secrets may be read or copied.
 
@@ -134,7 +138,49 @@ the package-specific `@reboot` crontab was removed, with its prior entry
 saved under the protected control directory. Do not queue additional Issues
 or restart the dispatcher without a new approved scope and frozen checks.
 The original checkout still has the inherited uncommitted CI workflow edit.
-Local passing tests do not establish CI/deployment readiness. GEOAI-007A/007B
-remain undefined. Independent Proxmox host-key comparison and actual reboot
-recovery were not performed. The development API has no ownership/auth layer;
-deployment, retention and resource quotas remain later work.
+Local passing tests do not establish CI/deployment readiness. Independent
+Proxmox host-key comparison and actual reboot recovery were not performed.
+The development API has no ownership/auth layer; deployment, retention and
+resource quotas remain later work.
+
+## P0 preparation handoff (2026-10-25, Europe/Moscow)
+
+The new roadmap assigns GEOAI-007A/007B to P0 and proposes GEOAI-012–040;
+these numbers were checked against `PLANS.md` and were unused. The roadmap
+does not queue work. GEOAI-007A local evidence reconciliation is complete:
+accepted commits are ancestors of `codex/geoai-current` at `bbf6f66`,
+its final bundle passed verification, and the original inherited workflow
+edit was saved byte-for-byte with SHA-256 outside the repository under
+`/home/geoai/dev-data/geoai-autonomy/p0-007a/`. An off-VM copy is not
+confirmed. No product tests were rerun for the evidence-only audit.
+
+GEOAI-007B is specified in `harness/build/007b-ci-github.md` but is not
+queued or implemented. The workflow's direct unittest discovery bypasses
+the isolation bootstrap; the bootstraps also hard-code VM-only output paths.
+Workflow/CI edits still require their own explicit approved scope under the
+rules above. Push, PR, main-rule changes and deployment remain separate.
+Use `PLANS.md` for the proposed dependencies and status; use
+`harness/build-log.md` for exact 007A hashes and current Git state.
+
+## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
+
+The owner authorized sequential P0, P1–P4 and later dependency-ready local
+tasks without a pause at package boundaries. P11 publication, production
+deployment and production migration still require separate authorization.
+Within scoped tasks, source/tests/docs/queue and workflow/CI changes are
+allowed; use portable isolated bootstraps, run focused plus full current
+regression/API and negative checks, inspect diff, then make local commits.
+Push only tested commits to `codex/geoai-current` in
+`PKG89/autocad_assistance`; create/update only its draft PR. Before first
+push, verify exact remote and workflow events cannot publish or deploy for
+that feature push. Never push main/master, force-push, merge or rebase.
+
+For a PROPOSED task, first verify dependencies, freeze base HEAD, allowed
+files/non-goals, acceptance checks, actual commands, budget and stop
+conditions in `harness/build/`; then mark READY. Do not invent geodetic
+tolerances, document forms, data rights or access. Keep one executor, one
+writable worktree and one compute worker, with at most two repair cycles per
+task. Preserve time/spending limits in a manifest before a run. On a blocker,
+record ID, HEAD, diff, checks and missing action, then continue only
+independent authorized work. Update `PLANS.md` and
+`harness/build-log.md` after each task and checkpoint every three tasks.

@@ -271,3 +271,78 @@ Keep one concise entry per task. Do not paste full command output.
 - Next: treat 008–011 as the local accepted development baseline. Define a
   separate scope for inherited CI repair, authentication/ownership, resource
   retention/quotas and deployment. GEOAI-007A/007B have no recorded criteria.
+
+## GEOAI-007A — local evidence reconciled; P0 prepared
+
+- 2026-10-25 (Europe/Moscow). Read current `AGENTS.md`, `PLANS.md`,
+  this journal and the inherited workflow before changing phase documents.
+  The new roadmap's IDs 012–040 were absent from the VM plan; they were
+  recorded as PROPOSED, not queued. Specs 007A and 007B now live under
+  `harness/build/`. No Symphony/Cursor worker was started.
+- Original checkout: `/home/geoai/projects/autocad_assistance`,
+  `codex/geo-ai-start` at documentation commit
+  `e9a8c5f2fe922056e851320ee3936e79a38292df` before these P0
+  documentation edits. The only inherited dirty file was and remains
+  `.github/workflows/cicd.yml`; it was not modified for P0. No Git remote
+  is configured there. Final handoff checkout
+  `/home/geoai/dev-data/geoai-autonomy/workspaces/handoff-final` was clean
+  at local branch `codex/geoai-current-final`.
+- Bare store `codex/geoai-current` points to
+  `bbf6f660985db3e519b06deec52e7ef39b9678a3`. Accepted 008
+  `aec7fda`, 009 `10cd7ff`, 010 `5c5915f` and 011 `b78b1f5`
+  all passed `merge-base --is-ancestor` against that HEAD. The edge
+  `b78b1f5 → bbf6f66` is a documentation commit recording completion.
+- `geoai-current-final.bundle` has SHA-256
+  `08e4fe4a7e5140f338aa30cce54938fa8bd39d8332af63fc7423a0a206c73384`;
+  `git bundle verify` succeeded and `bundle list-heads` named that exact
+  HEAD. Accepted 008/009/010/011 bundles also passed `bundle verify`;
+  their SHA-256 values matched the prior journal. Existing verified
+  preservation evidence was sufficient; no restoration or repeat product
+  commit was performed.
+- The inherited workflow was copied without changing it to
+  `/home/geoai/dev-data/geoai-autonomy/p0-007a/cicd.inherited.yml`.
+  Both original and copy have SHA-256
+  `204ea3260ff123aa118b704cf8d468c70222f9a4f9a41ad5a928992d927b4808`.
+  Its separate binary diff has SHA-256
+  `301ede3d6fa0e1665844c5a592a70d16a208218433fd11495031157937c6c479`.
+  An independent off-VM copy remains unconfirmed.
+- GitHub repository metadata reports `main` as default branch. Its branch
+  protection/rulesets were not established by that metadata. The inherited
+  workflow runs direct unittest discovery, while both isolation bootstraps
+  require absolute VM-only report roots. This is concrete 007B scope.
+- Verification for 007A: Git ancestry, bundle SHA/head/verify, workflow
+  copy hash and `git diff --check` passed. Product tests were not rerun;
+  stage 011's latest independent gate remains 11 focused, seven frozen,
+  10 regression and six API tests plus pip/diff/scope checks. No push, PR,
+  CI edit, deployment or production-data access occurred.
+- Next: 007B is SPECIFIED, NOT QUEUED. Freeze a separately approved CI file
+  scope and local tests; then perform the clean-runner positive/negative
+  checks. Full 007B closure requires an authorized push and actual successful
+  remote CI run. P1 begins with 012 after P0 dependency decisions.
+- After writing the P0 memory/specs, `git diff --check` passed. Original
+  checkout remains on `codex/geo-ai-start` at `e9a8c5f` with modified
+  `.github/workflows/cicd.yml`, `AGENTS.md`, `PLANS.md` and
+  `harness/build-log.md`, plus untracked `harness/build/007a-local-record.md`
+  and `harness/build/007b-ci-github.md`. P0 documentation is deliberately
+  uncommitted; no local commit was authorized for this new package.
+
+## P0 continuous authorization and run preflight
+
+- On 2026-10-25 (Europe/Moscow), the owner explicitly authorized scoped
+  workflow/CI edits, local commits, adding the exact GitHub origin if absent,
+  tested push only to `codex/geoai-current`, and a draft PR. No main/master
+  push, force-push, merge/rebase, production deployment/migration or real-data
+  use. This supersedes the prior per-package stop and P0 document-only scope;
+  AGENTS.md and PLANS.md were updated accordingly.
+- Preflight: source checkout remained `codex/geo-ai-start` at `e9a8c5f`
+  with the inherited workflow edit plus prepared P0 docs; final handoff
+  worktree was clean on `codex/geoai-current-final`. No origin was configured
+  in the source checkout. No Symphony/broker/Cursor worker was running.
+- Direct P0 run manifest: `/home/geoai/dev-data/geoai-autonomy/p0-run-manifest.json`,
+  start 2026-10-25T00:01:51Z, deadline 04:01:51Z, 90 minutes per task,
+  maximum two repair cycles, one writable tree/worker, zero external executor
+  spend. The prior controller's 30-minute/two-hour 008–011 budget remains
+  historical and was not reset or reused.
+- Next: commit only P0 documentation on the source branch, leaving the
+  inherited workflow edit untouched; bring the same docs into the accepted
+  code branch, then execute 007B.
