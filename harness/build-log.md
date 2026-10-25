@@ -681,3 +681,33 @@ Keep one concise entry per task. Do not paste full command output.
   READY on accepted 015–016; its schema migration, upload ownership,
   per-request gate and download checks are frozen in
   `harness/build/017-resource-ownership.md`.
+
+## GEOAI-017 — local gate passed; remote gate pending
+
+- Base: accepted 016 `04522be` and 017 frozen-scope documentation
+  `b01895f`. Only the accepted feature worktree changed. The original
+  checkout and inherited workflow edit remain untouched.
+- Project schema v2 adds an immutable owner UUID for newly created
+  projects and uploads. Version-1 projects migrate with NULL owner;
+  no identity is inferred or assigned to existing data. Scoped service
+  methods check owner for project/revision/job/source/result operations.
+- Opt-in authenticated API mode requires a separate project root.
+  Its outer ASGI guard checks HTTPS host and a revocable session before
+  request body parsing on resource routes; unsafe methods require exact
+  Origin and CSRF. Upload registration failure removes the newly written
+  file using no-follow directory descriptors. Preview, mapping and DXF
+  recheck owner, format, size and SHA-256 before reading. New source and
+  result downloads check owner and file integrity. Missing and foreign
+  resources return the same 404 response.
+- Local gate evidence: `/home/geoai/dev-data/geoai-autonomy/p2-017-final.log`
+  and `p2-017/final-gate/`: 107 focused, 10 isolated regression and six
+  isolated API tests passed; zero blocked network, dotenv, write or
+  process operations; `pip check` and `git diff --check` passed.
+  Focused negatives cover cross-owner/unknown/unowned IDs, anonymous
+  and CSRF rejection before upload parsing, tampered and symlinked
+  upload bytes, database registration rollback, source/result integrity,
+  and version-1 migration.
+- GitHub feature/PR CI is pending. Next: commit exact reviewed files,
+  push only `codex/geoai-current`, inspect both runs and record their
+  results before accepting 017. No real owner provisioning, deployment
+  or production migration occurred.

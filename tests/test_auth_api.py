@@ -24,7 +24,8 @@ class AuthApiTests(unittest.IsolatedAsyncioTestCase):
         self.upload_root = Path(self.temp.name) / "uploads"
         AuthStore(self.root).create_owner("owner", PASSWORD)
         self.app = create_app(
-            upload_root=self.upload_root, auth_root=self.root, auth_origin="https://testserver"
+            upload_root=self.upload_root, auth_root=self.root, auth_origin="https://testserver",
+            project_root=Path(self.temp.name) / "projects",
         )
 
     async def test_login_session_csrf_challenge_and_logout(self):
@@ -106,7 +107,9 @@ class AuthApiTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(ValueError):
             create_app(upload_root=self.upload_root, auth_root=self.root)
         with self.assertRaises(ValueError):
-            create_app(upload_root=self.upload_root, auth_root=self.root, auth_origin="http://testserver")
+            create_app(upload_root=self.upload_root, auth_root=self.root, auth_origin="https://testserver")
+        with self.assertRaises(ValueError):
+            create_app(upload_root=self.upload_root, auth_root=self.root, auth_origin="http://testserver", project_root=Path(self.temp.name) / "projects")
         app = create_app(upload_root=self.upload_root)
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(transport=transport, base_url="https://testserver") as client:

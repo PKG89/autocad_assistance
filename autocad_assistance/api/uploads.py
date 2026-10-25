@@ -1,11 +1,12 @@
 """HTTP adapter for accepting field-survey source files."""
 
 import csv
+import hashlib
 from pathlib import Path
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, File, Query, UploadFile, status
+from fastapi import APIRouter, File, Query, Request, UploadFile, status
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
@@ -29,8 +30,10 @@ from autocad_assistance.services.uploads import (
     UploadLimitError,
     UploadTooLargeError,
     read_stored_upload,
+    remove_stored_upload,
     store_upload,
 )
+from autocad_assistance.services.project_store import ProjectNotFoundError, ProjectStore
 
 
 class UploadResponse(BaseModel):
@@ -126,11 +129,31 @@ def create_upload_router(
     upload_root: str | Path,
     max_upload_bytes: int,
     max_preview_rows: int,
+    project_store: ProjectStore | None = None,
 ) -> APIRouter:
     if max_preview_rows <= 0:
         raise ValueError("max_preview_rows must be positive")
 
     router = APIRouter(prefix="/api/v1", tags=["uploads"])
+
+    async def read_owned(request: Request, upload_id: UUID):
+        record = None
+        if project_store is not None:
+            try:
+                record = await run_in_threadpool(
+                    project_store.assert_upload_owner, request.scope["geoai.owner_id"], str(upload_id)
+                )
+            except ProjectNotFoundError:
+                raise FileNotFoundError from None
+        raw, stored_format = await run_in_threadpool(
+            read_stored_upload, Path(upload_root), str(upload_id), max_upload_bytes
+        )
+        if record is not None and (
+            record.stored_format != stored_format or record.size_bytes != len(raw)
+            or record.sha256 != hashlib.sha256(raw).hexdigest()
+        ):
+            raise ValueError("Stored upload integrity check failed")
+        return raw, stored_format
 
     @router.post(
         "/uploads",
@@ -147,6 +170,7 @@ def create_upload_router(
         ),
     )
     async def upload_survey(
+        request: Request,
         file: Annotated[UploadFile, File(description="TXT, CSV, or KML source file")],
     ):
         try:
@@ -174,6 +198,17 @@ def create_upload_router(
         finally:
             await file.close()
 
+        if project_store is not None:
+            try:
+                await run_in_threadpool(
+                    project_store.register_upload_owner, request.scope["geoai.owner_id"], stored
+                )
+            except Exception:
+                await run_in_threadpool(
+                    remove_stored_upload, upload_root, stored.upload_id, stored.format
+                )
+                return _error(500, "STORAGE_ERROR", "Unable to store uploaded file")
+
         return UploadResponse(
             uploadId=stored.upload_id,
             originalFilename=stored.original_filename,
@@ -191,6 +226,7 @@ def create_upload_router(
         },
     )
     async def upload_preview(
+        request: Request,
         upload_id: UUID,
         limit: Annotated[int | None, Query(gt=0)] = None,
     ):
@@ -203,14 +239,11 @@ def create_upload_router(
             )
 
         try:
-            raw_data, stored_format = await run_in_threadpool(
-                read_stored_upload,
-                Path(upload_root),
-                str(upload_id),
-                max_upload_bytes,
-            )
+            raw_data, stored_format = await read_owned(request, upload_id)
         except FileNotFoundError:
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+        except ValueError:
+            return _error(422, "UPLOAD_INTEGRITY_ERROR", "Stored upload integrity check failed")
         except UploadTooLargeError as exc:
             return _error(413, "UPLOAD_TOO_LARGE", str(exc))
 
@@ -268,6 +301,7 @@ def create_upload_router(
         },
     )
     async def upload_mapping(
+        request: Request,
         upload_id: UUID,
         payload: MappingRequest,
         limit: Annotated[int | None, Query(gt=0)] = None,
@@ -281,14 +315,11 @@ def create_upload_router(
             )
 
         try:
-            raw_data, stored_format = await run_in_threadpool(
-                read_stored_upload,
-                Path(upload_root),
-                str(upload_id),
-                max_upload_bytes,
-            )
+            raw_data, stored_format = await read_owned(request, upload_id)
         except FileNotFoundError:
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+        except ValueError:
+            return _error(422, "UPLOAD_INTEGRITY_ERROR", "Stored upload integrity check failed")
         except UploadTooLargeError as exc:
             return _error(413, "UPLOAD_TOO_LARGE", str(exc))
 
@@ -339,18 +370,16 @@ def create_upload_router(
         },
     )
     async def upload_dxf(
+        request: Request,
         upload_id: UUID,
         payload: DxfRequest,
     ):
         try:
-            raw_data, stored_format = await run_in_threadpool(
-                read_stored_upload,
-                Path(upload_root),
-                str(upload_id),
-                max_upload_bytes,
-            )
+            raw_data, stored_format = await read_owned(request, upload_id)
         except FileNotFoundError:
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+        except ValueError:
+            return _error(422, "UPLOAD_INTEGRITY_ERROR", "Stored upload integrity check failed")
         except UploadTooLargeError as exc:
             return _error(413, "UPLOAD_TOO_LARGE", str(exc))
 

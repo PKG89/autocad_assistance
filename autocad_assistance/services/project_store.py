@@ -15,7 +15,7 @@ import unicodedata
 from uuid import UUID, uuid4
 
 from autocad_assistance.services.survey_contract import SurveyContext
-from autocad_assistance.services.uploads import read_stored_upload, validate_upload_bytes
+from autocad_assistance.services.uploads import StoredUpload, read_stored_upload, validate_upload_bytes
 
 
 MAX_SOURCE_BYTES = 10 * 1024 * 1024
@@ -41,6 +41,16 @@ class ProjectRecord:
     project_id: str
     name: str
     created_at: str
+    owner_id: str | None
+
+
+@dataclass(frozen=True)
+class UploadOwnerRecord:
+    upload_id: str
+    owner_id: str
+    sha256: str
+    stored_format: str
+    size_bytes: int
 
 
 @dataclass(frozen=True)
@@ -121,14 +131,16 @@ class ProjectStore:
         self.db_path = self.root / "projects.sqlite3"
         with self._db() as db:
             current = db.execute("PRAGMA user_version").fetchone()[0]
-            if current not in (0, 1):
+            if current not in (0, 1, 2):
                 raise ProjectStoreError(f"Unsupported project schema version: {current}")
-            db.executescript(
+            if current == 0:
+                db.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS projects (
                     project_id TEXT PRIMARY KEY,
                     name TEXT NOT NULL,
-                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    owner_id TEXT
                 );
                 CREATE TABLE IF NOT EXISTS revisions (
                     revision_id TEXT PRIMARY KEY,
@@ -155,9 +167,34 @@ class ProjectStore:
                     algorithm_version TEXT NOT NULL,
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
-                PRAGMA user_version = 1;
+                CREATE TABLE IF NOT EXISTS upload_owners (
+                    upload_id TEXT PRIMARY KEY,
+                    owner_id TEXT NOT NULL,
+                    sha256 TEXT NOT NULL,
+                    stored_format TEXT NOT NULL,
+                    size_bytes INTEGER NOT NULL
+                );
+                PRAGMA user_version = 2;
                 """
-            )
+                )
+            elif current == 1:
+                db.execute("BEGIN IMMEDIATE")
+                try:
+                    db.execute("ALTER TABLE projects ADD COLUMN owner_id TEXT")
+                    db.execute(
+                        """CREATE TABLE upload_owners (
+                            upload_id TEXT PRIMARY KEY,
+                            owner_id TEXT NOT NULL,
+                            sha256 TEXT NOT NULL,
+                            stored_format TEXT NOT NULL,
+                            size_bytes INTEGER NOT NULL
+                        )"""
+                    )
+                    db.execute("PRAGMA user_version = 2")
+                    db.execute("COMMIT")
+                except Exception:
+                    db.execute("ROLLBACK")
+                    raise
 
     @contextmanager
     def _db(self) -> Iterator[sqlite3.Connection]:
@@ -230,15 +267,20 @@ class ProjectStore:
             raise ProjectIntegrityError("Project file checksum or size is invalid")
         return raw
 
-    def create_project(self, name: str) -> ProjectRecord:
+    def create_project(self, name: str, *, owner_id: str | None = None) -> ProjectRecord:
         name = _label(name, name="Project name", limit=200)
+        if owner_id is not None:
+            owner_id = _uuid(owner_id)
         project_id = str(uuid4())
         with self._db() as db:
             db.execute("BEGIN IMMEDIATE")
             try:
                 descriptor = self._open_directory(project_id, create=True)
                 os.close(descriptor)
-                db.execute("INSERT INTO projects(project_id, name) VALUES (?, ?)", (project_id, name))
+                db.execute(
+                    "INSERT INTO projects(project_id, name, owner_id) VALUES (?, ?, ?)",
+                    (project_id, name, owner_id),
+                )
                 db.execute("COMMIT")
             except Exception:
                 db.execute("ROLLBACK")
@@ -253,6 +295,34 @@ class ProjectStore:
                 raise
         return self.get_project(project_id)
 
+    def create_owned_project(self, owner_id: str, name: str) -> ProjectRecord:
+        return self.create_project(name, owner_id=_uuid(owner_id))
+
+    def register_upload_owner(self, owner_id: str, stored: StoredUpload) -> UploadOwnerRecord:
+        owner_id = _uuid(owner_id)
+        upload_id = _uuid(stored.upload_id)
+        if stored.format not in {"txt", "csv", "kml"} or not 0 < stored.size_bytes <= MAX_SOURCE_BYTES:
+            raise ProjectStoreError("Stored upload metadata is invalid")
+        with self._db() as db:
+            try:
+                db.execute(
+                    "INSERT INTO upload_owners VALUES (?, ?, ?, ?, ?)",
+                    (upload_id, owner_id, stored.sha256, stored.format, stored.size_bytes),
+                )
+            except sqlite3.IntegrityError as exc:
+                raise ProjectStoreError("Upload already has an owner") from exc
+        return self.assert_upload_owner(owner_id, upload_id)
+
+    def assert_upload_owner(self, owner_id: str, upload_id: str) -> UploadOwnerRecord:
+        with self._db() as db:
+            row = db.execute(
+                "SELECT * FROM upload_owners WHERE upload_id = ? AND owner_id = ?",
+                (_uuid(upload_id), _uuid(owner_id)),
+            ).fetchone()
+        if row is None:
+            raise ProjectNotFoundError(upload_id)
+        return UploadOwnerRecord(**dict(row))
+
     def get_project(self, project_id: str) -> ProjectRecord:
         with self._db() as db:
             row = db.execute("SELECT * FROM projects WHERE project_id = ?", (_uuid(project_id),)).fetchone()
@@ -265,6 +335,24 @@ class ProjectStore:
             rows = db.execute("SELECT * FROM projects ORDER BY created_at, project_id").fetchall()
         return tuple(ProjectRecord(**dict(row)) for row in rows)
 
+    def list_projects_for(self, owner_id: str) -> tuple[ProjectRecord, ...]:
+        with self._db() as db:
+            rows = db.execute(
+                "SELECT * FROM projects WHERE owner_id = ? ORDER BY created_at, project_id",
+                (_uuid(owner_id),),
+            ).fetchall()
+        return tuple(ProjectRecord(**dict(row)) for row in rows)
+
+    def assert_project_owner(self, owner_id: str, project_id: str) -> ProjectRecord:
+        with self._db() as db:
+            row = db.execute(
+                "SELECT * FROM projects WHERE project_id = ? AND owner_id = ?",
+                (_uuid(project_id), _uuid(owner_id)),
+            ).fetchone()
+        if row is None:
+            raise ProjectNotFoundError(project_id)
+        return ProjectRecord(**dict(row))
+
     def add_revision(
         self,
         project_id: str,
@@ -274,12 +362,18 @@ class ProjectStore:
         context: SurveyContext,
         settings: Mapping[str, object] | None,
         algorithm_version: str,
+        expected_source_sha256: str | None = None,
+        expected_source_format: str | None = None,
     ) -> RevisionRecord:
         project_id = _uuid(project_id)
         algorithm_version = _label(algorithm_version, name="Algorithm version", limit=128)
         if not isinstance(context, SurveyContext):
             raise ProjectStoreError("Explicit survey context is required")
         raw, source_format = read_stored_upload(upload_root, upload_id, MAX_SOURCE_BYTES)
+        if expected_source_sha256 is not None and (
+            _digest(raw) != expected_source_sha256 or source_format != expected_source_format
+        ):
+            raise ProjectIntegrityError("Upload changed before source snapshot")
         validate_upload_bytes(raw, source_format)
         stored_settings = {
             "coordinateSystem": context.coordinate_system,
@@ -364,6 +458,25 @@ class ProjectStore:
             raise ProjectIntegrityError("Revision settings checksum is invalid")
         return record
 
+    def add_revision_for(
+        self, owner_id: str, project_id: str, upload_root: str | Path, upload_id: str,
+        *, context: SurveyContext, settings: Mapping[str, object] | None, algorithm_version: str,
+    ) -> RevisionRecord:
+        self.assert_project_owner(owner_id, project_id)
+        owned = self.assert_upload_owner(owner_id, upload_id)
+        raw, stored_format = read_stored_upload(upload_root, upload_id, MAX_SOURCE_BYTES)
+        if (
+            stored_format != owned.stored_format or len(raw) != owned.size_bytes
+            or _digest(raw) != owned.sha256
+        ):
+            raise ProjectIntegrityError("Upload checksum or size is invalid")
+        return self.add_revision(
+            project_id, upload_root, upload_id, context=context,
+            settings=settings, algorithm_version=algorithm_version,
+            expected_source_sha256=owned.sha256,
+            expected_source_format=owned.stored_format,
+        )
+
     def list_revisions(self, project_id: str) -> tuple[RevisionRecord, ...]:
         self.get_project(project_id)
         with self._db() as db:
@@ -382,6 +495,24 @@ class ProjectStore:
             revision.source_sha256,
             revision.source_size,
         )
+
+    def assert_revision_owner(self, owner_id: str, revision_id: str) -> RevisionRecord:
+        with self._db() as db:
+            row = db.execute(
+                """SELECT r.revision_id FROM revisions r JOIN projects p ON p.project_id = r.project_id
+                WHERE r.revision_id = ? AND p.owner_id = ?""",
+                (_uuid(revision_id), _uuid(owner_id)),
+            ).fetchone()
+        if row is None:
+            raise ProjectNotFoundError(revision_id)
+        return self.get_revision(row["revision_id"])
+
+    def read_source_for(self, owner_id: str, project_id: str, revision_id: str) -> bytes:
+        self.assert_project_owner(owner_id, project_id)
+        revision = self.assert_revision_owner(owner_id, revision_id)
+        if revision.project_id != project_id:
+            raise ProjectNotFoundError(revision_id)
+        return self.read_source(revision_id)
 
     def register_job(
         self,
@@ -411,6 +542,13 @@ class ProjectStore:
                 raise
         return self.get_job(job_id)
 
+    def register_job_for(
+        self, owner_id: str, revision_id: str, job_id: str,
+        *, request_settings: Mapping[str, object], status: str = "queued"
+    ) -> ProjectJobRecord:
+        self.assert_revision_owner(owner_id, revision_id)
+        return self.register_job(revision_id, job_id, request_settings=request_settings, status=status)
+
     def get_job(self, job_id: str) -> ProjectJobRecord:
         with self._db() as db:
             row = db.execute("SELECT * FROM jobs WHERE job_id = ?", (_uuid(job_id),)).fetchone()
@@ -422,6 +560,19 @@ class ProjectStore:
         if record.result_size is not None and not 0 < record.result_size <= MAX_RESULT_BYTES:
             raise ProjectIntegrityError("Job result size is invalid")
         return record
+
+    def assert_job_owner(self, owner_id: str, job_id: str) -> ProjectJobRecord:
+        with self._db() as db:
+            row = db.execute(
+                """SELECT j.job_id FROM jobs j
+                JOIN revisions r ON r.revision_id = j.revision_id
+                JOIN projects p ON p.project_id = r.project_id
+                WHERE j.job_id = ? AND p.owner_id = ?""",
+                (_uuid(job_id), _uuid(owner_id)),
+            ).fetchone()
+        if row is None:
+            raise ProjectNotFoundError(job_id)
+        return self.get_job(row["job_id"])
 
     def update_job_status(self, job_id: str, status: str) -> ProjectJobRecord:
         if status not in JOB_STATUSES:
@@ -477,6 +628,10 @@ class ProjectStore:
                 raise
         return self.get_job(job_id)
 
+    def publish_result_for(self, owner_id: str, job_id: str, result_bytes: bytes) -> ProjectJobRecord:
+        self.assert_job_owner(owner_id, job_id)
+        return self.publish_result(job_id, result_bytes)
+
     def read_result(self, job_id: str) -> bytes:
         job = self.get_job(job_id)
         if job.result_sha256 is None:
@@ -491,3 +646,7 @@ class ProjectStore:
             job.result_sha256,
             job.result_size,
         )
+
+    def read_result_for(self, owner_id: str, job_id: str) -> bytes:
+        self.assert_job_owner(owner_id, job_id)
+        return self.read_result(job_id)

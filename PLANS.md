@@ -62,7 +62,9 @@ Its fixed bounds and safe-read contract are in `harness/build/013-upload-guard.m
 GEOAI-014 is accepted at `0ad1e0a` after local and GitHub feature/PR
 checks. P1 is complete. GEOAI-015 is accepted after one CI repair at
 `a0e82bc`; both GitHub feature/PR runs passed. GEOAI-016 is accepted at
-`04522be` after local and GitHub push/PR checks. GEOAI-017 is READY under
+`04522be` after local and GitHub push/PR checks. GEOAI-017 passed its
+local gate: 107 focused, 10 isolated regression and six isolated API
+tests; exact feature/PR CI is pending. Scope is frozen in
 `harness/build/017-resource-ownership.md`.
 
 ## Proposed product roadmap — not queued
@@ -80,7 +82,7 @@ mapping and DXF through the shared engine.
 | P1 | 014 | Bounded calculation jobs | 013 | ACCEPTED at 0ad1e0a |
 | P2 | 015 | Versioned project storage | 012–014 | ACCEPTED at a0e82bc |
 | P2 | 016 | Owner authentication | 015 | ACCEPTED at 04522be |
-| P2 | 017 | Project, job and file ownership checks | 015–016 | READY |
+| P2 | 017 | Project, job and file ownership checks | 015–016 | LOCAL GATE PASSED; CI pending |
 | P3 | 018 | Quotas, retention and cleanup | 014–017 | PROPOSED |
 | P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–017 | PROPOSED |
 | P3 | 020 | Web jobs, results and download | 014–019 | PROPOSED |

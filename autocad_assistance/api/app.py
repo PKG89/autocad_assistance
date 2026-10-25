@@ -16,8 +16,11 @@ from pydantic import BaseModel
 
 from .middleware import RequestBodyLimitMiddleware
 from .auth import create_auth_router, validate_auth_origin
+from .owner_guard import OwnerGuardMiddleware
+from .owned_files import create_owned_files_router
 from .uploads import create_upload_router
 from autocad_assistance.services.auth_store import AuthStore
+from autocad_assistance.services.project_store import ProjectStore
 
 
 DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -38,6 +41,7 @@ def create_app(
     max_preview_rows: int = 50,
     auth_root: str | Path | None = None,
     auth_origin: str | None = None,
+    project_root: str | Path | None = None,
 ) -> FastAPI:
     """Create an isolated HTTP application without starting a server."""
 
@@ -47,6 +51,8 @@ def create_app(
         raise ValueError("max_preview_rows must be positive")
     if auth_root is not None and auth_origin is None:
         raise ValueError("auth_origin is required when auth_root is configured")
+    if auth_root is not None and project_root is None:
+        raise ValueError("project_root is required when auth_root is configured")
     if auth_root is not None:
         auth_origin = validate_auth_origin(auth_origin)
 
@@ -69,9 +75,11 @@ def create_app(
         path="/api/v1/uploads",
         max_body_bytes=app.state.max_upload_request_bytes,
     )
+    project_store = ProjectStore(project_root) if auth_root is not None else None
     if auth_root is not None:
         identity_store = AuthStore(auth_root)
         app.state.auth_store = identity_store
+        app.state.project_store = project_store
         app.add_middleware(
             RequestBodyLimitMiddleware,
             path="/api/v1/auth/login",
@@ -80,6 +88,8 @@ def create_app(
             subject="Authentication request",
         )
         app.include_router(create_auth_router(identity_store, auth_origin))
+        app.add_middleware(OwnerGuardMiddleware, store=identity_store, trusted_origin=auth_origin)
+        app.include_router(create_owned_files_router(project_store))
 
     @app.exception_handler(RequestValidationError)
     async def validation_error_handler(
@@ -106,6 +116,7 @@ def create_app(
             upload_root=resolved_upload_root,
             max_upload_bytes=max_upload_bytes,
             max_preview_rows=max_preview_rows,
+            project_store=project_store,
         )
     )
 

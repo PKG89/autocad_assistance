@@ -227,7 +227,19 @@ link were created; existing upload/DXF routes still await 017 ownership
 gates. The final run passed 104 focused, 10 isolated regression and six
 isolated API tests, zero blocked operations, pip and diff checks. GitHub
 push run 40148311053 and PR run 40148314247 passed at that SHA.
-GEOAI-017 is READY under `harness/build/017-resource-ownership.md`.
+GEOAI-017 scope is frozen under `harness/build/017-resource-ownership.md`.
+
+GEOAI-017 local gate passed. Opt-in authenticated API mode now requires
+an explicit project root and checks an HTTPS owner session for every
+resource request before body parsing; mutations require exact Origin
+and CSRF. Schema v2 assigns UUID owners to new projects and uploads;
+legacy v1 projects remain unowned and inaccessible through scoped reads.
+Source/result downloads and upload preview/mapping/DXF verify ownership,
+with identical 404 for foreign and missing IDs. The local gate passed
+107 focused, 10 isolated regression and six isolated API tests with zero
+blocked operations, plus pip and diff checks. GitHub feature/PR CI is
+pending. The legacy no-auth app factory mode remains for the isolated
+regression baseline; it is not a private cabinet deployment mode.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

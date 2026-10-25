@@ -257,3 +257,21 @@ def read_stored_upload(
     if len(matches) != 1:
         raise FileNotFoundError
     return matches[0]
+
+
+def remove_stored_upload(upload_root: str | Path, upload_id: str, stored_format: str) -> None:
+    """Remove a just-created UUID upload after owner registration fails."""
+    canonical_id = str(UUID(upload_id))
+    if canonical_id != upload_id or stored_format not in {"txt", "csv", "kml"}:
+        raise ValueError("Invalid stored upload identity")
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    root_fd = os.open(Path(upload_root).resolve(), flags)
+    try:
+        upload_fd = os.open(canonical_id, flags, dir_fd=root_fd)
+        try:
+            os.unlink(f"{canonical_id}.{stored_format}", dir_fd=upload_fd)
+        finally:
+            os.close(upload_fd)
+        os.rmdir(canonical_id, dir_fd=root_fd)
+    finally:
+        os.close(root_fd)
