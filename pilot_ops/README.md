@@ -1,4 +1,4 @@
-# GEO AI closed-pilot operational overlay, version 0.1.0
+# GEO AI closed-pilot operational overlay, version 0.1.1
 
 This overlay is separate from immutable product archive
 `79528bb9f6070e458724886a915f9d035cdfd110.tar`. It imports the
