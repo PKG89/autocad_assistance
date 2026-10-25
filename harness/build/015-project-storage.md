@@ -1,6 +1,6 @@
 # GEOAI-015 — versioned project storage
 
-Status: LOCAL ACCEPTED; remote CI pending. Base: accepted GEOAI-014 feature commit
+Status: ACCEPTED at `a0e82bc` after one CI repair. Base: accepted GEOAI-014 feature commit
 `0ad1e0a7955adde286d23cefa2731d17c70ac57b`. Dependencies 012–014
 passed local and GitHub push/PR checks.
 

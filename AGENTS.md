@@ -207,13 +207,16 @@ with zero blocked operations, plus pip and diff checks. GitHub push run
 `harness/build/015-project-storage.md`. P2 deadline is
 2026-10-25T04:33:23Z with one worker and zero external executor spend.
 
-GEOAI-015 passed its local gate. A separate SQLite project store preserves
+GEOAI-015 is accepted at `a0e82bc` after one CI repair. A separate SQLite project store preserves
 immutable source revisions, exact settings/job parameters, hashes,
 algorithm labels and verified DXF results under server UUID paths.
 No project HTTP routes or Telegram database changes were made. The final
 local run passed 92 focused, 10 isolated regression and six isolated API
 tests, with zero blocked operations, plus pip and diff checks. GitHub
-feature/PR CI remains pending; 016/017 remain PROPOSED.
+push run 40147682109 and PR run 40147684816 passed at that SHA.
+GEOAI-016 is READY under `harness/build/016-owner-auth.md`; 017 remains
+PROPOSED. The initial 015 push run exposed a cancellation cleanup race;
+the repair and exact CI evidence are in the build log.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

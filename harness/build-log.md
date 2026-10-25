@@ -617,3 +617,19 @@ Keep one concise entry per task. Do not paste full command output.
 - One of two allowed 015 repair cycles is used. Next: commit the reviewed
   race fix and journal, push the exact new feature HEAD, require both
   GitHub push and PR runs to pass before accepting 015.
+
+## GEOAI-015 — remote gate passed; GEOAI-016 ready
+
+- Exact repair HEAD `a0e82bc968884cd5d8a60bd522fea2bc3170f608`
+  was pushed only to `codex/geoai-current`. GitHub `GEO AI checks`
+  push run 40147682109 and draft PR #6 run 40147684816 both succeeded
+  at that SHA. The previous product head `cab8105` remains in history;
+  its push CI failure and PR success are recorded above. No production
+  workflow or deployment ran.
+- The verified branch bundle has SHA-256
+  `3581de76a2121c66081b50d55cb8de3f7f99e5aeef9e9cd0e5f7c57cf65c6512`
+  on VM and Windows. The VM worktree is clean at `a0e82bc`; its `origin`
+  remains the local bare store. GEOAI-015 is ACCEPTED after one repair.
+- P2 remains within its 2026-10-25T04:33:23Z deadline. GEOAI-016 is
+  READY with service/API/session and confirmed Telegram-link scope frozen
+  in `harness/build/016-owner-auth.md`; 017 stays PROPOSED.
