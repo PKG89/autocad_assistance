@@ -17,7 +17,8 @@ enrolled, default-deny local firewall preserving LAN SSH, disabled pilot
 systemd units, and a new empty marked state. The owner approved the proposed
 technical thresholds and selected two client peers, private DNS/TLS and
 backup storage names. One-use NetBird and Cloudflare credentials, real VPN
-IP/certificate, off-VM restore and target acceptance metrics remain open;
+IP/certificate, selected Proxmox backup scheduling and target acceptance
+metrics remain open. A temporary synthetic backup restored on VM109;
 GEOAI-039 is PARTIAL. No pilot service, public listener, production data,
 shared VPN policy, Proxmox schedule or PR merge has changed. GEOAI-040
 production publication remains BLOCKED.

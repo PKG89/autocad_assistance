@@ -1639,6 +1639,10 @@ Keep one concise entry per task. Do not paste full command output.
   DNS-01, and Proxmox storages `backup-fast-nfs`/`backup-weekly-nfs` with
   proposed retention. NetBird still needs a one-use setup key, Cloudflare a
   scoped DNS token. Neither secret is in chat/Git. PVE storage/schedule access
-  and off-VM restore remain unverified. No shared VPN policy or Proxmox
+  and schedule remain unverified. A VM110 synthetic backup was transferred
+  to VM109 with matching SHA-256 and restored to a new root; SQLite versions
+  1/8 and quick checks passed, and the restored DXF SHA matched VM110.
+  This temporary copy is not the selected retention destination.
+  No shared VPN policy or Proxmox
   schedule was changed. Full target evidence and next gates are in
   `harness/build/039-vm110-pilot-execution.md`; GEOAI-039 remains PARTIAL.

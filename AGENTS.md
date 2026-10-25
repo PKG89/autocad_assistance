@@ -15,7 +15,9 @@ The owner selected two NetBird client peers, `geoai.exitline.site`, ACME
 DNS-01 through Cloudflare, and Proxmox storage names. Setup key and DNS token
 must be supplied through root-only files, never chat or Git. Do not alter
 shared VPN policies or Proxmox schedules without a separate concrete approval.
-Do not start the pilot until private access and an off-VM backup restore pass.
+A synthetic off-VM restore passed on VM109; the selected Proxmox backup
+storages and retention are not yet configured. Do not start the pilot until
+private access is verified.
 
 ## Closed-pilot preparation handoff (2026-10-25)
 
