@@ -826,3 +826,45 @@ Keep one concise entry per task. Do not paste full command output.
   coordinates. GEOAI-019 is READY under the P3 manifest. Next:
   implement in the same writable feature worktree, run targeted and
   full isolated gates, then push exact reviewed commits and inspect CI.
+
+## GEOAI-019 — local and browser gates passed; CI pending
+
+- Base: accepted 018 at `8ed5687`, followed by frozen-scope commit
+  `bf35457`. Only the feature worktree changed. Added owner-scoped
+  paginated project/revision API and a plain same-origin web screen;
+  no new frontend package or geometry implementation was added.
+- The screen signs in through 016's session, restores it after reload,
+  creates/selects a project, uploads and previews TXT/CSV, shows
+  warnings, maps columns, collects explicit coordinate-system/unit/
+  scale labels and saves an immutable revision. KML remains available
+  through the existing upload API but is explicitly unsupported by
+  this tabular mapping flow. Untrusted text uses `textContent`, CSRF
+  stays in page memory, and the import button remains disabled after
+  success until a new upload. API create/import calls are documented
+  non-idempotent and never auto-retried by the screen.
+- The new API validates all mapped rows before accepting a revision,
+  records mapping and declared context with exact source bytes, and
+  returns matching 404s for unknown/foreign owner resources. Project
+  JSON bodies are capped at 64 KiB behind the 017 auth guard. Lists
+  are bounded and revisions return newest first. Invalid context,
+  mapping, KML, CSRF and oversize requests leave no accepted revision.
+- Final local gate: `/home/geoai/dev-data/geoai-autonomy/p3-019-final.log`
+  and `p3-019/final-gate/`: 116 focused, 10 isolated regression and
+  six isolated API tests passed, zero blocked network/dotenv/write/
+  process operations, `pip check` and `git diff --check` passed.
+  `node --check` passed for the local script.
+- Real browser UI check used a disposable synthetic owner and sample
+  CSV under `p3-019/browser-fixture-http/`; an HTTP-only local SSH
+  forward rewrote scheme/Origin solely for the UI flow because the
+  in-app browser rejected the disposable self-signed TLS certificate.
+  HTTPS/Origin/cookie security was tested independently by ASGI tests.
+  The browser completed login, reload/session recovery, project,
+  upload/preview and two intentional revisions. Double-clicking
+  create/import produced one resource per click intent; after finding
+  a misleading second-click message, the import button was held
+  disabled until the next upload. Screenshot:
+  `/home/geoai/dev-data/geoai-autonomy/p3-019/browser-proof.png`.
+  Both disposable servers, SSH forwards and the browser tab were stopped.
+- GitHub feature/PR CI is pending. Next: commit exact reviewed files,
+  push only `codex/geoai-current`, inspect both CI runs and then freeze
+  020 if accepted. No real credentials/surveys or deployment were used.

@@ -17,9 +17,11 @@ class RequestBodyLimitMiddleware:
     """Reject an oversized upload request before multipart parsing completes."""
 
     def __init__(self, app: ASGIApp, *, path: str, max_body_bytes: int,
+                 include_subpaths: bool = False,
                  error_code: str = "UPLOAD_TOO_LARGE", subject: str = "Upload request") -> None:
         self.app = app
         self.path = path
+        self.include_subpaths = include_subpaths
         self.max_body_bytes = max_body_bytes
         self.error_code = error_code
         self.subject = subject
@@ -38,7 +40,11 @@ class RequestBodyLimitMiddleware:
         )
 
     async def __call__(self, scope, receive, send) -> None:
-        if scope["type"] != "http" or scope.get("path") != self.path:
+        request_path = scope.get("path", "")
+        selected = request_path == self.path or (
+            self.include_subpaths and request_path.startswith(self.path + "/")
+        )
+        if scope["type"] != "http" or not selected:
             await self.app(scope, receive, send)
             return
 

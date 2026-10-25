@@ -1,0 +1,249 @@
+"use strict";
+
+const $ = (id) => document.getElementById(id);
+const fields = ["Point", "X", "Y", "Z", "Code", "Comments"];
+let csrfToken = null;
+let uploadId = null;
+let previewColumns = [];
+
+function message(text, isError = false) {
+  $("status").textContent = text;
+  $("status").classList.toggle("error", isError);
+}
+
+function item(text) {
+  const node = document.createElement("li");
+  node.textContent = text;
+  return node;
+}
+
+async function api(path, options = {}) {
+  const headers = new Headers(options.headers || {});
+  headers.set("Accept", "application/json");
+  if (options.body instanceof FormData) {
+    // The browser sets the multipart boundary.
+  } else if (options.body !== undefined) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (options.method && options.method !== "GET" && csrfToken) {
+    headers.set("X-CSRF-Token", csrfToken);
+  }
+  const response = await fetch(path, { ...options, headers, credentials: "same-origin" });
+  const body = await response.json();
+  if (!response.ok) {
+    const error = new Error(body.error?.message || `Ошибка HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return body;
+}
+
+async function busy(button, action, retainOnSuccess = false) {
+  if (button.disabled) return;
+  button.disabled = true;
+  let completed = false;
+  try {
+    await action();
+    completed = true;
+  } catch (error) {
+    message(error.message || "Не удалось выполнить действие", true);
+  } finally {
+    button.disabled = retainOnSuccess && completed;
+  }
+}
+
+function showLogin() {
+  csrfToken = null;
+  uploadId = null;
+  $("login-panel").hidden = false;
+  $("workspace").hidden = true;
+  $("logout").hidden = true;
+}
+
+async function showWorkspace(session) {
+  csrfToken = session.csrfToken;
+  $("login-panel").hidden = true;
+  $("workspace").hidden = false;
+  $("logout").hidden = false;
+  message(`Вы вошли как ${session.username}`);
+  await loadProjects();
+}
+
+async function loadProjects(preferredId = null) {
+  const response = await api("/api/v1/projects?page=1&pageSize=50");
+  const select = $("project-select");
+  const previous = preferredId || select.value;
+  select.replaceChildren(new Option("— выберите —", ""));
+  for (const project of response.data) {
+    select.add(new Option(project.name, project.projectId));
+  }
+  if (response.data.some((project) => project.projectId === previous)) {
+    select.value = previous;
+  } else if (response.data.length === 1) {
+    select.value = response.data[0].projectId;
+  }
+  await loadRevisions();
+}
+
+async function loadRevisions() {
+  const list = $("revision-list");
+  list.replaceChildren();
+  const projectId = $("project-select").value;
+  if (!projectId) {
+    list.append(item("Сначала выберите проект."));
+    return;
+  }
+  const response = await api(`/api/v1/projects/${projectId}/revisions?page=1&pageSize=50`);
+  if (!response.data.length) {
+    list.append(item("Пока нет сохранённых версий."));
+  }
+  for (const revision of response.data) {
+    list.append(item(`Версия ${revision.sequence} · ${revision.sourceFormat.toUpperCase()} · ${revision.createdAt}`));
+  }
+}
+
+function showPreview(preview) {
+  previewColumns = preview.columns;
+  $("import-submit").disabled = false;
+  $("import-result").textContent = "";
+  $("import-warnings").replaceChildren();
+  $("preview").hidden = false;
+  $("preview-summary").textContent = `${preview.rowCount} строк · ${preview.format.toUpperCase()} · ${preview.encoding}`;
+  const head = document.createElement("tr");
+  for (const column of preview.columns) {
+    const th = document.createElement("th");
+    th.textContent = column;
+    head.append(th);
+  }
+  $("preview-head").replaceChildren(head);
+  const body = $("preview-body");
+  body.replaceChildren();
+  for (const row of preview.rows) {
+    const tr = document.createElement("tr");
+    for (const value of row) {
+      const td = document.createElement("td");
+      td.textContent = value;
+      tr.append(td);
+    }
+    body.append(tr);
+  }
+  $("preview-warnings").replaceChildren(...preview.warnings.map((warning) => item(warning.message)));
+  const mapping = $("mapping-fields");
+  mapping.replaceChildren();
+  for (const field of fields) {
+    const label = document.createElement("label");
+    label.textContent = `Колонка ${field}`;
+    const select = document.createElement("select");
+    select.dataset.field = field;
+    select.add(new Option("— не выбрана —", ""));
+    preview.columns.forEach((column, index) => select.add(new Option(`${index + 1}: ${column}`, String(index))));
+    const exact = preview.columns.findIndex((column) => column.trim().toLowerCase() === field.toLowerCase());
+    if (exact >= 0) select.value = String(exact);
+    label.append(select);
+    mapping.append(label);
+  }
+}
+
+function mappingValues() {
+  const mapping = {};
+  for (const select of $("mapping-fields").querySelectorAll("select")) {
+    if (select.value !== "") mapping[select.dataset.field] = Number(select.value);
+  }
+  for (const required of ["X", "Y", "Z"]) {
+    if (mapping[required] === undefined) throw new Error(`Выберите колонку ${required}`);
+  }
+  return mapping;
+}
+
+$("login-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  busy(event.submitter, async () => {
+    const session = await api("/api/v1/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username: $("username").value, password: $("password").value }),
+    });
+    $("password").value = "";
+    await showWorkspace(session);
+  });
+});
+
+$("logout").addEventListener("click", (event) => busy(event.currentTarget, async () => {
+  await api("/api/v1/auth/logout", { method: "POST" });
+  showLogin();
+  message("Вы вышли из кабинета.");
+}));
+
+$("project-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  busy(event.submitter, async () => {
+    const project = await api("/api/v1/projects", {
+      method: "POST", body: JSON.stringify({ name: $("project-name").value }),
+    });
+    $("project-name").value = "";
+    await loadProjects(project.projectId);
+    message("Проект создан.");
+  });
+});
+
+$("project-select").addEventListener("change", () => {
+  loadRevisions().catch((error) => message(error.message, true));
+});
+
+$("upload-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  busy(event.submitter, async () => {
+    if (!$("project-select").value) throw new Error("Сначала выберите проект");
+    const file = $("survey-file").files[0];
+    if (!file) throw new Error("Выберите файл TXT или CSV");
+    uploadId = null;
+    $("preview").hidden = true;
+    const form = new FormData();
+    form.append("file", file);
+    const upload = await api("/api/v1/uploads", { method: "POST", body: form });
+    uploadId = upload.uploadId;
+    try {
+      const preview = await api(`/api/v1/uploads/${uploadId}/preview`);
+      showPreview(preview);
+      message("Файл загружен. Проверьте строки и сопоставьте колонки.");
+    } catch (error) {
+      uploadId = null;
+      throw error;
+    }
+  });
+});
+
+$("import-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  busy(event.submitter, async () => {
+    const projectId = $("project-select").value;
+    if (!projectId) throw new Error("Выберите проект");
+    if (!uploadId || !previewColumns.length) throw new Error("Сначала загрузите и проверьте файл");
+    const payload = {
+      uploadId, mapping: mappingValues(),
+      coordinateSystem: $("coordinate-system").value.trim() || null,
+      horizontalUnit: $("horizontal-unit").value.trim() || null,
+      verticalUnit: $("vertical-unit").value.trim() || null,
+      scaleFactor: $("scale-factor").value.trim(),
+    };
+    const result = await api(`/api/v1/projects/${projectId}/revisions`, {
+      method: "POST", body: JSON.stringify(payload),
+    });
+    $("import-result").textContent = `Сохранена версия ${result.revision.sequence}; ${result.rowCount} строк.`;
+    $("import-warnings").replaceChildren(...result.warnings.map((warning) => item(warning.message)));
+    uploadId = null;
+    await loadRevisions();
+    message("Импорт завершён.");
+  }, true);
+});
+
+api("/api/v1/auth/session")
+  .then(showWorkspace)
+  .catch((error) => {
+    if (error.status === 401) {
+      showLogin();
+      message("Войдите, чтобы открыть проекты.");
+    } else {
+      showLogin();
+      message(error.message, true);
+    }
+  });

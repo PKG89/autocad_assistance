@@ -10,12 +10,15 @@ P3 deadline: 2026-10-25T05:01:04Z.
 Add a small same-origin browser screen, served only when authenticated
 mode is configured. It signs in with the existing owner session,
 restores the session after reload, lists/creates the owner's projects,
-uploads TXT/CSV/KML using the accepted endpoint, shows preview columns,
+uploads TXT/CSV using the accepted endpoint, shows preview columns,
 rows and warnings, lets the owner choose column mapping, and collects
 explicit coordinate-system label, horizontal/vertical units and scale.
 Unknown labels remain unknown; no coordinate conversion or inferred
 geodetic datum is introduced. If a required choice is missing, the UI
 shows a clear prompt and the API rejects invalid mapping/context.
+The existing KML upload remains available but this mapped survey screen
+must clearly state that KML has no column preview/mapping and cannot
+enter this TXT/CSV revision workflow.
 
 Add owner-scoped project and revision routes: list/create projects,
 list revisions, import a validated upload as an immutable revision with
@@ -24,6 +27,10 @@ before accepting a revision. Keep the existing shared survey parser
 and ProjectStore; do not import the Telegram entry point or geometry
 engine in the web adapter. The owner comes only from verified request
 scope. Unknown and foreign project/upload IDs have identical 404s.
+List responses have bounded pagination and revisions list newest first;
+project JSON requests are capped
+at 64 KiB before parsing. Create/import requests are explicitly
+non-idempotent and the browser never retries them automatically.
 
 The screen uses plain local HTML/CSS/JavaScript, no external CDN or
 new frontend build tool. Render untrusted names/cells/warnings with

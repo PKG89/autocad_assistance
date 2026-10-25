@@ -11,13 +11,14 @@ from typing import Literal
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from .middleware import RequestBodyLimitMiddleware
 from .auth import create_auth_router, validate_auth_origin
 from .owner_guard import OwnerGuardMiddleware
 from .owned_files import create_owned_files_router
+from .projects import create_project_router
 from .uploads import create_upload_router
 from autocad_assistance.services.auth_store import AuthStore
 from autocad_assistance.services.project_store import ProjectStore, ResourceQuota
@@ -94,9 +95,42 @@ def create_app(
             error_code="AUTH_BODY_TOO_LARGE",
             subject="Authentication request",
         )
+        app.add_middleware(
+            RequestBodyLimitMiddleware,
+            path="/api/v1/projects",
+            include_subpaths=True,
+            max_body_bytes=64 * 1024,
+            error_code="PROJECT_BODY_TOO_LARGE",
+            subject="Project request",
+        )
         app.include_router(create_auth_router(identity_store, auth_origin))
         app.add_middleware(OwnerGuardMiddleware, store=identity_store, trusted_origin=auth_origin)
         app.include_router(create_owned_files_router(project_store))
+        app.include_router(create_project_router(project_store, resolved_upload_root))
+
+        web_root = Path(__file__).parent / "web"
+        web_headers = {
+            "Cache-Control": "no-store",
+            "Content-Security-Policy": (
+                "default-src 'self'; script-src 'self'; style-src 'self'; "
+                "connect-src 'self'; object-src 'none'; base-uri 'none'; "
+                "form-action 'self'; frame-ancestors 'none'"
+            ),
+            "Referrer-Policy": "no-referrer",
+            "X-Content-Type-Options": "nosniff",
+        }
+
+        @app.get("/app", include_in_schema=False)
+        async def web_app() -> FileResponse:
+            return FileResponse(web_root / "index.html", media_type="text/html", headers=web_headers)
+
+        @app.get("/app/app.js", include_in_schema=False)
+        async def web_script() -> FileResponse:
+            return FileResponse(web_root / "app.js", media_type="text/javascript", headers=web_headers)
+
+        @app.get("/app/styles.css", include_in_schema=False)
+        async def web_style() -> FileResponse:
+            return FileResponse(web_root / "styles.css", media_type="text/css", headers=web_headers)
 
     @app.exception_handler(RequestValidationError)
     async def validation_error_handler(

@@ -461,6 +461,18 @@ class ProjectStore:
             raise ProjectNotFoundError(upload_id)
         return UploadOwnerRecord(**dict(row))
 
+    def read_upload_for(
+        self, owner_id: str, upload_root: str | Path, upload_id: str,
+    ) -> tuple[bytes, str]:
+        owned = self.assert_upload_owner(owner_id, upload_id)
+        raw, stored_format = read_stored_upload(upload_root, upload_id, MAX_SOURCE_BYTES)
+        if (
+            stored_format != owned.stored_format or len(raw) != owned.size_bytes
+            or _digest(raw) != owned.sha256
+        ):
+            raise ProjectIntegrityError("Upload checksum or size is invalid")
+        return raw, stored_format
+
     def expired_uploads(self, *, now: int | None = None, limit: int = 100) -> tuple[UploadOwnerRecord, ...]:
         if not 1 <= limit <= 100:
             raise ValueError("cleanup limit must be between 1 and 100")
@@ -693,6 +705,10 @@ class ProjectStore:
                 (project_id,),
             ).fetchall()
         return tuple(self.get_revision(row["revision_id"]) for row in rows)
+
+    def list_revisions_for(self, owner_id: str, project_id: str) -> tuple[RevisionRecord, ...]:
+        self.assert_project_owner(owner_id, project_id)
+        return self.list_revisions(project_id)
 
     def read_source(self, revision_id: str) -> bytes:
         revision = self.get_revision(revision_id)

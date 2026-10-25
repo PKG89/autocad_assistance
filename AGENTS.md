@@ -252,10 +252,15 @@ project metadata never assigns an expiry to migrated uploads with
 unknown age. A persistent cleanup journal records apply outcomes.
 The first 018 GitHub push/PR runs passed at `52b794f`; the journal
 repair passed push run 40149469271 and PR run 40149474159 at `8ed5687`.
-No real data cleanup or production migration ran. GEOAI-019 is next
-and READY under `harness/build/019-import-screen.md` from this accepted
+No real data cleanup or production migration ran. GEOAI-019 passed its
+local gate under `harness/build/019-import-screen.md` from this accepted
 base. It uses the existing parser, authenticated project store and a
 small same-origin browser screen; no new frontend runtime is required.
+The final run passed 116 focused, 10 isolated regression and six isolated
+API tests, zero blocked operations, pip and diff checks. A disposable
+browser fixture confirmed login, session recovery, project creation,
+CSV preview, mapping, context and one revision after a double click.
+GitHub feature/PR CI is pending; no production deployment occurred.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

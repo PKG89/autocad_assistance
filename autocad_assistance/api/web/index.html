@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GEO AI — импорт съёмки</title>
+  <link rel="stylesheet" href="/app/styles.css">
+  <script src="/app/app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div><strong>GEO AI</strong><span>Импорт полевой съёмки</span></div>
+      <button id="logout" type="button" hidden>Выйти</button>
+    </header>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <section id="login-panel" class="card" hidden>
+      <h1>Вход владельца</h1>
+      <form id="login-form">
+        <label>Имя пользователя<input id="username" name="username" autocomplete="username" required></label>
+        <label>Пароль<input id="password" name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit">Войти</button>
+      </form>
+    </section>
+
+    <div id="workspace" hidden>
+      <section class="card">
+        <h1>1. Проект</h1>
+        <label>Выбрать проект<select id="project-select"><option value="">— выберите —</option></select></label>
+        <form id="project-form" class="inline-form">
+          <label>Новый проект<input id="project-name" maxlength="200" required placeholder="Название участка"></label>
+          <button type="submit">Создать</button>
+        </form>
+        <p class="hint">Каждое создание сохраняет отдельный проект. Дождитесь ответа перед повтором.</p>
+      </section>
+
+      <section class="card">
+        <h2>2. Файл и предварительный просмотр</h2>
+        <form id="upload-form" class="inline-form">
+          <label>TXT или CSV съёмка<input id="survey-file" type="file" accept=".txt,.csv" required></label>
+          <button type="submit">Загрузить и показать</button>
+        </form>
+        <p class="hint">KML не имеет табличного preview и mapping в этом сценарии. Исходные координаты не преобразуются.</p>
+        <div id="preview" hidden>
+          <p id="preview-summary"></p>
+          <div class="table-wrap"><table><thead id="preview-head"></thead><tbody id="preview-body"></tbody></table></div>
+          <h3>Предупреждения файла</h3><ul id="preview-warnings"></ul>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>3. Колонки и контекст</h2>
+        <form id="import-form">
+          <div id="mapping-fields" class="grid"></div>
+          <div class="grid">
+            <label>Система координат<input id="coordinate-system" maxlength="128" placeholder="Укажите, если известна"></label>
+            <label>Единица X/Y<input id="horizontal-unit" maxlength="64" placeholder="Например, м"></label>
+            <label>Единица Z<input id="vertical-unit" maxlength="64" placeholder="Например, м"></label>
+            <label>Масштаб плана<input id="scale-factor" value="500" required inputmode="decimal"></label>
+          </div>
+          <p class="hint">Пустые сведения останутся неизвестными и появятся в предупреждениях. Масштаб не меняет измеренные XYZ.</p>
+          <button id="import-submit" type="submit">Сохранить версию съёмки</button>
+        </form>
+        <p id="import-result" aria-live="polite"></p>
+        <ul id="import-warnings"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Версии выбранного проекта</h2>
+        <ul id="revision-list"></ul>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
