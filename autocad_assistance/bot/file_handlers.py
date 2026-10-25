@@ -1,6 +1,7 @@
 import os
 import tempfile
 import re
+from hashlib import sha256
 from typing import List, Optional, Set
 
 from telegram import Update, InlineKeyboardMarkup
@@ -307,6 +308,8 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     logger.info("Определён разделитель: %s", repr(parsed.delimiter))
     context.user_data["encoding"] = parsed.encoding
+    context.user_data["survey_source_sha256"] = sha256(raw_data).hexdigest()
+    context.user_data["survey_source_line_numbers"] = parsed.source_line_numbers
 
     import pandas as pd
 
@@ -315,6 +318,7 @@ async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     context.user_data["data_initial_count"] = len(data_initial)
     context.user_data["mapping_ready"] = False
     context.user_data["final_data"] = None
+    context.user_data["survey_warnings"] = ()
     context.user_data.setdefault("scale_value", BASE_SCALE)
 
     await update.message.reply_text(

@@ -10,15 +10,17 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
-from autocad_assistance.services.column_mapping import (
-    MappingValidationError,
-    map_survey_rows,
-)
+from autocad_assistance.services.column_mapping import MappingValidationError
 from autocad_assistance.services.dxf_jobs import (
     DxfCoordinateValidationError,
     render_dxf_bytes,
 )
 from autocad_assistance.services.survey_parser import SurveyParseError, parse_survey_bytes
+from autocad_assistance.services.survey_contract import (
+    SurveyContext,
+    SurveyContractError,
+    build_survey_dataset,
+)
 from autocad_assistance.services.uploads import (
     EmptyUploadError,
     InvalidUploadNameError,
@@ -87,12 +89,19 @@ class MappingRow(BaseModel):
     Comments: str | None
 
 
+class MappingWarning(BaseModel):
+    code: str
+    message: str
+    rowIndex: int | None = None
+
+
 class MappingResponse(BaseModel):
     uploadId: str
     mapping: dict[str, int]
     rows: list[MappingRow]
     rowCount: int
     returnedRows: int
+    warnings: list[MappingWarning] = Field(default_factory=list)
 
 
 def _error(status_code: int, code: str, message: str) -> JSONResponse:
@@ -318,25 +327,30 @@ def create_upload_router(
 
         try:
             raw_data = await run_in_threadpool(stored_file.read_bytes)
-            parsed = await run_in_threadpool(parse_survey_bytes, raw_data)
-            mapped = await run_in_threadpool(
-                map_survey_rows,
-                parsed.rows,
-                payload.mapping,
-            )
+            dataset = await run_in_threadpool(build_survey_dataset, raw_data, payload.mapping)
         except (OSError, SurveyParseError, csv.Error):
             return _error(422, "INVALID_SURVEY", "Survey data cannot be mapped")
         except MappingValidationError as exc:
             return _error(422, exc.code, exc.message)
+        except SurveyContractError as exc:
+            return _error(422, exc.code, exc.message)
 
-        limited_rows = [MappingRow(**mapped_row) for mapped_row in mapped.rows[:preview_limit]]
+        limited_rows = [MappingRow(**mapped_row) for mapped_row in dataset.mapped_rows[:preview_limit]]
         response_mapping = {key: int(value) for key, value in payload.mapping.items()}
         return MappingResponse(
             uploadId=str(upload_id),
             mapping=response_mapping,
             rows=limited_rows,
-            rowCount=len(mapped.rows),
+            rowCount=len(dataset.records),
             returnedRows=len(limited_rows),
+            warnings=[
+                MappingWarning(
+                    code=warning.code,
+                    message=warning.message,
+                    rowIndex=warning.row_index,
+                )
+                for warning in dataset.warnings
+            ],
         )
 
     @router.post(
@@ -373,15 +387,15 @@ def create_upload_router(
 
         try:
             raw_data = await run_in_threadpool(stored_file.read_bytes)
-            parsed = await run_in_threadpool(parse_survey_bytes, raw_data)
-            mapped = await run_in_threadpool(
-                map_survey_rows,
-                parsed.rows,
+            dataset = await run_in_threadpool(
+                build_survey_dataset,
+                raw_data,
                 payload.mapping,
+                context=SurveyContext(scale_factor=payload.scaleFactor),
             )
             dxf_bytes = await run_in_threadpool(
                 render_dxf_bytes,
-                mapped.rows,
+                dataset.mapped_rows,
                 scale_factor=payload.scaleFactor,
                 tin_settings={
                     "codes": payload.tinSettings.codes,
@@ -392,6 +406,8 @@ def create_upload_router(
         except (OSError, SurveyParseError, csv.Error):
             return _error(422, "INVALID_SURVEY", "Survey data cannot be mapped")
         except MappingValidationError as exc:
+            return _error(422, exc.code, exc.message)
+        except SurveyContractError as exc:
             return _error(422, exc.code, exc.message)
         except DxfCoordinateValidationError as exc:
             return _error(422, "INVALID_COORDINATE", str(exc))

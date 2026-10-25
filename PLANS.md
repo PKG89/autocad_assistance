@@ -55,6 +55,10 @@ matching file under `harness/build/`.
 - Next: freeze GEOAI-012 from the accepted 011/007A baseline, then execute
   P1 by dependencies. No production deployment is authorized.
 
+P1 run manifest: `/home/geoai/dev-data/geoai-autonomy/p1-run-manifest.json`.
+GEOAI-012 scope and acceptance are frozen in
+`harness/build/012-survey-model.md`. Stages 013–014 remain PROPOSED.
+
 ## Proposed product roadmap — not queued
 
 Numbers 012–040 were checked against this plan on 2026-10-25: none were
@@ -65,7 +69,7 @@ mapping and DXF through the shared engine.
 
 | Package | ID | Outcome | Depends on | Status |
 | --- | --- | --- | --- | --- |
-| P1 | 012 | Survey model, coordinates and provenance | 007A, 008–011 | PROPOSED |
+| P1 | 012 | Survey model, coordinates and provenance | 007A, 008–011 | LOCAL ACCEPTED; CI pending |
 | P1 | 013 | Safe uploads and file paths | 012 | PROPOSED |
 | P1 | 014 | Bounded calculation jobs | 013 | PROPOSED |
 | P2 | 015 | Versioned project storage | 012–014 | PROPOSED |

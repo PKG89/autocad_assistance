@@ -83,6 +83,19 @@ class DxfEndpointTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()["error"]["code"], "INVALID_COORDINATE")
 
+    async def test_dxf_rejects_nonpositive_scale_before_generation(self):
+        upload_id = await self.upload(
+            filename="survey.csv",
+            content=b"A,1,2,3,C1\n",
+        )
+        payload = self.default_payload()
+        payload["scaleFactor"] = 0
+        with patch("autocad_assistance.api.uploads.render_dxf_bytes") as render:
+            response = await self.generate_dxf(upload_id, payload)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["error"]["code"], "INVALID_SURVEY_CONTEXT")
+        render.assert_not_called()
+
     async def test_dxf_wraps_generation_failure(self):
         upload_id = await self.upload(
             filename="survey.csv",

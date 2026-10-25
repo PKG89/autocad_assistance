@@ -419,3 +419,44 @@ Keep one concise entry per task. Do not paste full command output.
 - P0 is accepted after the successful remote CI gate. Next: freeze
   GEOAI-012 scope and tests in `harness/build/`, move it from PROPOSED
   to READY, then implement it on the accepted feature branch.
+
+## P1 / GEOAI-012 — specification frozen
+
+- GitHub push and PR checks for P0 documentation head `6e1a751` both
+  passed (runs 40145686582 and 40145691264). P0 remains accepted.
+- Codebase graph is available but this repository is not indexed; targeted
+  filesystem search identified the existing parser, mapping, DXF service,
+  API and Telegram adapters. No broad repository audit was repeated.
+- P1 manifest starts 2026-10-25T00:12:17Z, deadline 04:12:17Z, 90
+  minutes per task, at most two repairs, one writable tree/compute worker,
+  zero external executor spend. See protected dev-data manifest.
+- GEOAI-012 is READY at base `6e1a751` with explicit scope, non-goals,
+  acceptance and checks in `harness/build/012-survey-model.md`.
+  No geodetic unit, CRS or tolerance will be inferred.
+
+## GEOAI-012 — local gate passed
+
+- Based on accepted feature HEAD `6e1a75154e4ac1cac4ce439a32569a735f9f1dd0`.
+  Added framework-independent `SurveyDataset`, `SurveyRecord`,
+  `SurveyContext` and structured warnings. The accepted parser now
+  records physical source-line numbers additively; the existing mapping
+  algorithm is reused. Original text and raw cells remain unchanged
+  beside finite Decimal XYZ; the model never transforms coordinates,
+  infers EPSG/units or applies drawing scale to measurements.
+- API mapping and DXF use the contract. Mapping returns additive warnings
+  with row index for duplicates/empty IDs and explicit unknown CRS/units.
+  Telegram keeps its accepted mapping step (including a blank Z pending
+  generation), saves a source digest/line numbers and checks the common
+  contract before DXF. Existing DXF and KML geometry code is unchanged.
+- Final fresh-venv gate: 68 focused tests, 10 isolated regression tests,
+  six isolated API tests, pip check and `git diff --check` passed.
+  Both bootstraps reported zero blocked network, dotenv, write and process
+  operations. Tests cover swapped axes, raw precision/provenance, duplicate
+  and empty IDs, unknown/local CRS, missing or nonfinite Z, precision
+  underflow, current Telegram scale and invalid API scale. Evidence:
+  `/home/geoai/dev-data/geoai-autonomy/p1-012-final-gate.log`.
+- Scope review found only parser/model, HTTP/Telegram adapters, state-key
+  cleanup, focused tests and task memory. No real survey, production DB,
+  .env, deployment or geometry/template change. Current status:
+  LOCAL ACCEPTED, remote CI pending. Next: commit exact reviewed files,
+  push only `codex/geoai-current`, inspect CI and then prepare 013.

@@ -94,6 +94,30 @@ class MappingEndpointTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.json()["rows"][0]["Comments"])
 
+    async def test_mapping_reports_duplicate_ids_and_unknown_coordinate_context(self):
+        upload_id = await self.upload(
+            filename="survey.csv",
+            content=b"A,1,2,3,C1\nA,4,5,6,C2\n",
+        )
+        response = await self.map_rows(
+            upload_id,
+            payload={"mapping": {"Point": 0, "X": 1, "Y": 2, "Z": 3, "Code": 4}},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual([row["Point"] for row in body["rows"]], ["A", "A"])
+        self.assertEqual(
+            [warning["code"] for warning in body["warnings"]],
+            [
+                "DUPLICATE_POINT_ID",
+                "UNKNOWN_COORDINATE_SYSTEM",
+                "UNKNOWN_HORIZONTAL_UNIT",
+                "UNKNOWN_VERTICAL_UNIT",
+            ],
+        )
+        self.assertEqual(body["warnings"][0]["rowIndex"], 2)
+
     async def test_mapping_validates_all_rows_even_when_limited(self):
         upload_id = await self.upload(
             filename="survey.csv",

@@ -12,6 +12,10 @@ from telegram.ext import ApplicationBuilder, CommandHandler
 from autocad_assistance.config import BOT_TOKEN
 from autocad_assistance import db
 from autocad_assistance.services.dxf_jobs import render_dxf_bytes
+from autocad_assistance.services.survey_contract import (
+    SurveyContext,
+    make_survey_dataset,
+)
 from autocad_assistance.bot.start import register_basic_handlers, start, cancel
 from autocad_assistance.bot.file_handlers import (
     handle_file,
@@ -45,6 +49,37 @@ from telegram.ext import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _telegram_contract_rows(user_data, final_data, scale_factor):
+    """Preserve the established Telegram mapping while recording provenance."""
+    digest = user_data.get("survey_source_sha256")
+    source_frame = user_data.get("data_initial")
+    if not digest or source_frame is None:
+        return final_data, ()
+    source_rows = [
+        list(row.fillna("").astype(str))
+        for _, row in source_frame.iterrows()
+    ]
+    mapped_rows = [
+        {
+            "Point": row["Point"],
+            "X": row["X"],
+            "Y": row["Y"],
+            "Z": row["Z"],
+            "Code": row["Code"],
+            "Comments": row.get("Coments", ""),
+        }
+        for row in final_data.to_dict("records")
+    ]
+    dataset = make_survey_dataset(
+        mapped_rows,
+        source_rows=source_rows,
+        source_sha256=digest,
+        source_line_numbers=user_data.get("survey_source_line_numbers") or (),
+        context=SurveyContext(scale_factor=scale_factor),
+    )
+    return dataset.mapped_rows, dataset.warnings
 
 def _write_termination_log(reason: str) -> None:
     try:
@@ -232,9 +267,18 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
                     "scale_value": context.user_data.get("scale_value"),
                     "refine": bool(context.user_data.get("tin_refine")),
                 }
+                survey_rows, survey_warnings = await asyncio.to_thread(
+                    _telegram_contract_rows,
+                    context.user_data,
+                    final_data,
+                    scale_factor,
+                )
+                context.user_data["survey_warnings"] = tuple(
+                    warning.code for warning in survey_warnings
+                )
                 dxf_bytes = await asyncio.to_thread(
                     render_dxf_bytes,
-                    final_data,
+                    survey_rows,
                     scale_factor=scale_factor,
                     tin_settings=tin_settings,
                 )

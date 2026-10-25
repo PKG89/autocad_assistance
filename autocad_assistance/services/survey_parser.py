@@ -19,6 +19,7 @@ class SurveyParseResult:
     encoding: str
     delimiter: str
     header: list[str] | None
+    source_line_numbers: tuple[int, ...] = ()
 
 
 def _detect_encoding(raw_data: bytes) -> str:
@@ -60,6 +61,7 @@ def parse_survey_bytes(raw_data: bytes) -> SurveyParseResult:
                     break
 
         rows: list[list[str]] = []
+        source_line_numbers: list[int] = []
         header: list[str] | None = None
         with TextIOWrapper(BytesIO(raw_data), encoding=encoding) as source:
             reader = csv.reader(source, delimiter=delimiter, skipinitialspace=True)
@@ -74,6 +76,7 @@ def parse_survey_bytes(raw_data: bytes) -> SurveyParseResult:
                     continue
                 if len(cleaned) >= 4:
                     rows.append(cleaned)
+                    source_line_numbers.append(reader.line_num)
     except (LookupError, UnicodeDecodeError) as exc:
         raise SurveyParseError("Survey file could not be decoded") from exc
 
@@ -85,4 +88,5 @@ def parse_survey_bytes(raw_data: bytes) -> SurveyParseResult:
         encoding=encoding,
         delimiter=delimiter,
         header=header,
+        source_line_numbers=tuple(source_line_numbers),
     )

@@ -175,6 +175,14 @@ both produced successful CI runs at the exact code SHA. The branch and
 inherited workflow also have verified copies on Windows outside VM109.
 P0 is complete; the next task is GEOAI-012 after a frozen spec.
 
+GEOAI-012 local gate passed on the accepted feature branch: 68 focused,
+10 isolated regression and six isolated API tests, plus pip/diff checks.
+The new shared model preserves raw XYZ, source provenance and explicit
+unknown unit/CRS context; HTTP and Telegram DXF paths use it. No coordinate
+transformation or unit inference is implemented. The task awaits a scoped
+local commit and feature-branch CI; see `PLANS.md` and
+`harness/build-log.md` for status.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local
