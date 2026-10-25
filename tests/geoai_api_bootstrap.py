@@ -16,13 +16,17 @@ def main() -> int:
     args = parser.parse_args()
 
     repo = Path(__file__).resolve().parents[1]
-    report_roots = (
-        Path("/home/geoai/dev-data/geoai-006").resolve(),
-        Path("/home/geoai/dev-data/geoai-007").resolve(),
-    )
+    report_root = Path(
+        os.environ.get("GEOAI_TEST_REPORT_ROOT")
+        or Path(tempfile.gettempdir()) / "geoai-test-reports"
+    ).resolve()
     output = Path(args.output_dir).resolve()
-    if not any(output.is_relative_to(root) for root in report_roots):
-        raise ValueError("Output must be inside an approved GEOAI API report directory")
+    if (
+        output == report_root
+        or not output.is_relative_to(report_root)
+        or output.is_relative_to(repo)
+    ):
+        raise ValueError("Output must be below the external GEOAI report root")
 
     runtime = output / "api-runtime"
     runtime.mkdir()

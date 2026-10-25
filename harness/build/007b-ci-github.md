@@ -1,6 +1,7 @@
 # GEOAI-007B — isolated CI and GitHub handoff
 
-Status: READY under the owner's 2026-10-25 continuous-roadmap authorization.
+Status: LOCALLY VERIFIED; remote feature CI pending under the owner's
+2026-10-25 continuous-roadmap authorization.
 Scoped CI edits, tested feature push and draft PR are authorized. Production
 publication and deployment remain excluded.
 

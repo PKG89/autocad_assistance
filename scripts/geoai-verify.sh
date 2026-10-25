@@ -21,12 +21,14 @@ stamp=$(date -u +%Y%m%dT%H%M%SZ)
 
 regression_out="/home/geoai/dev-data/geoai-004/harness-verify-$stamp"
 mkdir -p "$regression_out"
+GEOAI_TEST_REPORT_ROOT=/home/geoai/dev-data/geoai-004 \
 timeout 180s .venv/bin/python -I -B tests/geoai_bootstrap.py \
   --output-dir "$regression_out"
 
 if [[ -f tests/geoai_api_bootstrap.py && -f tests/test_api.py ]]; then
   api_out="/home/geoai/dev-data/geoai-007/harness-verify-$stamp"
   mkdir -p "$api_out"
+  GEOAI_TEST_REPORT_ROOT=/home/geoai/dev-data/geoai-007 \
   timeout 180s .venv/bin/python -I -B tests/geoai_api_bootstrap.py \
     --output-dir "$api_out"
 fi

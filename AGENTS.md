@@ -154,13 +154,20 @@ edit was saved byte-for-byte with SHA-256 outside the repository under
 `/home/geoai/dev-data/geoai-autonomy/p0-007a/`. An off-VM copy is not
 confirmed. No product tests were rerun for the evidence-only audit.
 
-GEOAI-007B is specified in `harness/build/007b-ci-github.md` but is not
-queued or implemented. The workflow's direct unittest discovery bypasses
-the isolation bootstrap; the bootstraps also hard-code VM-only output paths.
-Workflow/CI edits still require their own explicit approved scope under the
-rules above. Push, PR, main-rule changes and deployment remain separate.
+GEOAI-007B is specified in `harness/build/007b-ci-github.md`. Its former
+direct-discovery and VM-path problems are being addressed under the
+continuous-roadmap authorization below. Main-rule changes and deployment
+remain separate.
 Use `PLANS.md` for the proposed dependencies and status; use
 `harness/build-log.md` for exact 007A hashes and current Git state.
+
+Current 007B handoff: local clean-venv checks pass (59 focused, 10 isolated
+regression, six isolated API), with zero blocked operations. A temporary
+failing test made the CI runner fail; direct regression discovery still
+failed as required. The new feature/PR workflow has read-only contents
+permission and no production secrets or jobs; the existing production
+workflow is unchanged. Remote push/PR/CI verification is pending, so 007B
+is not yet complete.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

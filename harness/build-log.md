@@ -346,3 +346,48 @@ Keep one concise entry per task. Do not paste full command output.
 - Next: commit only P0 documentation on the source branch, leaving the
   inherited workflow edit untouched; bring the same docs into the accepted
   code branch, then execute 007B.
+
+## GEOAI-007B — local CI gate passed; remote gate pending
+
+- Source P0 documents were committed separately as `eac98fad0e410eeee46e974e5ce928333fc30aeb`;
+  the inherited workflow remained the only dirty source file. The same
+  documents were committed atop accepted code branch `codex/geoai-current`
+  as `14121661a928d3d1b57185aa3b5703d4ebe7faf4`. No 008–011 product
+  commit was replayed. A stale local tracking ref briefly created a
+  `codex/geoai-current` branch at `072fbf1`; it had no unique work, was
+  refreshed from the verified bare ref at `bbf6f66`, and then used.
+- Added a separate `.github/workflows/geoai-ci.yml` for push to
+  `codex/geoai-current`, PR to `main`, and manual checks. It grants only
+  `contents: read` and has no registry login, image publication,
+  deployment or production secrets. The existing
+  `.github/workflows/cicd.yml` was not changed on the code branch, so
+  feature/PR events cannot trigger its main/master-only production jobs.
+  The inherited source edit remains separately preserved by 007A.
+- Both bootstrap scripts now use an explicit
+  `GEOAI_TEST_REPORT_ROOT` (with a portable temporary default), require
+  the output directory below that resolved external root and reject an
+  output path in the checkout. The runner also rejects a report root inside
+  the checkout before creating files. The VM's existing verify script passes its
+  former report roots explicitly. A new runner finds all focused
+  `test_*.py` files except the two guarded suites, then calls both
+  bootstraps; `requirements-test.txt` records existing runtime
+  dependencies and `httpx==0.28.1`.
+- A fresh user-local venv installed `requirements-test.txt` and passed
+  pip check, 59 focused tests, 10 isolated regression tests and six isolated
+  API tests. Both guarded suites reported zero blocked network, dotenv,
+  write or process operations. A temporary intentionally failing test
+  made the entire runner exit 1; direct regression discovery also exited
+  1 with its isolation error. The temporary probe was removed. Shell
+  syntax and `git diff --check` passed. Evidence logs:
+  `/home/geoai/dev-data/geoai-autonomy/p0-007b/`.
+- Read-only GitHub checks: remote `main` and HEAD are `36f49b2`;
+  `codex/geoai-current` did not exist remotely before first push. Public
+  branch metadata reports `main` `protected=false`; no rules were
+  changed. The code worktree's `origin` points to the local bare store,
+  not GitHub, and must not be replaced. First external push still requires
+  an exact target/auth check. No production workflow was run.
+- Current status: LOCALLY VERIFIED only. Next: review exact staged diff,
+  make a scoped local 007B commit, push only that verified code branch to
+  `PKG89/autocad_assistance`, create a draft PR, inspect real CI, and
+  repair up to two times within the P0 budget. Do not mark 007B complete
+  before a successful remote run.

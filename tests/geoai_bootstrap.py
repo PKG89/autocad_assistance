@@ -26,9 +26,17 @@ def main():
     parser.add_argument("--output-dir", required=True)
     args = parser.parse_args()
     repo = Path(__file__).resolve().parents[1]
+    report_root = Path(
+        os.environ.get("GEOAI_TEST_REPORT_ROOT")
+        or Path(tempfile.gettempdir()) / "geoai-test-reports"
+    ).resolve()
     output = Path(args.output_dir).resolve()
-    if not output.is_relative_to(Path("/home/geoai/dev-data/geoai-004")):
-        raise ValueError("Output must be inside GEOAI-004 report directory")
+    if (
+        output == report_root
+        or not output.is_relative_to(report_root)
+        or output.is_relative_to(repo)
+    ):
+        raise ValueError("Output must be below the external GEOAI report root")
     runtime = output / "runtime"
     runtime.mkdir()
     for name in ("home", "tmp", "logs", "data", "cache"):

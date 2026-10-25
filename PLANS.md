@@ -39,10 +39,11 @@ matching file under `harness/build/`.
   verification. The difference from product commit `b78b1f5` is a
   documentation commit. The inherited uncommitted CI workflow has a separate
   copy and SHA-256 under `/home/geoai/dev-data/geoai-autonomy/p0-007a/`.
-- GEOAI-007B: READY under the owner's 2026-10-25 scope. Prepare a clean, isolated regression/API
-  and focused-test job; prove a failing test makes CI red; keep PR/feature
-  checks separate from image publishing and deployment; inspect main branch
-  rules. Remote completion needs an authorized push and successful GitHub run.
+- GEOAI-007B: LOCALLY VERIFIED; remote CI pending. The separate feature/PR
+  checks, portable bootstrap roots, clean-venv install and positive/negative
+  local gates passed. The production workflow was unchanged. GitHub reports
+  `main` as unprotected; no rules were changed. Full completion needs a
+  successful GitHub run for an authorized feature push.
   Scope and checks are in `harness/build/007b-ci-github.md`.
 - The owner now authorizes the scoped CI edit, exact origin, feature push and
   draft PR for 007B; branch-rule changes and deployment remain excluded.
