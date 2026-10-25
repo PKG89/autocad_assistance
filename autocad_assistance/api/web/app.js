@@ -162,7 +162,7 @@ async function loadJobs() {
   if (!response.data.length) list.append(item("Заданий пока нет."));
   let active = false;
   for (const job of response.data) {
-    const row = item(`Версия ${job.revisionId} · ${job.status} · попытка ${job.attempt}${job.errorCode ? ` · ${job.errorCode}` : ""}`);
+    const row = item(`Версия ${job.revisionId} · ${job.status} · попытка ${job.attempt}${job.errorCode ? ` · ${job.errorMessage || job.errorCode}` : ""}`);
     row.className = "job-row";
     const actions = document.createElement("div");
     actions.className = "job-actions";

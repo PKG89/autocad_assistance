@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import json
 import os
 from pathlib import Path
@@ -41,21 +42,26 @@ def main() -> int:
     from autocad_assistance.services.dxf_jobs import render_dxf_bytes
 
     request = json.loads((job_dir / "request.json").read_text(encoding="utf-8"))
-    rendered = render_dxf_bytes(
-        request["rows"],
-        scale_factor=request["scale_factor"],
-        tin_settings=request["tin_settings"],
-        line_orders=request.get("line_orders"),
-        line_model=request.get("line_model"),
-        jobs_root=job_dir,
-    )
-    if len(rendered) > output_bytes:
-        return 3
-    candidate = job_dir / "result.candidate"
-    with candidate.open("xb") as output:
-        output.write(rendered)
-        output.flush()
-        os.fsync(output.fileno())
+    try:
+        rendered = render_dxf_bytes(
+            request["rows"],
+            scale_factor=request["scale_factor"],
+            tin_settings=request["tin_settings"],
+            line_orders=request.get("line_orders"),
+            line_model=request.get("line_model"),
+            jobs_root=job_dir,
+        )
+        if len(rendered) > output_bytes:
+            return 4  # Stable worker protocol: bounded DXF output exceeded.
+        candidate = job_dir / "result.candidate"
+        with candidate.open("xb") as output:
+            output.write(rendered)
+            output.flush()
+            os.fsync(output.fileno())
+    except OSError as exc:
+        if exc.errno == errno.EFBIG:
+            return 4
+        raise
     return 0
 
 

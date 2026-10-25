@@ -58,7 +58,7 @@ class CalculationJobManager:
         *,
         max_pending: int = 4,
         timeout_seconds: float = 120.0,
-        max_output_bytes: int = 25 * 1024 * 1024,
+        max_output_bytes: int = 96 * 1024 * 1024,
         max_retries: int = 2,
         worker_command: Sequence[str] | None = None,
     ) -> None:
@@ -395,12 +395,18 @@ class CalculationJobManager:
                     elif terminal_error is not None:
                         candidate.unlink(missing_ok=True)
                         self._set_state(job_id, "failed", terminal_error)
+                    elif process.returncode == 4:
+                        candidate.unlink(missing_ok=True)
+                        self._set_state(job_id, "failed", "RESULT_TOO_LARGE")
                     elif process.returncode != 0:
                         candidate.unlink(missing_ok=True)
                         self._set_state(job_id, "failed", "WORKER_FAILED")
-                    elif candidate.is_symlink() or not candidate.is_file() or not 0 < candidate.stat().st_size <= self.max_output_bytes:
+                    elif candidate.is_symlink() or not candidate.is_file() or candidate.stat().st_size <= 0:
                         candidate.unlink(missing_ok=True)
                         self._set_state(job_id, "failed", "INVALID_RESULT")
+                    elif candidate.stat().st_size > self.max_output_bytes:
+                        candidate.unlink(missing_ok=True)
+                        self._set_state(job_id, "failed", "RESULT_TOO_LARGE")
                     else:
                         candidate_fd = os.open(candidate, os.O_RDONLY | os.O_NOFOLLOW)
                         try:
