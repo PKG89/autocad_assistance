@@ -1235,3 +1235,31 @@ Keep one concise entry per task. Do not paste full command output.
   synthetic archive and job, reporting exactly one wrong line, layer
   and label; unauthenticated access was 401. No real data or
   production action. Exact feature/PR CI pending.
+
+## P6 checkpoint — GEOAI-026, 027, 028 accepted
+
+- Exact GEOAI-028 HEAD `1ea061c1afb4b75b0aba06ae67d402b0a3e815a6`
+  passed GitHub push CI 40157505101 and draft PR CI 40157509671.
+  Complete branch bundle SHA-256
+  `0c79af963bf558a942582ed2fdc5acb1ad742fb595ad887ab7fd0c4fb5b68e3f`
+  matched VM/Windows. Feature worktree clean; original checkout and
+  inherited dirty workflow untouched. All P6 tasks accepted; three
+  task checkpoint recorded. No real reference examples, production
+  deployment or migration.
+- Next candidate GEOAI-029 depends on accepted 028. Existing
+  `autocad_assistance/templates/SinoKOD.txt` and
+  `autocad_assistance/config.py` contain codes and block/layer mappings;
+  assess provenance and conflicts before defining versioned rules.
+
+## P7 preflight — GEOAI-029 ready
+
+- Accepted 028 base `1ea061c`; P6 checkpoint saved. P7 manifest
+  `/home/geoai/dev-data/geoai-autonomy/p7-run-manifest.json` has a
+  2026-10-25T07:20:40Z deadline, 90 minutes/task, at most two repair
+  cycles, one writable worktree/compute worker and $0 external spend.
+- `templates/SinoKOD.txt` has 75 point rows; `config.py` has explicit
+  block aliases, line prefixes and three layer overrides. The source
+  is incomplete/ambiguous for some codes, so 029 will snapshot and
+  expose only existing mappings, preserving unresolved/conflicts.
+  `harness/build/029-object-catalog.md` is READY. No real data,
+  new taxonomy or production action.

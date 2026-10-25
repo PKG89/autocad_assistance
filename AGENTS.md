@@ -374,12 +374,20 @@ HTTPS synthetic upload/download and exact push/PR CI
 were supplied. GEOAI-028 is READY with a bounded exact diagnostic
 comparison under `harness/build/028-dxf-comparison.md`.
 
-GEOAI-028 local gate passed: owner-only, read-only comparison of a
+GEOAI-028 is accepted at `1ea061c`: owner-only, read-only comparison of a
 saved job DXF against a separately supplied archive reference. It
 reports exact discrepancies and unsupported entities, without an
 invented geodetic tolerance. Five focused comparison tests, 149 total
-focused + 10 regression + six API, and verified HTTPS passed. Exact
-feature/PR CI is pending; P6 checkpoint follows acceptance.
+focused + 10 regression + six API, verified HTTPS and exact feature/PR
+CI 40157505101/40157509671 passed. P6 checkpoint is complete: three
+tasks accepted, feature worktree clean, original checkout unchanged.
+Next candidate GEOAI-029 can derive a versioned dictionary from the
+existing SinoKOD template and generator mappings without inventing
+object semantics.
+P7 manifest is active with one worker/worktree, at most two repairs
+per task, 90 minutes per task and deadline 2026-10-25T07:20:40Z.
+GEOAI-029 READY under `harness/build/029-object-catalog.md` from
+committed SinoKOD and generator config, with ambiguity preserved.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

@@ -94,8 +94,8 @@ mapping and DXF through the shared engine.
 | P5 | 025 | Confirmed decisions and review history | 017, 023–024 | ACCEPTED |
 | P6 | 026 | Reversible derived-geometry edits | 025 | ACCEPTED, correction at 5880fea |
 | P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
-| P6 | 028 | DXF comparison and quality measures | 027 | READY |
-| P7 | 029 | Versioned object-code rules | 012, 028 | PROPOSED |
+| P6 | 028 | DXF comparison and quality measures | 027 | ACCEPTED at 1ea061c |
+| P7 | 029 | Versioned object-code rules | 012, 028 | READY |
 | P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | PROPOSED |
 | P7 | 031 | Contours and composite situation objects | 028–030 | PROPOSED |
 | P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | PROPOSED |
@@ -194,8 +194,16 @@ GEOAI-027 passed local tests, synthetic HTTPS and exact feature/PR CI
 at `f618613` (40156949699/40156952551). GEOAI-028 is READY under
 `harness/build/028-dxf-comparison.md` with exact diagnostics and no
 invented geodetic tolerance.
-GEOAI-028 passed the local full gate and synthetic HTTPS comparison;
-exact feature/PR CI is pending. Complete the P6 checkpoint after CI.
+GEOAI-028 passed the local full gate, synthetic HTTPS and exact
+feature/PR CI at `1ea061c` (40157505101/40157509671). P6 (026–028)
+is ACCEPTED; checkpoint: clean feature worktree, original checkout
+unchanged, no real data or production action. Next dependency-ready
+candidate is GEOAI-029 from existing SinoKOD and generator mappings.
+P7 run manifest is bounded to 2026-10-25T07:20:40Z, 90 minutes per
+task, at most two repairs, one worktree/compute worker and $0
+external executor. GEOAI-029 is READY under
+`harness/build/029-object-catalog.md`; preserve ambiguous and
+unmapped codes without making up semantics.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

@@ -1,6 +1,6 @@
 # GEOAI-028 — bounded DXF inventory and reference comparison
 
-Status: LOCAL GATE PASSED; exact feature/PR CI pending. GEOAI-027 accepted
+Status: ACCEPTED; exact feature/PR CI passed. GEOAI-027 accepted
 base `f618613a5d832756671a47db3351c9e2f3f7397e`.
 P6 manifest deadline 2026-10-25T06:33:23Z; task ceiling 90 minutes,
 one initial attempt plus at most two repairs, one writable worktree,
@@ -68,4 +68,5 @@ final gate passed 149 focused, 10 isolated regression, six isolated
 API, `pip check`, zero blocked operations and `git diff --check`.
 Verified localhost HTTPS showed the exact three introduced errors and
 rejected an unauthenticated read. No real data or production action.
-Await exact feature/PR CI before accepting GEOAI-028.
+Exact HEAD `1ea061c1afb4b75b0aba06ae67d402b0a3e815a6` passed
+feature CI 40157505101 and draft PR CI 40157509671. P6 accepted.
