@@ -1,7 +1,8 @@
 # GEOAI-027 — private, immutable reference archive
 
-Status: READY after exact GEOAI-026 feature and PR CI passed. Base:
-`6285b1ada23053dc7fbfdc5d726d85d966a91fd6`.
+Status: LOCAL GATE PASSED; exact feature/PR CI pending after GEOAI-026 and its static-route correction passed
+exact feature and PR CI. Corrected base:
+`5880fea3b9341ba371baa429fab9364cb87a1aac`.
 P6 manifest deadline 2026-10-25T06:33:23Z; task ceiling 90 minutes,
 one initial attempt plus at most two repairs, one writable worktree,
 one compute worker and $0 external executor.
@@ -54,3 +55,16 @@ automatic corpus generation, ML training or legal judgement.
 Stop on exhausted budget, unexpected edits, lost isolation, missing
 data rights, unclear source provenance or production action. Record
 HEAD, diff, checks and exact blocker in shared memory.
+
+## Local verification (2026-10-25)
+
+Schema v8, owner-scoped archive APIs and immutable sealed records are
+implemented. Five synthetic archive tests cover byte-identical restart
+and download, fixed correction snapshots, owner/CSRF and permission
+rejection, conflict/size/quota, schema migration and tamper detection.
+The final isolated gate passed 144 focused, 10 regression and six API
+tests, `pip check`, zero blocked operations and `git diff --check`.
+Disposable localhost HTTPS with verified certificate passed create,
+repeat/conflict, list, download, rights omission and source parity.
+Only synthetic fixtures were used. Await exact feature/PR CI before
+accepting GEOAI-027 or starting GEOAI-028.

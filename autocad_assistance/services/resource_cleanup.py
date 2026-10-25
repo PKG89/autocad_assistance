@@ -30,7 +30,7 @@ def main(argv: list[str] | None = None) -> int:
     if not database.is_file():
         parser.error("Existing project database is required")
     with closing(sqlite3.connect(f"file:{database}?mode=ro", uri=True)) as db:
-        if db.execute("PRAGMA user_version").fetchone()[0] != 7:
+        if db.execute("PRAGMA user_version").fetchone()[0] != 8:
             parser.error("Migrate the project database separately before cleanup")
     store = ProjectStore(args.project_root)
     report = store.cleanup_expired_uploads(

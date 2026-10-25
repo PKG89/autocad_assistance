@@ -188,7 +188,10 @@ No production publication is authorized.
 GEOAI-026 static-script correction passed the repeat local gate: the
 missing `/app/line-edits.js` route is added and asserted in the
 authenticated app test. GEOAI-027 implementation waits for exact
-feature/PR CI.
+feature/PR CI, now successful at `5880fea` (40156349260/40156351787).
+GEOAI-027 is in implementation from this corrected accepted base.
+GEOAI-027 now passed local tests and synthetic HTTPS acceptance; exact
+feature/PR CI is pending. GEOAI-028 depends on that acceptance.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

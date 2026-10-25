@@ -21,9 +21,12 @@ from .owner_guard import OwnerGuardMiddleware
 from .owned_files import create_owned_files_router
 from .jobs import create_job_router
 from .projects import create_project_router
+from .reference_archives import create_reference_archive_router
 from .uploads import create_upload_router
 from autocad_assistance.services.auth_store import AuthStore
-from autocad_assistance.services.project_store import ProjectStore, ResourceQuota
+from autocad_assistance.services.project_store import (
+    MAX_REFERENCE_DXF_BYTES, ProjectStore, ResourceQuota,
+)
 from autocad_assistance.services.calculation_jobs import CalculationJobManager
 from autocad_assistance.services.project_jobs import ProjectJobBridge
 
@@ -120,6 +123,13 @@ def create_app(
             error_code="PROJECT_BODY_TOO_LARGE",
             subject="Project request",
         )
+        app.add_middleware(
+            RequestBodyLimitMiddleware,
+            path="/api/v1/reference-archives",
+            max_body_bytes=MAX_REFERENCE_DXF_BYTES + 64 * 1024,
+            error_code="REFERENCE_TOO_LARGE",
+            subject="Reference upload request",
+        )
         if jobs_root is not None:
             app.add_middleware(
                 RequestBodyLimitMiddleware,
@@ -138,6 +148,7 @@ def create_app(
             project_store, getattr(app.state, "project_job_bridge", None),
         ))
         app.include_router(create_project_router(project_store, resolved_upload_root))
+        app.include_router(create_reference_archive_router(project_store))
         if jobs_root is not None:
             app.include_router(create_job_router(app.state.project_job_bridge))
 

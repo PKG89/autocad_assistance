@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from dataclasses import dataclass
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -28,6 +29,7 @@ MAX_DECISION_BYTES = 1024 * 1024
 MAX_DECISION_EVENTS_PER_REVISION = 2_000
 MAX_LINE_EDIT_BYTES = 1024 * 1024
 MAX_LINE_EDIT_EVENTS_PER_REVISION = 2_000
+MAX_REFERENCE_DXF_BYTES = 25 * 1024 * 1024
 JOB_STATUSES = frozenset({"queued", "running", "cancelling", "cancelled", "failed", "succeeded"})
 
 
@@ -67,6 +69,10 @@ class LineEditConflictError(ProjectStoreError):
     """A stale line model or reused edit request key conflicts."""
 
 
+class ReferenceConflictError(ProjectStoreError):
+    """An archive request key was reused for different content."""
+
+
 @dataclass(frozen=True)
 class ResourceQuota:
     max_projects: int = 20
@@ -74,11 +80,14 @@ class ResourceQuota:
     max_revisions: int = 500
     max_jobs: int = 500
     max_total_bytes: int = 512 * 1024 * 1024
+    max_references: int = 100
+    max_reference_bytes: int = 256 * 1024 * 1024
 
     def __post_init__(self) -> None:
         if any(value <= 0 for value in (
             self.max_projects, self.max_uploads, self.max_revisions,
-            self.max_jobs, self.max_total_bytes,
+            self.max_jobs, self.max_total_bytes, self.max_references,
+            self.max_reference_bytes,
         )):
             raise ValueError("Resource quota limits must be positive")
 
@@ -175,6 +184,24 @@ class LineEditRecord:
     created_at: str
 
 
+@dataclass(frozen=True)
+class ReferenceRecord:
+    entry_id: str
+    revision_id: str
+    project_id: str
+    request_id: str
+    request_sha256: str
+    source_sha256: str
+    reference_sha256: str
+    reference_size: int
+    metadata_json: str
+    corrections_json: str
+    validation_json: str
+    entry_sha256: str
+    author_id: str
+    created_at: str
+
+
 def _uuid(value: str) -> str:
     try:
         normalized = str(UUID(value))
@@ -232,7 +259,7 @@ class ProjectStore:
         self.db_path = self.root / "projects.sqlite3"
         with self._db() as db:
             current = db.execute("PRAGMA user_version").fetchone()[0]
-            if current not in (0, 1, 2, 3, 4, 5, 6, 7):
+            if current not in (0, 1, 2, 3, 4, 5, 6, 7, 8):
                 raise ProjectStoreError(f"Unsupported project schema version: {current}")
             if current == 0:
                 db.executescript(
@@ -324,7 +351,25 @@ class ProjectStore:
                 );
                 CREATE INDEX IF NOT EXISTS line_edit_revision_version
                     ON line_edit_events(revision_id, version);
-                PRAGMA user_version = 7;
+                CREATE TABLE IF NOT EXISTS reference_entries (
+                    entry_id TEXT PRIMARY KEY,
+                    revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+                    project_id TEXT NOT NULL REFERENCES projects(project_id),
+                    request_id TEXT NOT NULL UNIQUE,
+                    request_sha256 TEXT NOT NULL,
+                    source_sha256 TEXT NOT NULL,
+                    reference_sha256 TEXT NOT NULL,
+                    reference_size INTEGER NOT NULL,
+                    metadata_json TEXT NOT NULL,
+                    corrections_json TEXT NOT NULL,
+                    validation_json TEXT NOT NULL,
+                    entry_sha256 TEXT NOT NULL,
+                    author_id TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE INDEX IF NOT EXISTS reference_project_created
+                    ON reference_entries(project_id, created_at);
+                PRAGMA user_version = 8;
                 """
                 )
             elif current == 1:
@@ -441,6 +486,33 @@ class ProjectStore:
                         ON line_edit_events(revision_id, version)""")
                     db.execute("PRAGMA user_version = 7")
                     db.execute("COMMIT")
+                    current = 7
+                except Exception:
+                    db.execute("ROLLBACK")
+                    raise
+            if current == 7:
+                db.execute("BEGIN IMMEDIATE")
+                try:
+                    db.execute("""CREATE TABLE reference_entries (
+                        entry_id TEXT PRIMARY KEY,
+                        revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+                        project_id TEXT NOT NULL REFERENCES projects(project_id),
+                        request_id TEXT NOT NULL UNIQUE,
+                        request_sha256 TEXT NOT NULL,
+                        source_sha256 TEXT NOT NULL,
+                        reference_sha256 TEXT NOT NULL,
+                        reference_size INTEGER NOT NULL,
+                        metadata_json TEXT NOT NULL,
+                        corrections_json TEXT NOT NULL,
+                        validation_json TEXT NOT NULL,
+                        entry_sha256 TEXT NOT NULL,
+                        author_id TEXT NOT NULL,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )""")
+                    db.execute("""CREATE INDEX reference_project_created
+                        ON reference_entries(project_id, created_at)""")
+                    db.execute("PRAGMA user_version = 8")
+                    db.execute("COMMIT")
                 except Exception:
                     db.execute("ROLLBACK")
                     raise
@@ -460,7 +532,7 @@ class ProjectStore:
     def _require_quota(
         self, db: sqlite3.Connection, owner_id: str | None,
         *, projects: int = 0, uploads: int = 0, revisions: int = 0,
-        jobs: int = 0, bytes_added: int = 0,
+        jobs: int = 0, references: int = 0, bytes_added: int = 0,
     ) -> None:
         if owner_id is None:
             return  # Historical local-only projects have no authenticated owner.
@@ -471,13 +543,15 @@ class ProjectStore:
                 ON p.project_id=r.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0],
             db.execute("""SELECT count(*) FROM jobs j JOIN revisions r ON r.revision_id=j.revision_id
                 JOIN projects p ON p.project_id=r.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0],
+            db.execute("""SELECT count(*) FROM reference_entries e JOIN projects p
+                ON p.project_id=e.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0],
         )
         limits = (
             self.quota.max_projects, self.quota.max_uploads,
-            self.quota.max_revisions, self.quota.max_jobs,
+            self.quota.max_revisions, self.quota.max_jobs, self.quota.max_references,
         )
         if any(count + change > limit for count, change, limit in zip(
-            counts, (projects, uploads, revisions, jobs), limits
+            counts, (projects, uploads, revisions, jobs, references), limits
         )):
             raise ResourceQuotaExceededError("Owner resource count quota exceeded")
         upload_bytes = db.execute(
@@ -488,7 +562,11 @@ class ProjectStore:
         result_bytes = db.execute("""SELECT COALESCE(sum(j.result_size),0) FROM jobs j
             JOIN revisions r ON r.revision_id=j.revision_id
             JOIN projects p ON p.project_id=r.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0]
-        if upload_bytes + revision_bytes + result_bytes + bytes_added > self.quota.max_total_bytes:
+        reference_bytes = db.execute("""SELECT COALESCE(sum(e.reference_size),0) FROM reference_entries e
+            JOIN projects p ON p.project_id=e.project_id WHERE p.owner_id=?""", (owner_id,)).fetchone()[0]
+        if reference_bytes + (bytes_added if references else 0) > self.quota.max_reference_bytes:
+            raise ResourceQuotaExceededError("Owner reference byte quota exceeded")
+        if upload_bytes + revision_bytes + result_bytes + reference_bytes + bytes_added > self.quota.max_total_bytes:
             raise ResourceQuotaExceededError("Owner byte quota exceeded")
 
     def _open_directory(self, *parts: str, create: bool = False) -> int:
@@ -899,6 +977,157 @@ class ProjectStore:
         if revision.project_id != project_id:
             raise ProjectNotFoundError(revision_id)
         return self.read_source(revision_id)
+
+    @staticmethod
+    def _reference_record(row: sqlite3.Row) -> ReferenceRecord:
+        if ProjectStore._reference_seal(row) != row["entry_sha256"]:
+            raise ProjectIntegrityError("Reference metadata checksum is invalid")
+        return ReferenceRecord(**{field: row[field] for field in ReferenceRecord.__dataclass_fields__})
+
+    @staticmethod
+    def _reference_seal(values: Mapping[str, object]) -> str:
+        fields = ("entry_id", "revision_id", "project_id", "request_id", "request_sha256",
+                  "source_sha256", "reference_sha256", "reference_size", "metadata_json",
+                  "corrections_json", "validation_json", "author_id", "created_at")
+        rendered = json.dumps({field: values[field] for field in fields},
+                              ensure_ascii=False, sort_keys=True,
+                              separators=(",", ":"), allow_nan=False)
+        return _digest(rendered.encode("utf-8"))
+
+    @staticmethod
+    def _reference_request_hash(revision_id: str, reference_sha256: str,
+                                metadata_json: str) -> str:
+        request_json = _canonical_json({"revisionId": revision_id,
+                                        "referenceSha256": reference_sha256,
+                                        "metadata": json.loads(metadata_json)})
+        return _digest(request_json.encode("utf-8"))
+
+    def lookup_reference_for(
+        self, owner_id: str, revision_id: str, request_id: str,
+        *, reference_sha256: str, metadata: Mapping[str, object],
+    ) -> ReferenceRecord | None:
+        owner_id, revision_id, request_id = _uuid(owner_id), _uuid(revision_id), _uuid(request_id)
+        self.assert_revision_owner(owner_id, revision_id)
+        metadata_json = _canonical_json(dict(metadata))
+        request_hash = self._reference_request_hash(revision_id, reference_sha256, metadata_json)
+        with self._db() as db:
+            row = db.execute("SELECT * FROM reference_entries WHERE request_id=?", (request_id,)).fetchone()
+        if row is None:
+            return None
+        if (row["revision_id"], row["author_id"], row["request_sha256"]) != (
+            revision_id, owner_id, request_hash,
+        ):
+            raise ReferenceConflictError("Reference request key was reused")
+        return self._reference_record(row)
+
+    def create_reference_for(
+        self, owner_id: str, revision_id: str, request_id: str, raw: bytes,
+        *, metadata: Mapping[str, object], corrections: Mapping[str, object],
+        validation: Mapping[str, object],
+    ) -> ReferenceRecord:
+        owner_id, revision_id, request_id = _uuid(owner_id), _uuid(revision_id), _uuid(request_id)
+        if not isinstance(raw, bytes) or not 0 < len(raw) <= MAX_REFERENCE_DXF_BYTES:
+            raise ProjectStoreError("Reference DXF size is invalid")
+        metadata_json = _canonical_json(dict(metadata))
+        corrections_json = _canonical_json(dict(corrections))
+        validation_json = _canonical_json(dict(validation))
+        reference_hash = _digest(raw)
+        request_hash = self._reference_request_hash(revision_id, reference_hash, metadata_json)
+        entry_id = str(uuid4())
+        directory_fd: int | None = None
+        filename = f"{entry_id}.dxf"
+        wrote_file = False
+        with self._db() as db:
+            db.execute("BEGIN IMMEDIATE")
+            try:
+                revision = db.execute("""SELECT r.project_id,r.source_sha256 FROM revisions r
+                    JOIN projects p ON p.project_id=r.project_id
+                    WHERE r.revision_id=? AND p.owner_id=?""", (revision_id, owner_id)).fetchone()
+                if revision is None:
+                    raise ProjectNotFoundError(revision_id)
+                existing = db.execute("SELECT * FROM reference_entries WHERE request_id=?",
+                                      (request_id,)).fetchone()
+                if existing is not None:
+                    if (existing["revision_id"], existing["author_id"], existing["request_sha256"]) != (
+                        revision_id, owner_id, request_hash,
+                    ):
+                        raise ReferenceConflictError("Reference request key was reused")
+                    db.execute("COMMIT")
+                    return self._reference_record(existing)
+                self._require_quota(db, owner_id, references=1, bytes_added=len(raw))
+                directory_fd = self._open_directory(revision["project_id"], "references", create=True)
+                wrote_file = True
+                self._write_file(directory_fd, filename, raw)
+                created_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+                values = {
+                    "entry_id": entry_id, "revision_id": revision_id,
+                    "project_id": revision["project_id"], "request_id": request_id,
+                    "request_sha256": request_hash, "source_sha256": revision["source_sha256"],
+                    "reference_sha256": reference_hash, "reference_size": len(raw),
+                    "metadata_json": metadata_json, "corrections_json": corrections_json,
+                    "validation_json": validation_json, "author_id": owner_id,
+                    "created_at": created_at,
+                }
+                seal = self._reference_seal(values)
+                db.execute("""INSERT INTO reference_entries
+                    (entry_id,revision_id,project_id,request_id,request_sha256,source_sha256,
+                     reference_sha256,reference_size,metadata_json,corrections_json,
+                     validation_json,entry_sha256,author_id,created_at)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    (entry_id, revision_id, revision["project_id"], request_id, request_hash,
+                     revision["source_sha256"], reference_hash, len(raw), metadata_json,
+                     corrections_json, validation_json, seal, owner_id, created_at))
+                row = db.execute("SELECT * FROM reference_entries WHERE entry_id=?",
+                                 (entry_id,)).fetchone()
+                db.execute("COMMIT")
+                return self._reference_record(row)
+            except Exception:
+                db.execute("ROLLBACK")
+                if wrote_file and directory_fd is not None:
+                    try:
+                        os.unlink(filename, dir_fd=directory_fd)
+                        os.fsync(directory_fd)
+                    except OSError:
+                        pass
+                raise
+            finally:
+                if directory_fd is not None:
+                    os.close(directory_fd)
+
+    def get_reference_for(self, owner_id: str, entry_id: str) -> ReferenceRecord:
+        owner_id, entry_id = _uuid(owner_id), _uuid(entry_id)
+        with self._db() as db:
+            row = db.execute("""SELECT e.* FROM reference_entries e JOIN projects p
+                ON p.project_id=e.project_id WHERE e.entry_id=? AND p.owner_id=?""",
+                (entry_id, owner_id)).fetchone()
+        if row is None:
+            raise ProjectNotFoundError(entry_id)
+        return self._reference_record(row)
+
+    def list_references_for(
+        self, owner_id: str, project_id: str, *, page: int = 1, page_size: int = 20,
+    ) -> tuple[tuple[ReferenceRecord, ...], int]:
+        owner_id, project_id = _uuid(owner_id), _uuid(project_id)
+        self.assert_project_owner(owner_id, project_id)
+        if page < 1 or not 1 <= page_size <= 50:
+            raise ProjectStoreError("Reference page is invalid")
+        with self._db() as db:
+            total = db.execute("SELECT COUNT(*) FROM reference_entries WHERE project_id=?",
+                               (project_id,)).fetchone()[0]
+            rows = db.execute("""SELECT * FROM reference_entries WHERE project_id=?
+                ORDER BY created_at DESC,entry_id DESC LIMIT ? OFFSET ?""",
+                (project_id, page_size, (page - 1) * page_size))
+            return tuple(self._reference_record(row) for row in rows), total
+
+    def read_reference_for(self, owner_id: str, entry_id: str) -> bytes:
+        record = self.get_reference_for(owner_id, entry_id)
+        revision = self.assert_revision_owner(owner_id, record.revision_id)
+        if revision.project_id != record.project_id or revision.source_sha256 != record.source_sha256:
+            raise ProjectIntegrityError("Reference source provenance changed")
+        self.read_source_for(owner_id, record.project_id, record.revision_id)
+        return self._read_file((record.project_id, "references"), f"{record.entry_id}.dxf",
+                               MAX_REFERENCE_DXF_BYTES, record.reference_sha256,
+                               record.reference_size)
 
     @staticmethod
     def _line_decision(row: sqlite3.Row) -> LineDecisionRecord:

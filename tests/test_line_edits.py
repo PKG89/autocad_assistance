@@ -204,13 +204,14 @@ class LineEditMigrationTests(unittest.TestCase):
             owner = str(uuid4())
             project = store.create_owned_project(owner, "Existing")
             with closing(sqlite3.connect(store.db_path)) as db:
+                db.execute("DROP TABLE reference_entries")
                 db.execute("DROP TABLE line_edit_events")
                 db.execute("PRAGMA user_version=6")
                 db.commit()
             reopened = ProjectStore(root)
             self.assertEqual(reopened.assert_project_owner(owner, project.project_id), project)
             with closing(sqlite3.connect(reopened.db_path)) as db:
-                self.assertEqual(db.execute("PRAGMA user_version").fetchone()[0], 7)
+                self.assertEqual(db.execute("PRAGMA user_version").fetchone()[0], 8)
                 self.assertIsNotNone(db.execute(
                     "SELECT name FROM sqlite_master WHERE name='line_edit_events'").fetchone())
 

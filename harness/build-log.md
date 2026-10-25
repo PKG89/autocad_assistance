@@ -1175,7 +1175,7 @@ Keep one concise entry per task. Do not paste full command output.
   examples during development. No real reference files or rights
   were supplied in-session; no production action.
 
-## GEOAI-026 integration correction — gate/CI pending
+## GEOAI-026 integration correction — accepted
 
 - While inspecting GEOAI-027's API wiring, found that the 026 HTML
   includes `/app/line-edits.js` but the FastAPI app did not serve it.
@@ -1185,5 +1185,28 @@ Keep one concise entry per task. Do not paste full command output.
   Four focused line-edit tests passed. The repeat full gate
   `p6-026/static-route-gate.log` passed 137 focused, 10 isolated
   regression and six isolated API tests with zero blocked operations,
-  `pip check` and diff check. Exact feature/PR CI must pass before
-  resuming 027 implementation.
+  `pip check` and diff check. Exact feature HEAD
+  `5880fea3b9341ba371baa429fab9364cb87a1aac` passed GitHub push
+  run 40156349260 and draft PR run 40156351787. Bundle SHA-256
+  `b3f529b58c4331f8cb10ff646088dac3f5fe6b2e60d56fdd5a2faea9034a3bac`
+  matched VM/Windows. GEOAI-027 implementation resumes from this base.
+
+## GEOAI-027 — local gate passed; exact CI pending
+
+- Corrected accepted base `5880fea`. Schema v8 stores a private,
+  immutable reference DXF entry bound to an owned source revision and
+  its SHA-256, explicit field/reference provenance, rights holder,
+  permission evidence, permitted uses and fixed correction event IDs.
+  Entry metadata and author/time are SHA-256 sealed; DXF downloads are
+  size/hash-verified. Idempotency, owner count/byte quotas and a 25 MiB
+  authenticated CSRF upload boundary are enforced. No automatic export
+  or model training.
+- Five synthetic archive tests passed: restart, owner/CSRF, rights,
+  invalid/oversized bytes, quota, v7 migration, fixed correction
+  snapshot and tamper detection. The final local gate
+  `p6-027/accepted-gate.log` passed 144 focused, 10 isolated regression,
+  six isolated API, `pip check`, zero blocked operations and diff check.
+  Disposable verified localhost HTTPS passed create, idempotent repeat,
+  conflict, list/download byte parity, permission rejection and
+  unchanged source SHA-256. No real survey/reference or production action.
+- Exact feature/PR CI pending. GEOAI-028 must wait for this acceptance.
