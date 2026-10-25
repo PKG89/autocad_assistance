@@ -24,8 +24,11 @@ types. Expand supported block inserts for display while retaining insert
 identity/attributes; never claim a partial unsupported block as exact.
 Reject invalid/corrupt DXF, excessive byte/entity/vertex expansion,
 non-finite coordinates, and unavailable/foreign jobs with safe errors.
-Use existing result size policy where possible; freeze numeric bounds
-in the implementation and tests before writing the parser.
+The viewer accepts at most 8 MiB of already verified result bytes,
+10,000 source plus expanded entities, 50,000 rendered vertices and
+64 characters per displayed DXF text attribute. The project result
+store's independent 25 MiB maximum remains unchanged. Exceeding any
+viewer bound returns 413 and does not modify the source or result.
 
 In `/app`, add a plan action on a ready job. Render only vetted geometry
 with DOM/SVG APIs, no untrusted HTML. Offer layer toggles, fit/zoom/pan,
