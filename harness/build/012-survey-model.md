@@ -1,6 +1,7 @@
 # GEOAI-012 — shared survey data contract
 
-Status: LOCAL ACCEPTED; remote CI pending. Base: accepted `codex/geoai-current` at
+Status: ACCEPTED at `608a8e3ff84178470dbad6663fcca27fef5508b9`.
+Base: accepted `codex/geoai-current` at
 `6e1a75154e4ac1cac4ce439a32569a735f9f1dd0`.
 Dependencies 007A and 008–011 are accepted. P0 remote CI has passed.
 
@@ -57,3 +58,5 @@ the shared contract before DXF generation. API mapping and DXF use the same
 contract. Final local gate: 68 focused, 10 isolated regression and six
 isolated API tests; pip and diff checks passed. No coordinate transformation,
 unit inference or geodetic tolerance was introduced.
+GitHub push run 40146181250 and draft PR #6 run 40146183772 both
+succeeded at the exact accepted commit.

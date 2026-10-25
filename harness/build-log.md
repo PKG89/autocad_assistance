@@ -460,3 +460,22 @@ Keep one concise entry per task. Do not paste full command output.
   .env, deployment or geometry/template change. Current status:
   LOCAL ACCEPTED, remote CI pending. Next: commit exact reviewed files,
   push only `codex/geoai-current`, inspect CI and then prepare 013.
+
+## Three-task checkpoint: 007A, 007B, 012
+
+- GEOAI-012 product/memory commit
+  `608a8e3ff84178470dbad6663fcca27fef5508b9` was pushed only to
+  `codex/geoai-current`; GitHub push run 40146181250 and draft PR #6
+  run 40146183772 both succeeded at that exact SHA. Bundle SHA-256
+  `34f6cb015e3b01e27d00935044879102b260a0f5b04b3cc809728afc60754475`
+  was verified on VM109 and copied to Windows. No production workflow
+  run occurred. 007A, 007B and 012 are ACCEPTED.
+- Before preparing 013, the active code worktree on VM109 was clean on
+  `codex/geoai-current` at `608a8e3`; its `origin` remains the local
+  bare store. GitHub draft PR #6 tracks the same feature branch. P1
+  manifest remains within its 2026-10-25T04:12:17Z deadline; no external
+  executor spend or second worker.
+- GEOAI-013 is READY on the accepted 012 dependency. Its technical
+  size/row/point limits and narrow file/security scope are frozen in
+  `harness/build/013-upload-guard.md` before code edits. Continue with
+  013; 014 stays PROPOSED.
