@@ -16,19 +16,22 @@ class _RequestBodyTooLarge(Exception):
 class RequestBodyLimitMiddleware:
     """Reject an oversized upload request before multipart parsing completes."""
 
-    def __init__(self, app: ASGIApp, *, path: str, max_body_bytes: int) -> None:
+    def __init__(self, app: ASGIApp, *, path: str, max_body_bytes: int,
+                 error_code: str = "UPLOAD_TOO_LARGE", subject: str = "Upload request") -> None:
         self.app = app
         self.path = path
         self.max_body_bytes = max_body_bytes
+        self.error_code = error_code
+        self.subject = subject
 
     def _response(self) -> JSONResponse:
         return JSONResponse(
             status_code=413,
             content={
                 "error": {
-                    "code": "UPLOAD_TOO_LARGE",
+                    "code": self.error_code,
                     "message": (
-                        f"Upload request exceeds the {self.max_body_bytes}-byte limit"
+                        f"{self.subject} exceeds the {self.max_body_bytes}-byte limit"
                     ),
                 }
             },

@@ -1,6 +1,6 @@
 # GEOAI-016 — owner authentication and confirmed Telegram link
 
-Status: READY. Base: accepted GEOAI-015 feature commit
+Status: LOCAL ACCEPTED; remote CI pending. Base: accepted GEOAI-015 feature commit
 `a0e82bc968884cd5d8a60bd522fea2bc3170f608`. Dependency 015 passed
 local and GitHub push/PR checks after one recorded repair.
 
@@ -17,7 +17,8 @@ enforced server-side. Login rotates any preexisting session; logout,
 expiration and revoke-all invalidate server-side records.
 
 Expose HTTPS-only login, session, logout, revoke and link-challenge routes
-when an auth root is explicitly configured. Use a `__Host-` session cookie
+only when an auth root and exact trusted HTTPS origin are explicitly
+configured. Do not trust an arbitrary Host header. Use a `__Host-` session cookie
 with Secure, HttpOnly, SameSite=Strict and Path=/; no token in JSON, URL,
 localStorage or logs. Mutating session routes require a same-origin check
 and a session-bound CSRF token where authenticated. Responses containing

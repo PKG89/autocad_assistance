@@ -15,7 +15,9 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from .middleware import RequestBodyLimitMiddleware
+from .auth import create_auth_router, validate_auth_origin
 from .uploads import create_upload_router
+from autocad_assistance.services.auth_store import AuthStore
 
 
 DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -34,6 +36,8 @@ def create_app(
     upload_root: str | Path | None = None,
     max_upload_bytes: int = DEFAULT_MAX_UPLOAD_BYTES,
     max_preview_rows: int = 50,
+    auth_root: str | Path | None = None,
+    auth_origin: str | None = None,
 ) -> FastAPI:
     """Create an isolated HTTP application without starting a server."""
 
@@ -41,6 +45,10 @@ def create_app(
         raise ValueError("max_upload_bytes must be positive")
     if max_preview_rows <= 0:
         raise ValueError("max_preview_rows must be positive")
+    if auth_root is not None and auth_origin is None:
+        raise ValueError("auth_origin is required when auth_root is configured")
+    if auth_root is not None:
+        auth_origin = validate_auth_origin(auth_origin)
 
     resolved_upload_root = Path(upload_root) if upload_root is not None else (
         Path(tempfile.gettempdir()) / "autocad-assistance-geo-ai" / "uploads"
@@ -61,6 +69,17 @@ def create_app(
         path="/api/v1/uploads",
         max_body_bytes=app.state.max_upload_request_bytes,
     )
+    if auth_root is not None:
+        identity_store = AuthStore(auth_root)
+        app.state.auth_store = identity_store
+        app.add_middleware(
+            RequestBodyLimitMiddleware,
+            path="/api/v1/auth/login",
+            max_body_bytes=4096,
+            error_code="AUTH_BODY_TOO_LARGE",
+            subject="Authentication request",
+        )
+        app.include_router(create_auth_router(identity_store, auth_origin))
 
     @app.exception_handler(RequestValidationError)
     async def validation_error_handler(

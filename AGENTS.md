@@ -218,6 +218,16 @@ GEOAI-016 is READY under `harness/build/016-owner-auth.md`; 017 remains
 PROPOSED. The initial 015 push run exposed a cancellation cleanup race;
 the repair and exact CI evidence are in the build log.
 
+GEOAI-016 passed its local gate. An opt-in owner identity store uses
+scrypt, one-time local provisioning, bounded login attempts, revocable
+idle/absolute sessions, a Secure/HttpOnly/SameSite cookie, trusted HTTPS
+origin and CSRF checks. The Telegram link requires a one-time code plus
+a private bot update from a configured admin ID. No real credentials or
+link were created; existing upload/DXF routes still await 017 ownership
+gates. The final run passed 104 focused, 10 isolated regression and six
+isolated API tests, zero blocked operations, pip and diff checks. GitHub
+feature/PR CI is pending; 017 remains PROPOSED.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

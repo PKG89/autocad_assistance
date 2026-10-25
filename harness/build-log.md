@@ -633,3 +633,35 @@ Keep one concise entry per task. Do not paste full command output.
 - P2 remains within its 2026-10-25T04:33:23Z deadline. GEOAI-016 is
   READY with service/API/session and confirmed Telegram-link scope frozen
   in `harness/build/016-owner-auth.md`; 017 stays PROPOSED.
+
+## GEOAI-016 — local gate passed; remote gate pending
+
+- Base: accepted 015 at `a0e82bc`, followed by frozen-scope
+  documentation commit `aac535e`. The owner identity store is separate
+  from both project data and Telegram statistics. No real owner password,
+  session or Telegram link was provisioned; tests used disposable roots
+  and synthetic credentials only.
+- Local CLI provisions one owner with hidden password. Scrypt parameters
+  are N=2^17, r=8, p=1 with one cross-process KDF lock. Per-username
+  and global login attempts are bounded. SQLite stores a salted password
+  digest and SHA-256 session verifier; the bearer token is cookie-only.
+  Server-side idle and absolute expiry are 30 minutes and eight hours.
+  Login rotates an old session; logout, revoke-all and confirmed Telegram
+  linking revoke sessions.
+- Auth routes require explicit auth root and exact trusted HTTPS origin.
+  The `__Host-geoai_session` cookie has Secure, HttpOnly, SameSite=Strict
+  and Path=/; mutations enforce Origin and CSRF, responses use no-store.
+  One-time link codes expire after ten minutes and can be confirmed only
+  by a private Telegram bot update from a configured admin ID. Bot
+  registration is opt-in. Existing upload/preview/DXF routes remain
+  unprotected pending 017; no private cabinet is claimed yet.
+- Final local gate at
+  `/home/geoai/dev-data/geoai-autonomy/p2-016-accepted.log`:
+  104 focused, 10 isolated regression and six isolated API tests passed;
+  both isolated suites reported zero blocked network, dotenv, write and
+  process operations. `pip check` and `git diff --check` passed. Tests
+  include brute-force bounds, session fixation/expiry/revocation,
+  cross-origin/host rejection, CSRF, secure cookie flags, opt-in bot
+  registration and one-time Telegram confirmation.
+- GitHub feature/PR CI is pending. Next: commit exact reviewed files,
+  push only `codex/geoai-current`, inspect both CI runs, then freeze 017.

@@ -218,6 +218,11 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
     )
 
     register_basic_handlers(app)
+    auth_root = os.getenv("GEOAI_AUTH_ROOT")
+    if auth_root:
+        from autocad_assistance.bot.owner_link import register_owner_link_handler
+
+        register_owner_link_handler(app, auth_root)
     app.add_handler(conv_handler)
     # Ensure reply-keyboard main menu text and inline callbacks are handled.
     # ReplyKeyboard uses normal text messages, so register a MessageHandler
