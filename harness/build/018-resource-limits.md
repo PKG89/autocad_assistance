@@ -1,6 +1,6 @@
 # GEOAI-018 — bounded resources and explicit expired-upload cleanup
 
-Status: IN PROGRESS; journal repair awaiting exact feature/PR CI. Base: accepted GEOAI-017 feature commit
+Status: ACCEPTED at `8ed5687` after one scope repair and exact feature/PR CI. Base: accepted GEOAI-017 feature commit
 `f3bee9c22daeacc4217b21286338f5ee48058bdd`. Dependencies 014–017
 passed local and GitHub feature/PR checks. P3 manifest:
 `/home/geoai/dev-data/geoai-autonomy/p3-run-manifest.json`.

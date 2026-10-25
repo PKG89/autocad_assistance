@@ -84,8 +84,8 @@ mapping and DXF through the shared engine.
 | P2 | 015 | Versioned project storage | 012–014 | ACCEPTED at a0e82bc |
 | P2 | 016 | Owner authentication | 015 | ACCEPTED at 04522be |
 | P2 | 017 | Project, job and file ownership checks | 015–016 | ACCEPTED at f3bee9c |
-| P3 | 018 | Quotas, retention and cleanup | 014–017 | LOCAL GATE PASSED; CI pending |
-| P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–017 | PROPOSED |
+| P3 | 018 | Quotas, retention and cleanup | 014–017 | ACCEPTED at 8ed5687 |
+| P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–018 | READY |
 | P3 | 020 | Web jobs, results and download | 014–019 | PROPOSED |
 | P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | PROPOSED |
 | P4 | 022 | Reproducible staging, recovery and rollback | 021 | PROPOSED |

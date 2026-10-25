@@ -241,7 +241,7 @@ blocked operations, plus pip and diff checks. GitHub push run 40148828172
 and draft PR run 40148831218 succeeded at that SHA. P2 is complete.
 The legacy no-auth app factory mode remains for the isolated
 regression baseline; it is not a private cabinet deployment mode.
-GEOAI-018 passed its local gate under `harness/build/018-resource-limits.md` from
+GEOAI-018 is accepted at `8ed5687` under `harness/build/018-resource-limits.md` from
 accepted 017. P3 deadline is 2026-10-25T05:01:04Z with one writable
 worktree/compute worker, 90 minutes per task, two repair cycles and
 zero external executor spend. Retention remains opt-in and cleanup
@@ -250,8 +250,12 @@ local gate passed 113 focused, 10 isolated regression and six isolated
 API tests, zero blocked operations, pip and diff checks. Version-4
 project metadata never assigns an expiry to migrated uploads with
 unknown age. A persistent cleanup journal records apply outcomes.
-The first 018 GitHub push/PR runs passed at `52b794f`, but the journal
-repair still requires exact CI before acceptance.
+The first 018 GitHub push/PR runs passed at `52b794f`; the journal
+repair passed push run 40149469271 and PR run 40149474159 at `8ed5687`.
+No real data cleanup or production migration ran. GEOAI-019 is next
+and READY under `harness/build/019-import-screen.md` from this accepted
+base. It uses the existing parser, authenticated project store and a
+small same-origin browser screen; no new frontend runtime is required.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

@@ -797,3 +797,32 @@ Keep one concise entry per task. Do not paste full command output.
   113 focused, 10 isolated regression, six isolated API tests, zero
   blocked operations, pip and diff checks. Next: commit the reviewed
   journal repair, push exact feature HEAD and require both CI runs.
+
+## GEOAI-018 — remote gate passed; GEOAI-019 next
+
+- Exact journal repair commit `8ed56875bd1859baead50086c57c4ea52718defa`
+  was pushed only to `codex/geoai-current`. GitHub `GEO AI checks`
+  push run 40149469271 and draft PR #6 run 40149474159 succeeded at
+  that SHA. GEOAI-018 is ACCEPTED after one scope repair; no further
+  repair budget was used.
+- Full branch bundle SHA-256
+  `0360aab5476366e23202e5bbf1cf7cb1b098cb9887925a08a4732048093199f6`
+  matches on VM and Windows. The VM worktree is clean at `8ed5687`;
+  its origin still points to the local bare store. The original
+  checkout/inherited workflow edit remain untouched. No real data
+  cleanup, production migration or deployment ran.
+- P3 remains within its 2026-10-25T05:01:04Z deadline. Next: freeze
+  019's import screen and owner-scoped project/revision API from this
+  accepted base, then implement it with focused and isolated gates.
+
+## GEOAI-019 — scope frozen
+
+- Accepted base `8ed5687`; 019's dependency set has passed local and
+  GitHub feature/PR checks. Scope and acceptance are frozen in
+  `harness/build/019-import-screen.md`. No new framework or system
+  package is required; the screen will use local assets and existing
+  FastAPI/session/parser/project services. It will collect explicit
+  coordinate context and preserve warnings without changing measured
+  coordinates. GEOAI-019 is READY under the P3 manifest. Next:
+  implement in the same writable feature worktree, run targeted and
+  full isolated gates, then push exact reviewed commits and inspect CI.
