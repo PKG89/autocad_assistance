@@ -1705,3 +1705,11 @@ Keep one concise entry per task. Do not paste full command output.
   while the ACME TXT resolved. This may be router cache or filtering;
   no router/DNS change was made. Only the desktop NetBird peer was
   visible on VM110, so the second selected access path remains unverified.
+
+## GEOAI-039 private client and firewall recheck — 2026-10-25
+
+- The owner chose to retain VM110 instead of moving the pilot to a VPS. No VPS or public entry point was configured.
+- On VM110, NetBird 0.81.2 remained connected as `geoai.netbird.cloud` at `100.104.46.7` and reported only the approved desktop peer `100.104.97.169`. A read-only check on separate `mcp-ops` found both desktop and `openclawagent.netbird.cloud` (`100.104.100.176`), confirming that the second peer is online but not yet in VM110's peer map. Owner verification of GEOAI-Clients group/policy is pending.
+- This local Windows host is `WIN11`, not `DESKTOP-L4BB2VP`, and has no NetBird client. Its router resolver `192.168.1.1` returned NXDOMAIN for `geoai.froglight.ru`; direct query to `8.8.8.8` returned `100.104.46.7`. Approved client DNS checks are pending. No router or shared VPN DNS change was made.
+- NetBird inserted a blanket `wt0` accept into nftables input chains, including an attempted input guard. A corrected early `prerouting` guard now limits decrypted `wt0` ingress to the two selected source IPs on TCP 22/443; later NetBird ACL rules still apply. `nft -c` passed. The installed `/etc/nftables.conf` and versioned `harness/pilot/vm110-nftables.conf` match SHA-256 `24111e37bd82912e8f7ab6cd72731c896a43ec6730b9341d683c4dd939f177be`. Fresh LAN SSH, NetBird management, and the desktop peer connection remained active; rollback timers were cancelled. Do not restart nftables alone while NetBird is active because the file's `flush ruleset` also removes the NetBird ACL until its daemon reinstalls it.
+- The application and TLS units remain disabled/inactive. No port 443 or 18460 listener exists. Exact archive and off-VM synthetic restore results are unchanged; no completed test was repeated.
