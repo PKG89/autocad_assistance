@@ -87,6 +87,15 @@ class UploadCleanupReport:
 
 
 @dataclass(frozen=True)
+class CleanupEventRecord:
+    event_id: int
+    upload_id: str
+    owner_id: str
+    outcome: str
+    recorded_at: int
+
+
+@dataclass(frozen=True)
 class RevisionRecord:
     revision_id: str
     project_id: str
@@ -171,7 +180,7 @@ class ProjectStore:
         self.db_path = self.root / "projects.sqlite3"
         with self._db() as db:
             current = db.execute("PRAGMA user_version").fetchone()[0]
-            if current not in (0, 1, 2, 3):
+            if current not in (0, 1, 2, 3, 4):
                 raise ProjectStoreError(f"Unsupported project schema version: {current}")
             if current == 0:
                 db.executescript(
@@ -217,7 +226,14 @@ class ProjectStore:
                     expires_at INTEGER,
                     state TEXT NOT NULL DEFAULT 'active'
                 );
-                PRAGMA user_version = 3;
+                CREATE TABLE IF NOT EXISTS cleanup_events (
+                    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    upload_id TEXT NOT NULL,
+                    owner_id TEXT NOT NULL,
+                    outcome TEXT NOT NULL CHECK(outcome IN ('removed','failed')),
+                    recorded_at INTEGER NOT NULL
+                );
+                PRAGMA user_version = 4;
                 """
                 )
             elif current == 1:
@@ -246,6 +262,22 @@ class ProjectStore:
                     db.execute("ALTER TABLE upload_owners ADD COLUMN expires_at INTEGER")
                     db.execute("ALTER TABLE upload_owners ADD COLUMN state TEXT NOT NULL DEFAULT 'active'")
                     db.execute("PRAGMA user_version = 3")
+                    db.execute("COMMIT")
+                    current = 3
+                except Exception:
+                    db.execute("ROLLBACK")
+                    raise
+            if current == 3:
+                db.execute("BEGIN IMMEDIATE")
+                try:
+                    db.execute("""CREATE TABLE cleanup_events (
+                        event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        upload_id TEXT NOT NULL,
+                        owner_id TEXT NOT NULL,
+                        outcome TEXT NOT NULL CHECK(outcome IN ('removed','failed')),
+                        recorded_at INTEGER NOT NULL
+                    )""")
+                    db.execute("PRAGMA user_version = 4")
                     db.execute("COMMIT")
                 except Exception:
                     db.execute("ROLLBACK")
@@ -469,12 +501,34 @@ class ProjectStore:
             try:
                 remove_stored_upload(upload_root, item.upload_id, item.stored_format)
             except (OSError, ValueError):
+                with self._db() as db:
+                    db.execute(
+                        """INSERT INTO cleanup_events(upload_id,owner_id,outcome,recorded_at)
+                        VALUES (?,?,?,?)""",
+                        (item.upload_id, item.owner_id, "failed", int(time.time())),
+                    )
                 failed.append(item.upload_id)
                 continue
             with self._db() as db:
+                db.execute("BEGIN IMMEDIATE")
                 db.execute("DELETE FROM upload_owners WHERE upload_id=? AND state='deleting'", (item.upload_id,))
+                db.execute(
+                    """INSERT INTO cleanup_events(upload_id,owner_id,outcome,recorded_at)
+                    VALUES (?,?,?,?)""",
+                    (item.upload_id, item.owner_id, "removed", int(time.time())),
+                )
+                db.execute("COMMIT")
             removed.append(item.upload_id)
         return UploadCleanupReport(tuple(item.upload_id for item in candidates), tuple(removed), tuple(failed))
+
+    def cleanup_journal(self, *, limit: int = 100) -> tuple[CleanupEventRecord, ...]:
+        if not 1 <= limit <= 100:
+            raise ValueError("journal limit must be between 1 and 100")
+        with self._db() as db:
+            rows = db.execute(
+                "SELECT * FROM cleanup_events ORDER BY event_id DESC LIMIT ?", (limit,)
+            ).fetchall()
+        return tuple(CleanupEventRecord(**dict(row)) for row in rows)
 
     def get_project(self, project_id: str) -> ProjectRecord:
         with self._db() as db:

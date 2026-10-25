@@ -748,7 +748,7 @@ Keep one concise entry per task. Do not paste full command output.
 
 - Base: accepted 017 at `f3bee9c`, followed by P2 checkpoint and 018
   frozen-scope commit `d2ee01d`. Only the feature worktree changed.
-- Project metadata schema v3 adds optional creation/expiry times and
+- Project metadata schema v4 adds optional creation/expiry times and
   cleanup state for uploads. Version-2 rows migrate with NULL times,
   so historical uploads are not assigned an invented expiration. The
   opt-in retention setting creates expiration only for new uploads.
@@ -774,3 +774,26 @@ Keep one concise entry per task. Do not paste full command output.
 - GitHub feature/PR CI is pending. Next: commit exact reviewed files,
   push only `codex/geoai-current`, inspect both CI runs. No cleanup of
   real data, production migration, deployment or credential change ran.
+
+## GEOAI-018 — first scope repair before acceptance
+
+- Initial product commit `52b794f3d89bbbd46e8cc7a806b631bc0503db99`
+  passed GitHub push run 40149278271 and draft PR #6 run 40149281733.
+  A review against the supplied roadmap found that cleanup still lacked
+  a persistent journal. The stage remains open despite successful CI.
+- One of two allowed repair cycles is used. Added version-4
+  `cleanup_events` metadata with upload/owner UUID, outcome and time.
+  Apply success and failure are recorded; dry-run remains read-only.
+  The maintenance command returns a bounded journal. Retention classes
+  are explicit: temporary uploads may expire by configuration;
+  accepted source snapshots and DXF exports are retained; reference
+  archives do not yet exist and cannot be cleaned here. Existing 014
+  single-worker, queue and timeout bounds cover compute work.
+- A focused test initially assumed ordering between independent upload
+  events and was corrected to assert two removals, one failed attempt
+  and the latest retry outcome. No product behavior was weakened.
+  Targeted tests and the complete local gate passed again at
+  `/home/geoai/dev-data/geoai-autonomy/p3-018-repair1.log`:
+  113 focused, 10 isolated regression, six isolated API tests, zero
+  blocked operations, pip and diff checks. Next: commit the reviewed
+  journal repair, push exact feature HEAD and require both CI runs.

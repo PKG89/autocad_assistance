@@ -104,6 +104,7 @@ class ResourceLimitTests(unittest.TestCase):
         dry = self.store.cleanup_expired_uploads(self.upload_root, now=cutoff, apply=False)
         self.assertEqual(len(dry.candidates), 2)
         self.assertEqual(dry.removed, ())
+        self.assertEqual(self.store.cleanup_journal(), ())
         self.assertTrue(one.path.exists())
         two.path.unlink()
         outside = self.root / "outside.csv"
@@ -112,6 +113,7 @@ class ResourceLimitTests(unittest.TestCase):
         applied = self.store.cleanup_expired_uploads(self.upload_root, now=cutoff, apply=True)
         self.assertIn(one.upload_id, applied.removed)
         self.assertIn(two.upload_id, applied.failed)
+        self.assertEqual({item.outcome for item in self.store.cleanup_journal()}, {"removed", "failed"})
         self.assertEqual(outside.read_bytes(), SOURCE)
         self.assertEqual(self.store.read_source_for(self.owner, project.project_id, revision.revision_id), SOURCE)
         self.assertFalse(one.path.exists())
@@ -123,6 +125,12 @@ class ResourceLimitTests(unittest.TestCase):
         self.assertEqual(retry.removed, (two.upload_id,))
         self.assertEqual(retry.failed, ())
         self.assertFalse(two.path.exists())
+        self.assertEqual(self.store.cleanup_journal()[0].outcome, "removed")
+        reopened = ProjectStore(self.store.root, quota=self.quota, upload_retention_days=1)
+        outcomes = [item.outcome for item in reopened.cleanup_journal()]
+        self.assertEqual(outcomes[0], "removed")
+        self.assertEqual(outcomes.count("removed"), 2)
+        self.assertEqual(outcomes.count("failed"), 1)
 
     def test_retention_absent_and_version2_migration_are_non_destructive(self):
         root = self.root / "legacy"
@@ -158,11 +166,13 @@ class ResourceLimitTests(unittest.TestCase):
         with redirect_stdout(output):
             self.assertEqual(cleanup_main(args), 0)
         self.assertEqual(json.loads(output.getvalue())["mode"], "dry-run")
+        self.assertEqual(json.loads(output.getvalue())["journal"], [])
         self.assertTrue(item.path.exists())
         output = StringIO()
         with redirect_stdout(output):
             self.assertEqual(cleanup_main(args + ["--apply"]), 0)
         self.assertEqual(json.loads(output.getvalue())["removed"], [item.upload_id])
+        self.assertEqual(json.loads(output.getvalue())["journal"][0]["outcome"], "removed")
         self.assertFalse(item.path.exists())
 
 
