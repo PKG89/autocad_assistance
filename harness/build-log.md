@@ -665,3 +665,19 @@ Keep one concise entry per task. Do not paste full command output.
   registration and one-time Telegram confirmation.
 - GitHub feature/PR CI is pending. Next: commit exact reviewed files,
   push only `codex/geoai-current`, inspect both CI runs, then freeze 017.
+
+## GEOAI-016 — remote gate passed; GEOAI-017 ready
+
+- Exact reviewed commit `04522becb613dc06d4b19e4b579318315cac6775`
+  was pushed only to `codex/geoai-current`. GitHub `GEO AI checks`
+  push run 40148311053 and draft PR #6 run 40148314247 succeeded at
+  that SHA. No production workflow or deployment ran.
+- The verified branch bundle has SHA-256
+  `7290edd0f7fd47b032b8cf50320416b26168fbff91f62edce3c7be0765bd07ca`
+  on VM and Windows. Worktree was clean at `04522be`; the original
+  checkout and inherited workflow edit were untouched. GEOAI-016 is
+  ACCEPTED without a repair cycle or real credential provisioning.
+- P2 remains within the 2026-10-25T04:33:23Z deadline. GEOAI-017 is
+  READY on accepted 015–016; its schema migration, upload ownership,
+  per-request gate and download checks are frozen in
+  `harness/build/017-resource-ownership.md`.

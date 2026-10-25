@@ -1,6 +1,6 @@
 # GEOAI-016 — owner authentication and confirmed Telegram link
 
-Status: LOCAL ACCEPTED; remote CI pending. Base: accepted GEOAI-015 feature commit
+Status: ACCEPTED at `04522be` after local and GitHub push/PR CI. Base: accepted GEOAI-015 feature commit
 `a0e82bc968884cd5d8a60bd522fea2bc3170f608`. Dependency 015 passed
 local and GitHub push/PR checks after one recorded repair.
 
