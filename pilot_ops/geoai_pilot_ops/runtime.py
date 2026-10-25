@@ -25,6 +25,10 @@ RELEASES = {
         "cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81",
         8570880,
     ),
+    "15374b5c856958fdf67c5efdce68db81e05ac92f": (
+        "b6d5ba6ec44554feca4d1e43fb98450fccab13f7d5b003f2c6ddca0e4520df0b",
+        8581120,
+    ),
     "1ea061c1afb4b75b0aba06ae67d402b0a3e815a6": (
         "9e3858aeec823b64ae7bfa61c69890a93acd1f0f2e29c687ee149afd34229c8f",
         8509440,
