@@ -868,3 +868,30 @@ Keep one concise entry per task. Do not paste full command output.
 - GitHub feature/PR CI is pending. Next: commit exact reviewed files,
   push only `codex/geoai-current`, inspect both CI runs and then freeze
   020 if accepted. No real credentials/surveys or deployment were used.
+
+## GEOAI-019 — remote gate passed; GEOAI-020 next
+
+- Exact reviewed commit `897cf600e916207fa2a8f6a9797e3bc8729fe642`
+  was pushed only to `codex/geoai-current`. GitHub `GEO AI checks`
+  push run 40150237735 and draft PR #6 run 40150241097 succeeded at
+  that SHA. GEOAI-019 is ACCEPTED without a repair cycle.
+- Full branch bundle SHA-256
+  `a31bbe349c520ee813c6ea05a9fa0860698c74e9fd7d05aab4cb020e90a27efa`
+  matches on VM and Windows. The worktree is clean at `897cf60`;
+  origin remains the local bare store. The original checkout and
+  inherited CI edit are untouched. No production deployment ran.
+- P3 remains within 2026-10-25T05:01:04Z. Next: freeze 020 from this
+  accepted base, preserving the one-worker and two-repair bounds.
+
+## GEOAI-020 — scope frozen
+
+- Accepted base is `897cf60`; dependencies 014–019 passed local and
+  GitHub feature/PR checks. The finite P3 manifest remains active with
+  one writable tree/compute worker, 90 minutes per task and two repair
+  cycles. No second worker or external executor was started.
+- Scope and acceptance are frozen in `harness/build/020-jobs-results.md`:
+  owner-scoped durable job submit/status/cancel/retry, atomic
+  client-owned idempotency key, bounded coordinator bridge, verified
+  result publication/download and browser job controls. No production
+  worker or deployment is authorized. GEOAI-020 is READY; next is
+  implementation in the same feature worktree and full isolated gates.

@@ -1,6 +1,6 @@
 # GEOAI-019 — owner web import screen and project revisions
 
-Status: READY. Base: accepted GEOAI-018 feature commit
+Status: ACCEPTED at `897cf60` after local/browser and GitHub push/PR gates. Base: accepted GEOAI-018 feature commit
 `8ed56875bd1859baead50086c57c4ea52718defa`. Dependencies
 009–010, 012–013 and 016–018 passed local and GitHub feature/PR checks.
 P3 deadline: 2026-10-25T05:01:04Z.
