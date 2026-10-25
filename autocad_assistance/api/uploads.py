@@ -23,9 +23,12 @@ from autocad_assistance.services.survey_contract import (
 )
 from autocad_assistance.services.uploads import (
     EmptyUploadError,
+    InvalidUploadContentError,
     InvalidUploadNameError,
     UnsupportedUploadFormatError,
+    UploadLimitError,
     UploadTooLargeError,
+    read_stored_upload,
     store_upload,
 )
 
@@ -111,41 +114,6 @@ def _error(status_code: int, code: str, message: str) -> JSONResponse:
     )
 
 
-def _resolve_upload_file(upload_root: Path, upload_id: str) -> tuple[Path, str]:
-    root = upload_root.resolve()
-    upload_dir = root / upload_id
-    if upload_dir.is_symlink() or not upload_dir.is_dir():
-        raise FileNotFoundError
-
-    try:
-        resolved_dir = upload_dir.resolve(strict=True)
-    except OSError as exc:
-        raise FileNotFoundError from exc
-    if not resolved_dir.is_relative_to(root):
-        raise FileNotFoundError
-
-    expected_files = [resolved_dir / f"{upload_id}.txt", resolved_dir / f"{upload_id}.csv", resolved_dir / f"{upload_id}.kml"]
-    matches: list[Path] = []
-    for candidate in expected_files:
-        if not candidate.exists():
-            continue
-        if candidate.is_symlink() or not candidate.is_file():
-            raise FileNotFoundError
-        try:
-            resolved_candidate = candidate.resolve(strict=True)
-        except OSError as exc:
-            raise FileNotFoundError from exc
-        if not resolved_candidate.is_relative_to(root):
-            raise FileNotFoundError
-        matches.append(resolved_candidate)
-
-    if len(matches) != 1:
-        raise FileNotFoundError
-
-    stored_file = matches[0]
-    return stored_file, stored_file.suffix.lower().removeprefix(".")
-
-
 def _build_preview_columns(header: list[str] | None, rows: list[list[str]]) -> list[str]:
     if header is not None:
         return header
@@ -195,6 +163,10 @@ def create_upload_router(
             return _error(422, "UNSUPPORTED_FILE_FORMAT", str(exc))
         except EmptyUploadError as exc:
             return _error(422, "EMPTY_FILE", str(exc))
+        except InvalidUploadContentError as exc:
+            return _error(422, "INVALID_UPLOAD_CONTENT", str(exc))
+        except UploadLimitError as exc:
+            return _error(413, "UPLOAD_LIMIT_EXCEEDED", str(exc))
         except UploadTooLargeError as exc:
             return _error(413, "UPLOAD_TOO_LARGE", str(exc))
         except OSError:
@@ -231,13 +203,16 @@ def create_upload_router(
             )
 
         try:
-            stored_file, stored_format = await run_in_threadpool(
-                _resolve_upload_file,
+            raw_data, stored_format = await run_in_threadpool(
+                read_stored_upload,
                 Path(upload_root),
                 str(upload_id),
+                max_upload_bytes,
             )
         except FileNotFoundError:
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+        except UploadTooLargeError as exc:
+            return _error(413, "UPLOAD_TOO_LARGE", str(exc))
 
         if stored_format == "kml":
             return _error(
@@ -250,7 +225,6 @@ def create_upload_router(
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
 
         try:
-            raw_data = await run_in_threadpool(stored_file.read_bytes)
             parsed = await run_in_threadpool(parse_survey_bytes, raw_data)
         except (OSError, SurveyParseError, csv.Error):
             return _error(422, "INVALID_SURVEY", "Survey data cannot be previewed")
@@ -307,13 +281,16 @@ def create_upload_router(
             )
 
         try:
-            stored_file, stored_format = await run_in_threadpool(
-                _resolve_upload_file,
+            raw_data, stored_format = await run_in_threadpool(
+                read_stored_upload,
                 Path(upload_root),
                 str(upload_id),
+                max_upload_bytes,
             )
         except FileNotFoundError:
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+        except UploadTooLargeError as exc:
+            return _error(413, "UPLOAD_TOO_LARGE", str(exc))
 
         if stored_format == "kml":
             return _error(
@@ -326,7 +303,6 @@ def create_upload_router(
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
 
         try:
-            raw_data = await run_in_threadpool(stored_file.read_bytes)
             dataset = await run_in_threadpool(build_survey_dataset, raw_data, payload.mapping)
         except (OSError, SurveyParseError, csv.Error):
             return _error(422, "INVALID_SURVEY", "Survey data cannot be mapped")
@@ -367,13 +343,16 @@ def create_upload_router(
         payload: DxfRequest,
     ):
         try:
-            stored_file, stored_format = await run_in_threadpool(
-                _resolve_upload_file,
+            raw_data, stored_format = await run_in_threadpool(
+                read_stored_upload,
                 Path(upload_root),
                 str(upload_id),
+                max_upload_bytes,
             )
         except FileNotFoundError:
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
+        except UploadTooLargeError as exc:
+            return _error(413, "UPLOAD_TOO_LARGE", str(exc))
 
         if stored_format == "kml":
             return _error(
@@ -386,7 +365,6 @@ def create_upload_router(
             return _error(404, "UPLOAD_NOT_FOUND", "Upload not found")
 
         try:
-            raw_data = await run_in_threadpool(stored_file.read_bytes)
             dataset = await run_in_threadpool(
                 build_survey_dataset,
                 raw_data,

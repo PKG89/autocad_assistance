@@ -227,7 +227,10 @@ class MappingEndpointTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.json()["error"]["code"], "INVALID_COLUMN_MAPPING")
 
     async def test_mapping_rejects_empty_or_unusable_survey(self):
-        upload_id = await self.upload(filename="survey.csv", content=b"Point,X,Y,Z\n")
+        upload_id = str(uuid4())
+        folder = self.upload_root() / upload_id
+        folder.mkdir(parents=True)
+        (folder / f"{upload_id}.csv").write_bytes(b"Point,X,Y,Z\n")
         response = await self.map_rows(
             upload_id,
             payload={"mapping": {"Point": 0, "X": 1, "Y": 2, "Z": 3, "Code": 4}},

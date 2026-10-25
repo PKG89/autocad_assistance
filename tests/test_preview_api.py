@@ -137,16 +137,21 @@ class UploadPreviewEndpointTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.json()["error"]["code"], "UNSUPPORTED_PREVIEW_FORMAT")
 
     async def test_preview_rejects_header_only_survey(self):
-        upload_id = await self.upload(filename="survey.csv", content=b"Point,X,Y,Z\n")
+        upload_id = str(uuid4())
+        folder = self.upload_root() / upload_id
+        folder.mkdir(parents=True)
+        (folder / f"{upload_id}.csv").write_bytes(b"Point,X,Y,Z\n")
         response = await self.get_preview(upload_id)
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()["error"]["code"], "INVALID_SURVEY")
         self.assertNotIn("path", response.json()["error"])
 
     async def test_preview_rejects_oversized_csv_field(self):
-        upload_id = await self.upload(
-            filename="survey.csv",
-            content=b"Point,X,Y,Z\n" + (b"A" * 140000) + b",1,2,3\n",
+        upload_id = str(uuid4())
+        folder = self.upload_root() / upload_id
+        folder.mkdir(parents=True)
+        (folder / f"{upload_id}.csv").write_bytes(
+            b"Point,X,Y,Z\n" + (b"A" * 140000) + b",1,2,3\n"
         )
         response = await self.get_preview(upload_id)
         self.assertEqual(response.status_code, 422)

@@ -1,6 +1,6 @@
 # GEOAI-013 — bounded uploads and safe file access
 
-Status: READY. Base: accepted GEOAI-012 feature commit
+Status: LOCAL ACCEPTED; remote CI pending. Base: accepted GEOAI-012 feature commit
 `608a8e3ff84178470dbad6663fcca27fef5508b9`.
 Dependency 012 passed local and remote push/PR checks.
 
@@ -12,7 +12,8 @@ Keep the existing 10 MiB HTTP file-size limit. On the 2-vCPU, approximately
 at 100,000 coordinate tuples and 200,000 XML elements. These limits bound
 parser materialization and job input independently of later compute quotas;
 they may be lowered by configuration, never raised by a test. Reject binary
-or disguised content, malformed KML and unsupported archives. Do not
+or disguised content, malformed KML and unsupported archives. KML with NUL
+bytes (including UTF-16 XML) is outside this safe upload profile. Do not
 extract archives or infer geodetic validity from an extension.
 
 Candidate files: `services/uploads.py`, `api/uploads.py`,

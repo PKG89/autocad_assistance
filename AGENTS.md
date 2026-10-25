@@ -184,6 +184,16 @@ succeeded at the exact accepted SHA. A three-task checkpoint covering
 007A, 007B and 012 is recorded in the build log. Next task GEOAI-013
 is READY under `harness/build/013-upload-guard.md`.
 
+GEOAI-013 has passed its local gate on the feature worktree. Uploads now
+reject binary/disguised content and bound rows, lines, columns, fields,
+KML elements and coordinate tuples. Preview, mapping and DXF read one
+UUID-named regular file through bounded no-follow descriptors. The final
+local run passed 75 focused, 10 isolated regression and six isolated API
+tests with zero blocked operations, plus pip and diff checks. GitHub
+feature/PR CI is pending; 014 remains PROPOSED until it succeeds. The
+P1 deadline is 2026-10-25T04:12:17Z, with one worker and no external
+executor spend.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

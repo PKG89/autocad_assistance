@@ -479,3 +479,26 @@ Keep one concise entry per task. Do not paste full command output.
   size/row/point limits and narrow file/security scope are frozen in
   `harness/build/013-upload-guard.md` before code edits. Continue with
   013; 014 stays PROPOSED.
+
+## GEOAI-013 — local gate passed; remote gate pending
+
+- Base: accepted 012 at `608a8e3`, followed by documentation checkpoint
+  `7a5ce8b`. One writable feature worktree on `codex/geoai-current`;
+  original checkout and inherited CI edit were not touched.
+- Preserved 10 MiB HTTP upload limit and added 100,000 usable survey rows,
+  150,000 physical lines, 64 columns, 4,096 characters per field,
+  100,000 KML coordinate tuples and 200,000 XML elements. Rejects binary,
+  disguised, malformed and over-limit files before accepting the upload;
+  failed uploads remove their partial file/directory. User names are
+  metadata; server UUIDs define stored paths.
+- Preview, mapping and DXF use a single bounded, no-follow descriptor read
+  of an exact UUID-named regular file. Tests cover symlinks, a path swap
+  after open, unique IDs, control/bidi names, malformed KML, XML DTD,
+  row/line/column/field/coordinate limits and stable API errors.
+- Local gate at `/home/geoai/dev-data/geoai-autonomy/p1-013-final.log`:
+  75 focused, 10 isolated regression and six isolated API tests passed;
+  both isolated suites reported zero blocked network, dotenv, write and
+  process operations. `pip check` and `git diff --check` passed. No real
+  survey, production DB, `.env`, deployment or geometry change.
+- GitHub feature/PR checks are pending. Next: commit exact reviewed files,
+  push only `codex/geoai-current`, inspect both CI runs, then freeze 014.
