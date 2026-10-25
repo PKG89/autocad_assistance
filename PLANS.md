@@ -16,9 +16,10 @@ in netplan (earlier DHCP wording is superseded), NetBird enrolled at
 `100.104.46.7`, default-deny local firewall preserving LAN SSH, disabled
 pilot systemd units, and a new empty marked state. The owner approved the
 technical thresholds and selected two client peers, private DNS/TLS and
-backup storage names. The VPN peer and A record are verified. Certificate,
-second client access, selected Proxmox backup scheduling and target metrics
-remain open. A temporary synthetic backup restored on VM109;
+backup storage names. The VPN peer, A record and certificate are verified.
+Second client access, DNS resolution on approved clients, selected Proxmox
+backup scheduling and target metrics remain open. A temporary synthetic
+backup restored on VM109;
 GEOAI-039 is PARTIAL. No pilot service, public listener, production data,
 shared VPN policy, Proxmox schedule or PR merge has changed. GEOAI-040
 production publication remains BLOCKED.
@@ -29,7 +30,10 @@ pilot config now uses the new HTTPS origin and passed the exact-release
 check again. The Cloudflare DNS token is no longer needed. NetBird
 enrolled with VPN IP `100.104.46.7`; the owner added A `geoai` ->
 `100.104.46.7`, verified on both Reg.ru authoritative servers. The
-Reg.ru DNS-01 TXT challenge remains before private HTTPS can start.
+Reg.ru DNS-01 TXT challenge passed and Certbot issued a certificate
+valid until 2027-01-23. Manual renewal is required. VM110's router
+resolver did not yet return the private A address; client resolution
+and the second NetBird peer remain before private HTTPS can start.
 
 ### Authoritative status snapshot — 2026-10-25
 

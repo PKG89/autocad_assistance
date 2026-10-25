@@ -1686,3 +1686,22 @@ Keep one concise entry per task. Do not paste full command output.
   entry in Reg.ru. The owner reported it entered, but the authoritative
   servers have not returned it yet. Certbot remains waiting; no ACME
   validation or certificate issuance has been attempted.
+
+## GEOAI-039 private certificate issued — 2026-10-25
+
+- The exact DNS-01 TXT value appeared on both Reg.ru authoritative servers.
+  Certbot then completed the challenge and issued a certificate for
+  `geoai.froglight.ru`, SAN matching the name, valid from 2026-10-25
+  12:38:04 UTC to 2027-01-23 12:38:03 UTC. Chain verification against the
+  system CA succeeded with the intermediate supplied separately.
+- Fullchain and key were installed under `/etc/geoai-pilot/tls/` as
+  root:caddy mode 0640; `caddy validate` passed when executed as the
+  service user. The app and TLS units remain inactive. Manual Certbot
+  certificates do not auto-renew, so the renewal timer stays disabled;
+  a new Reg.ru TXT challenge is required before expiry.
+- `ns1.reg.ru`, `ns2.reg.ru` and public resolvers returned A
+  `100.104.46.7`; VM110's configured resolver `192.168.1.1` still
+  returned name not found after VM110's local resolver cache was flushed,
+  while the ACME TXT resolved. This may be router cache or filtering;
+  no router/DNS change was made. Only the desktop NetBird peer was
+  visible on VM110, so the second selected access path remains unverified.
