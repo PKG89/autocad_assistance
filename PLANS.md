@@ -168,8 +168,9 @@ the same immutable revision, returns reasons/provenance and never
 chooses one. The synthetic zigzag gave A=P1,P2,P3,P4 and
 B=P1,P3,P4,P2; direct accepted-023/current DXF line semantics matched.
 The final local gate passed 131 focused, 10 isolated regression and
-six isolated API tests. Exact GitHub feature/PR CI is pending; after
-acceptance freeze GEOAI-025 from the verified base.
+six isolated API tests. Exact GitHub feature/PR runs
+40154016183/40154019673 passed at `cbcd0f3`; GEOAI-024 is ACCEPTED.
+GEOAI-025 is READY from this base under `harness/build/025-decisions.md`.
 After exact CI acceptance, P4 closes and GEOAI-023 can be frozen from
 the accepted base. No production publication is authorized.
 

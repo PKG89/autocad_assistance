@@ -1,6 +1,6 @@
 # GEOAI-024 — explainable A/B line-connection candidates
 
-Status: LOCAL VERIFIED; exact GitHub feature/PR CI pending. Base: accepted GEOAI-023 feature commit
+Status: ACCEPTED. Exact GEOAI-024 feature commit `cbcd0f39174b8b25afc6771a2f6f5643c02dcee5`. Base: accepted GEOAI-023 feature commit
 `24dad9cddfb90c9d4f5cad9d1dfed3415bfea534`; 012, 015, 020–023
 dependencies passed local and exact GitHub feature/PR checks. P5
 manifest: `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`;
@@ -86,4 +86,6 @@ action; record HEAD, diff, checks and exact blocker.
   syntax checks passed both changed browser scripts. One repair
   covered CSV parse errors and length overflow with safe API errors.
   No decision, database schema, DXF generation or production state
-  was changed. Exact GitHub feature/PR CI is pending.
+  was changed. Exact GitHub push run 40154016183 and draft PR #6 run
+  40154019673 passed. VM/Windows full-branch bundle SHA-256:
+  `091ca2cb2383cacda8919130bda6a503a8f0ca2092680a67224ca62c05f3cf8c`.

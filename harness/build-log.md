@@ -1094,4 +1094,9 @@ Keep one concise entry per task. Do not paste full command output.
   Final local gate `p5-024/final-gate-repaired.log` passed 131
   focused, 10 isolated regression and six isolated API tests,
   zero blocked operations, `pip check`, `git diff --check` and JS
-  syntax on Windows Node 24. Exact GitHub feature/PR CI remains.
+  syntax on Windows Node 24. Exact GitHub push run 40154016183 and
+  draft PR #6 run 40154019673 passed at feature HEAD `cbcd0f3`.
+  Complete branch bundle SHA-256
+  `091ca2cb2383cacda8919130bda6a503a8f0ca2092680a67224ca62c05f3cf8c`.
+  GEOAI-024 ACCEPTED; GEOAI-025 READY from that base under
+  `harness/build/025-decisions.md`. Original checkout untouched.
