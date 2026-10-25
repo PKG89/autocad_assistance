@@ -1160,3 +1160,17 @@ Keep one concise entry per task. Do not paste full command output.
   `pip check`, `git diff --check`; Windows Node 24 syntax passed.
   Disposable servers/tab stopped; no real data or production action.
   Exact GitHub feature/PR CI pending.
+
+## GEOAI-026 — accepted; GEOAI-027 ready
+
+- Exact feature HEAD `6285b1ada23053dc7fbfdc5d726d85d966a91fd6`
+  passed GitHub push run 40155918471 and draft PR #6 run
+  40155921751. Complete branch bundle SHA-256
+  `512dfb668dcc522d67482b226fc3ded041e91654467e23e83a6eb923b0163ef6`
+  matched VM/Windows. Worktree clean at this HEAD; original checkout
+  untouched. GEOAI-026 ACCEPTED.
+- GEOAI-027 READY from accepted 026 under
+  `harness/build/027-reference-archive.md`. The archive must require
+  explicit provenance and permission evidence and use only synthetic
+  examples during development. No real reference files or rights
+  were supplied in-session; no production action.

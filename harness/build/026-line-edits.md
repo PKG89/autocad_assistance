@@ -1,6 +1,7 @@
 # GEOAI-026 — controlled line edits over immutable measurements
 
-Status: LOCAL VERIFIED; exact feature/PR CI pending. Base:
+Status: ACCEPTED at exact feature commit
+`6285b1ada23053dc7fbfdc5d726d85d966a91fd6`. Base:
 `43fe7403af521ffc80822dcba8ead3a5b5aee23b`.
 Package P6 manifest: `/home/geoai/dev-data/geoai-autonomy/p6-run-manifest.json`,
 deadline 2026-10-25T06:33:23Z. One
@@ -97,4 +98,7 @@ blocker in shared memory.
   closed. The full gate `p6-026/final-gate-bounded.log` passed 137
   focused, 10 isolated regression and six isolated API tests, zero
   blocked operations, `pip check` and `git diff --check`. JS syntax
-  passed Windows Node 24. Exact GitHub feature/PR CI remains pending.
+  passed Windows Node 24. Exact GitHub push run 40155918471 and
+  draft PR #6 run 40155921751 passed. Full-branch bundle SHA-256
+  `512dfb668dcc522d67482b226fc3ded041e91654467e23e83a6eb923b0163ef6`
+  matched VM and Windows.
