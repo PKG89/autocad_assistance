@@ -30,6 +30,10 @@ of 030A. Explicit-rule development and synthetic contract checks do not
 require an ML dataset; real-survey quality
 acceptance still requires approved, correctly paired examples and criteria.
 030B/031C and 037/038 retain their evidence gates.
+The 030A readiness check is in `harness/build/030a-readiness.md`: the
+available format does not yet identify an object/string ID or an
+unambiguous action/order for all records. 030A remains PROPOSED pending a
+domain-approved contract; 031A has a separate asset/rule gate.
 
 Candidate teaching files belong in the existing 027 archive only after
 authorized ingestion, initially unverified with provenance and use scope.
@@ -147,8 +151,9 @@ The staging manifest's schemaVersion 5 is a separate format.
 
 The unified material request is `harness/build/missing-materials.md`.
 Only independently ready tasks with defined requirements may proceed.
-None of 029A, 030A/030B, 031A–031C, 032–035 or 037–038 is currently
-READY for product work. PROPOSED subtask registration is not dispatch.
+029A is accepted for its bounded parser contract. None of 030A/030B,
+031A–031C, 032–035 or 037–038 is currently READY for product work.
+PROPOSED subtask registration is not dispatch.
 The remaining READY statements in the chronological log below describe
 earlier checkpoints; this status snapshot is the current authority.
 
@@ -244,9 +249,9 @@ mapping and DXF through the shared engine.
 | P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
 | P6 | 028 | DXF comparison and quality measures | 027 | ACCEPTED at 1ea061c |
 | P7 | 029 | Versioned object-code rules | 012, 028 | ACCEPTED at 79528bb |
-| P7 | 029A | Versioned field-coding profiles and provenance | 012, accepted 029; source/rights inventory | PROPOSED; extension, not reopening 029 |
+| P7 | 029A | Versioned field-coding profiles and provenance | 012, accepted 029; source/rights inventory | ACCEPTED for bounded parser at 9548fa5; no drawable assets or geometry |
 | P7 | 030 | Measured line-tracing improvement | 030A and 030B scopes below | PARTIAL: existing inference experiment only; full acceptance not implied by either subtask alone |
-| P7 | 030A | Explainable tracing from explicit field codes | 012, 025–026, 028, 029A | PROPOSED; freeze explicit profile/ordering rules and synthetic checks first |
+| P7 | 030A | Explainable tracing from explicit field codes | 012, 025–026, 028, 029A | PROPOSED; object ID, action/style disambiguation and sequence rules require an approved contract; see `harness/build/030a-readiness.md` |
 | P7 | 030B | Inference of connections with insufficient codes | 024–025, 028–029; authorized held-out objects and class criteria | BLOCKED for acceptance; retains prior synthetic experiment and regression |
 | P7 | 031 | Situation outlines and composite objects | Capability-specific 031A/031B/031C dependencies | NOT ACCEPTED; subtask acceptance does not imply whole-stage acceptance |
 | P7 | 031A | Point symbols, multiple objects per point and annotation | 012, 028, 029A; approved symbol assets/rules | PROPOSED; independent of 030B and ML |
@@ -259,8 +264,8 @@ mapping and DXF through the shared engine.
 | P10 | 036 | Dataset-readiness audit | 025, 027–028 | ACCEPTED at e5663fa; reports not ready for training/evaluation |
 | P10 | 037 | Small offline recommendation model | 036 | BLOCKED by actual data readiness |
 | P10 | 038 | Reviewable model suggestions | 025, 037 | BLOCKED by 037 |
-| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PARTIAL: owner synthetic scenario accepted; VM restore lacks isolated OS boot and dump/VM-backup pairing is unverified |
-| P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by full 039 and explicit authorization; no merge, boot autostart or wider access |
+| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | ACCEPTED for bounded synthetic pilot; VM111 isolated boot and VM110 backup pairing verified |
+| P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by separate explicit authorization; no merge, boot autostart or wider access |
 
 For a first limited site release, P1–P4 plus P11 are the main path. P5–P10
 can follow; the document package can move earlier if it does not depend on

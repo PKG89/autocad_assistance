@@ -1825,3 +1825,24 @@ Keep one concise entry per task. Do not paste full command output.
   surveys, block placement, line tracing, or reuse rights. Next: prepare
   one bounded 030A or 031A specification; neither is READY or authorized
   to auto-run in this package. 030B/031C and 037–038 blockers remain.
+
+## GEOAI-030A readiness check — 2026-10-25
+
+- The owner asked to continue after accepted 039/029A. VM109 feature branch
+  `codex/geoai-current` was clean at local
+  `d3e15caefde8e1e81c23bc6e50ef8fce96352ba7`; GitHub PR #6 head
+  `8b09c7711fb45136b14ff966a1985312de946eda` had the same Git tree
+  `2f9ade25ecf2eb11c39ba3d3c5d55da1f079cb2f` and both checks passed.
+- Reused the existing DrawLine/DrawPoint inventory, 029A profile, shared
+  `SurveyRecord` and accepted 024 line-candidate service. The raw survey
+  contract has point ID/code/XYZ/row but no separate line-object ID,
+  confirmed action or sequence. DrawLine `0`/`1` overlap start/end markers
+  with style IDs. No exact deterministic edge set can be derived for all
+  cases without an approved disambiguation/ordering rule.
+- `harness/build/030a-readiness.md` records a conservative explicit-field
+  proposal, concrete abstentions and a synthetic acceptance matrix.
+  Corrected stale chronological rows in `PLANS.md` so 029A and bounded 039
+  agree with the current status snapshot. 030A remains PROPOSED, not READY;
+  no geometry, generator, pilot, network or data were changed. Next step is
+  the owner's/domain reviewer's choice of how object ID, action and order
+  are supplied. 030B/031C and real-survey validation retain their gates.

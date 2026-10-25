@@ -5,6 +5,10 @@
 The owner first requested a roadmap amendment, then separately authorized
 the bounded 039/029A package. GEOAI-029A now has a frozen profile contract
 and passing local checks; see `harness/build/029a-profile-spec.md`.
+The next candidate 030A has a readiness record at
+`harness/build/030a-readiness.md`. Do not treat raw `0`/`1` as an
+unambiguous action or invent object IDs/order; obtain the agreed contract
+before implementation. No 030A product code has been started.
 Read the current `PLANS.md` subtask registry and
 `harness/build/029a-031-field-to-finish-plan.md` before later P7 work.
 029 and 029A are accepted; 030A and 031A/031B remain PROPOSED. 030B carries
