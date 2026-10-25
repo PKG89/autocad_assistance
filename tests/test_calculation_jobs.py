@@ -32,6 +32,13 @@ if point in {"SLOW", "TIMEOUT"}:
     time.sleep(2)
 if point == "CRASH":
     sys.exit(7)
+if point == "OVERSIZE":
+    (job_dir / "dxf-job-leftover").mkdir()
+    (job_dir / "result.candidate").write_bytes(b"partial")
+    sys.exit(4)
+if point == "BIG_RESULT":
+    (job_dir / "result.candidate").write_bytes(b"x" * (int(sys.argv[2]) + 1))
+    sys.exit(0)
 if point != "EMPTY":
     (job_dir / "result.candidate").write_bytes(b"DXF:" + point.encode())
 '''
@@ -128,6 +135,28 @@ class CalculationJobTests(unittest.TestCase):
         empty = manager.submit(rows("EMPTY"))
         self.assertEqual(wait_for(manager, empty.job_id, {"failed"}).error_code, "INVALID_RESULT")
         self.assertFalse((self.root / empty.job_id / "result.dxf").exists())
+
+    def test_oversize_cleans_partial_files_and_next_job_succeeds(self):
+        manager = self.manager()
+        oversized = manager.submit(rows("OVERSIZE"))
+        result = wait_for(manager, oversized.job_id, {"failed"})
+        self.assertEqual(result.error_code, "RESULT_TOO_LARGE")
+        job_dir = self.root / oversized.job_id
+        self.assertFalse((job_dir / "result.candidate").exists())
+        self.assertFalse((job_dir / "result.dxf").exists())
+        self.assertFalse((job_dir / "dxf-job-leftover").exists())
+        following = manager.submit(rows("OK"))
+        self.assertEqual(wait_for(manager, following.job_id, {"succeeded"}).status, "succeeded")
+
+    def test_completed_candidate_over_limit_is_not_published(self):
+        manager = self.manager(max_output_bytes=16)
+        oversized = manager.submit(rows("BIG_RESULT"))
+        self.assertEqual(wait_for(manager, oversized.job_id, {"failed"}).error_code, "RESULT_TOO_LARGE")
+        job_dir = self.root / oversized.job_id
+        self.assertFalse((job_dir / "result.candidate").exists())
+        self.assertFalse((job_dir / "result.dxf").exists())
+        following = manager.submit(rows("OK"))
+        self.assertEqual(wait_for(manager, following.job_id, {"succeeded"}).status, "succeeded")
 
     def test_restart_marks_interrupted_work_and_preserves_result(self):
         first = self.manager()

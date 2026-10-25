@@ -15,6 +15,7 @@ from autocad_assistance.services.calculation_jobs import JobCapacityError, JobNo
 from autocad_assistance.services.column_mapping import MappingValidationError
 from autocad_assistance.services.project_jobs import ProjectJobBridge
 from autocad_assistance.services.project_store import (
+    MAX_RESULT_BYTES,
     ProjectIntegrityError, ProjectNotFoundError, ProjectStoreError,
     ResourceQuotaExceededError, SubmissionConflictError,
 )
@@ -43,10 +44,15 @@ def _error(status_code: int, code: str, message: str) -> JSONResponse:
 
 
 def _view(job) -> dict:
+    error_message = (
+        f"DXF result exceeds the {MAX_RESULT_BYTES // (1024 * 1024)} MiB limit"
+        if job.error_code == "RESULT_TOO_LARGE" else None
+    )
     return {
         "jobId": job.job_id, "revisionId": job.revision_id,
         "status": job.status, "attempt": job.attempt, "retryOf": job.retry_of,
-        "errorCode": job.error_code, "resultReady": job.result_ready,
+        "errorCode": job.error_code, "errorMessage": error_message,
+        "resultReady": job.result_ready,
         "createdAt": job.created_at, "updatedAt": job.updated_at,
     }
 

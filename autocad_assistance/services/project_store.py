@@ -23,7 +23,7 @@ from autocad_assistance.services.uploads import (
 
 
 MAX_SOURCE_BYTES = 10 * 1024 * 1024
-MAX_RESULT_BYTES = 25 * 1024 * 1024
+MAX_RESULT_BYTES = 96 * 1024 * 1024
 MAX_SETTINGS_BYTES = 64 * 1024
 MAX_DECISION_BYTES = 1024 * 1024
 MAX_DECISION_EVENTS_PER_REVISION = 2_000
@@ -1520,7 +1520,7 @@ class ProjectStore:
 
     def publish_result(self, job_id: str, result_bytes: bytes) -> ProjectJobRecord:
         if not isinstance(result_bytes, bytes) or not 0 < len(result_bytes) <= MAX_RESULT_BYTES:
-            raise ProjectStoreError("Result must be 1 to 25 MiB of bytes")
+            raise ProjectStoreError("Result must be 1 to 96 MiB of bytes")
         job = self.get_job(job_id)
         revision = self.get_revision(job.revision_id)
         if job.algorithm_version != revision.algorithm_version:
