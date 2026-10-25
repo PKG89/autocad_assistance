@@ -966,3 +966,18 @@ Keep one concise entry per task. Do not paste full command output.
 - Full final local gate: `p4-021/final-gate-exact.log`; exact feature
   commit and GitHub push/PR CI remain pending. No Telegram network,
   production data, migration or deployment was used.
+
+## GEOAI-021 — remote gate passed; GEOAI-022 next
+
+- Exact feature commit `eecaad8e7ccef59a609a8d2ad3929071efb1de7e`
+  passed GitHub `GEO AI checks` push run 40151771462 and draft PR #6
+  run 40151774538. Full branch bundle SHA-256
+  `94e5f42b799337de4bb0bd7696e2a09bf66a968acbc7921e9623544fad3455b4`
+  matches on VM and Windows. The feature worktree was clean at that
+  HEAD before this acceptance update; the original checkout and
+  inherited workflow edit remain untouched.
+- GEOAI-021 is ACCEPTED. P4 remains inside its 2026-10-25T05:35:44Z
+  deadline. Docker is absent on VM109. GEOAI-022 is READY from this
+  accepted base under `harness/build/022-staging-recovery.md`, with
+  the same one-worker, two-repair and zero-spend bounds. No production
+  service, migration, real credential or deployment was used.

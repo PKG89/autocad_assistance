@@ -1,6 +1,6 @@
 # GEOAI-021 — end-to-end web MVP acceptance against Telegram
 
-Status: LOCAL GATE PASSED; FEATURE/PR CI PENDING. Base: accepted GEOAI-020 feature commit
+Status: ACCEPTED at `eecaad8e7ccef59a609a8d2ad3929071efb1de7e`. Base: accepted GEOAI-020 feature commit
 `91aeb53ad410abdc071498a4d22e561db3684dbe`; 018–020 and remote
 007B CI passed. P4 deadline: 2026-10-25T05:35:44Z.
 
@@ -87,4 +87,7 @@ action; record HEAD, diff, checks and blocker before any pause.
   `/home/geoai/dev-data/geoai-autonomy/p4-021/final-gate-exact.log`;
   it passed 121 focused, 10 isolated regression and six isolated API
   tests with zero blocked operations, plus `pip check` and diff checks.
-  GitHub feature/PR checks remain pending.
+  GitHub `GEO AI checks` push run 40151771462 and draft PR #6 run
+  40151774538 passed at the exact commit. Full branch bundle SHA-256
+  `94e5f42b799337de4bb0bd7696e2a09bf66a968acbc7921e9623544fad3455b4`
+  matched on VM and Windows. No production action ran.

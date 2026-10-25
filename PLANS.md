@@ -87,8 +87,8 @@ mapping and DXF through the shared engine.
 | P3 | 018 | Quotas, retention and cleanup | 014–017 | ACCEPTED at 8ed5687 |
 | P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–018 | ACCEPTED at 897cf60 |
 | P3 | 020 | Web jobs, results and download | 014–019 | ACCEPTED at 91aeb53 |
-| P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | LOCAL GATE PASSED; CI PENDING |
-| P4 | 022 | Reproducible staging, recovery and rollback | 021 | PROPOSED |
+| P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | ACCEPTED at eecaad8 |
+| P4 | 022 | Reproducible staging, recovery and rollback | 021 | READY |
 | P5 | 023 | Browser plan viewer | 015, 020–021 | PROPOSED |
 | P5 | 024 | A/B line-connection candidates | 012, 023 | PROPOSED |
 | P5 | 025 | Confirmed decisions and review history | 017, 023–024 | PROPOSED |
@@ -119,8 +119,15 @@ and PR checks; package complete. GEOAI-020 is accepted at `91aeb53`
 after 120 focused, 10 isolated regression and six isolated API tests;
 GitHub push run 40151146814 and PR run 40151149754 succeeded.
 P4 run manifest is `/home/geoai/dev-data/geoai-autonomy/p4-run-manifest.json`.
-GEOAI-021 is READY under `harness/build/021-web-mvp-acceptance.md`;
-022 remains PROPOSED until 021 is accepted.
+GEOAI-021 scope and acceptance evidence are under
+`harness/build/021-web-mvp-acceptance.md`.
+
+GEOAI-021 is accepted at `eecaad8` after 121 focused, 10 isolated
+regression and six isolated API tests; GitHub push run 40151771462
+and PR run 40151774538 succeeded. GEOAI-022 is READY under
+`harness/build/022-staging-recovery.md` from this accepted base.
+Docker is absent on VM109, so staging uses the existing verified
+Python environment and isolated synthetic data; no system install.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

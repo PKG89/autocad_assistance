@@ -277,13 +277,17 @@ P3 is complete; P4's finite manifest and GEOAI-021 frozen scope are in
 `harness/build/021-web-mvp-acceptance.md`. No production worker or
 deployment is authorized.
 
-GEOAI-021 local acceptance uses one fixed synthetic CSV through the
+GEOAI-021 is accepted at `eecaad8` after local and GitHub feature/PR
+checks. Its acceptance uses one fixed synthetic CSV through the
 authenticated web API and offline Telegram handlers. It compares exact
 measured rows and DXF model-space entities, including block scales,
 layers, labels and TIN, then rejects a deliberately changed point.
 The test exposed and corrected the web 1:500 render factor mismatch;
 `harness/build/021-web-mvp-acceptance.md` records raw timing/memory
-evidence. Exact feature/PR CI is pending before acceptance.
+evidence. GEOAI-022 is READY under
+`harness/build/022-staging-recovery.md`; VM109 has no Docker, so use
+the verified Python runtime and only disposable synthetic staging
+roots. No system package, production service or real data operation.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
