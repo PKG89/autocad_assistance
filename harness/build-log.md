@@ -1355,3 +1355,21 @@ Keep one concise entry per task. Do not paste full command output.
   reviewed labels or class-level acceptance criteria in-session.
   The audit cannot export data or start training. 037/038 are blocked
   until actual readiness is demonstrated.
+
+## GEOAI-036 — local gate passed; exact CI pending
+
+- Implemented owner-only, read-only `/api/v1/dataset-readiness` over
+  bounded private archive metadata. The report counts user-asserted
+  training/evaluation uses and enumerates concrete evidence gaps. It
+  never reads raw reference bytes or emits permission text, and it
+  always keeps readiness false under the current unverified schema.
+- Three focused readiness tests cover empty/authenticated owners,
+  assertion/privacy/foreign-owner isolation and tamper/limit failure.
+  Full gate `p10-036/full-gate.log` passed 157 focused, 10 isolated
+  regression and six API tests, `pip check`, zero blocked operations;
+  `git diff --check` passed. Verified localhost HTTPS synthetic smoke
+  passed with one reference, two use assertions, seven concrete
+  blockers, false readiness and no permission-evidence leak.
+- No real reference corpus or independently verified rights was used.
+  GEOAI-037/038 remain blocked pending a passing later readiness audit.
+  Exact feature push and draft PR CI are pending for 036.

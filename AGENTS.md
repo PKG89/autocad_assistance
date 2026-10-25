@@ -415,6 +415,13 @@ task, 90 minutes, at most two repairs and deadline
 2026-10-25T07:37:48Z. Its read-only dataset-readiness report must
 never treat user-asserted permission as independently verified or
 export archive contents. GEOAI-037/038 require a passing later audit.
+GEOAI-036 local implementation is a read-only, owner-scoped metadata
+audit at `/api/v1/dataset-readiness`. Its full local gate passed 157
+focused, 10 isolated regression and six API tests, `pip check`, zero
+blocked operations and diff check. Verified HTTPS synthetic smoke
+passed authentication, privacy and not-ready checks. User permission
+assertions are not independent verification; both readiness flags remain
+false. Exact feature push and PR CI are required before acceptance.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

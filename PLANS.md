@@ -227,6 +227,13 @@ external executor. GEOAI-036 is READY under
 `harness/build/036-dataset-readiness.md`. It may accept a precise
 not-ready report; 037/038 remain blocked until real data and rights
 meet the audit.
+GEOAI-036 local gate and verified HTTPS synthetic smoke passed. The
+report enumerates missing rights review, whole-object family IDs,
+reference review, priority class coverage, independent splits,
+per-class criteria and byte-integrity verification. The API does not
+export reference bytes or permission text. Both training and
+evaluation readiness remain false. Exact feature push and PR CI
+remain before acceptance; 037/038 still blocked.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus
