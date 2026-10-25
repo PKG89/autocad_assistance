@@ -1,5 +1,20 @@
 # AutoCAD Assistance GEO AI
 
+## Field-to-Finish planning handoff (2026-10-25)
+
+The owner requested a roadmap amendment, not implementation or queue startup.
+Read the current `PLANS.md` subtask registry and
+`harness/build/029a-031-field-to-finish-plan.md` before later P7 work.
+029 remains accepted; 029A, 030A and 031A/031B are PROPOSED. 030B carries
+the prior synthetic inference experiment and remains blocked for full
+acceptance; 031C depends on its relevant accepted capability and class evidence.
+The new capability-specific dependencies supersede historical statements
+that all 031 work requires full 030. No new task is READY or dispatched.
+Keep source data/codes immutable and reuse the existing catalog, decisions,
+reference archive, comparison and DXF service. Local teaching files are
+unverified reference candidates, not approved ML data or freely licensed assets.
+The pilot product/operations pair and 039/040 gates remain unchanged.
+
 ## Current GEOAI-039 handoff (2026-10-25)
 
 The owner reports a passed **synthetic user scenario** on the installed

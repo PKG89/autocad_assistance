@@ -5,6 +5,40 @@ matching file under `harness/build/`.
 
 ## Current phase and execution order
 
+### Field-to-Finish roadmap amendment — 2026-10-25
+
+The owner approved adding the researched local Civil 3D/AutoCAD materials
+and external Field-to-Finish examples to this plan. This is a planning-only
+amendment: no implementation task is READY, no queue is started, and no
+third-party code, survey files or symbols are imported by this change.
+Detailed proposed scope and acceptance gates are in
+`harness/build/029a-031-field-to-finish-plan.md`.
+
+Preserve accepted 027, 028 and 029. Add 029A for explicit versioned coding
+profiles; divide 030 into deterministic coded tracing (030A) and ambiguous
+connection inference (030B); divide 031 into point symbols (031A), coded
+line/area objects (031B), and inferred composite objects (031C).
+030B retains the existing review-only experiment and its measured regression.
+The former blanket dependency of all 031 work on full 030 is superseded by
+the subtask dependencies below, not by a claim that 030 or 031 is accepted.
+
+Proposed order: source/provenance and reuse-rights inventory -> 029A ->
+030A -> 031A/031B -> reviewed source/reference comparison using 027/028.
+031A can follow 029A independently of 030A. Explicit-rule development and
+synthetic contract checks do not require an ML dataset; real-survey quality
+acceptance still requires approved, correctly paired examples and criteria.
+030B/031C and 037/038 retain their evidence gates.
+
+Candidate teaching files belong in the existing 027 archive only after
+authorized ingestion, initially unverified with provenance and use scope.
+Their source/DWG correspondence, rights and independent-family identity
+are not established; do not mark them accepted references or add them to
+036 training/evaluation data automatically. Use 028 for reviewed comparison.
+P8 032/033 can later consume verified terrain/breakline flags; P9 034/035
+can draw on layout ideas. Existing domain, template and numeric-rule gates
+remain in force. The selected pilot and 039/040 operational acceptance
+continue separately; a later feature needs its own tested release.
+
 ### GEOAI-039 owner scenario and remaining gates — 2026-10-25
 
 The owner passed the synthetic cabinet scenario on VM110: import, preview,
@@ -99,8 +133,9 @@ The staging manifest's schemaVersion 5 is a separate format.
 | --- | --- | --- |
 | ACCEPTED | 007A/007B/007C, 008–011, P1 012–014, P2 015–017, P3 018–020, P4 021–022, P5 023–025, P6 026–028, P7 029 | Existing feature/PR CI and local acceptance passed; these are the selected release functions. |
 | ACCEPTED as an audit only | P10 036 | Reports `readyForTraining=false` and `readyForEvaluation=false` under current unverified evidence; outside chosen release. No training permission follows from this acceptance. |
-| PARTIAL | P7 030 | Synthetic review-only candidate measured a class regression. Resume only with authorized source-point/final-DXF object pairs, independent whole-object split, labelled correct links/breaks and agreed per-class baseline/regression criteria. Keep current generator unchanged. Do not repeat synthetic trials without a new checkable hypothesis. |
-| BLOCKED | P7 031 | Full 030 accepted first; then split 031 by object class with reviewed examples, class-specific expected geometry and checks. |
+| PROPOSED | P7 029A, 030A, 031A/031B | Versioned profiles, explicit coded tracing and coded objects. Follow the subtask dependencies and freeze specifications before READY; synthetic development does not depend on ML readiness. Real-survey acceptance needs reviewed source/reference pairs. No queue started. |
+| PARTIAL | P7 030 / 030B | Existing synthetic review-only inference candidate measured a class regression; 030B remains blocked for full acceptance by authorized object pairs, independent whole-object splits, correct links/breaks and agreed per-class criteria. New 030A acceptance cannot accept 030B or the whole 030. Keep the deployed generator unchanged. |
+| NOT ACCEPTED | P7 031 | Split by capability: 031A depends on 029A; 031B on 029A/030A and 028; 031C remains blocked by the relevant accepted 030B/class evidence. No blanket full-030 dependency for 031A/031B. |
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
 | BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
 | BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
@@ -109,7 +144,8 @@ The staging manifest's schemaVersion 5 is a separate format.
 
 The unified material request is `harness/build/missing-materials.md`.
 Only independently ready tasks with defined requirements may proceed.
-None of 030–035 or 037–038 is currently READY for product work.
+None of 029A, 030A/030B, 031A–031C, 032–035 or 037–038 is currently
+READY for product work. PROPOSED subtask registration is not dispatch.
 The remaining READY statements in the chronological log below describe
 earlier checkpoints; this status snapshot is the current authority.
 
@@ -205,8 +241,14 @@ mapping and DXF through the shared engine.
 | P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
 | P6 | 028 | DXF comparison and quality measures | 027 | ACCEPTED at 1ea061c |
 | P7 | 029 | Versioned object-code rules | 012, 028 | ACCEPTED at 79528bb |
-| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | PARTIAL: synthetic experiment only; real held-out criteria missing |
-| P7 | 031 | Contours and composite situation objects | 028–030 | BLOCKED by full 030 and class evidence |
+| P7 | 029A | Versioned field-coding profiles and provenance | 012, accepted 029; source/rights inventory | PROPOSED; extension, not reopening 029 |
+| P7 | 030 | Measured line-tracing improvement | 030A and 030B scopes below | PARTIAL: existing inference experiment only; full acceptance not implied by either subtask alone |
+| P7 | 030A | Explainable tracing from explicit field codes | 012, 025–026, 028, 029A | PROPOSED; freeze explicit profile/ordering rules and synthetic checks first |
+| P7 | 030B | Inference of connections with insufficient codes | 024–025, 028–029; authorized held-out objects and class criteria | BLOCKED for acceptance; retains prior synthetic experiment and regression |
+| P7 | 031 | Situation outlines and composite objects | Capability-specific 031A/031B/031C dependencies | NOT ACCEPTED; subtask acceptance does not imply whole-stage acceptance |
+| P7 | 031A | Point symbols, multiple objects per point and annotation | 012, 028, 029A; approved symbol assets/rules | PROPOSED; independent of 030B and ML |
+| P7 | 031B | Explicitly coded line and area objects | 028, 029A, 030A; reviewed class geometry | PROPOSED; independent of 030B and ML |
+| P7 | 031C | Ambiguous composite situation objects | Relevant accepted 030B capability, 028, reviewed class examples | BLOCKED by inference/class evidence |
 | P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | BLOCKED by domain references, masks and licensed implementation |
 | P8 | 033 | Terrain contours and elevation checks | 032 | BLOCKED by 032 and contour criteria |
 | P9 | 034 | Report data model and templates | 012, 015 | BLOCKED by owner forms and numeric rules |

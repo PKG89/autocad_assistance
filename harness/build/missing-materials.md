@@ -1,6 +1,8 @@
 # GEO AI — единый перечень материалов для заблокированных этапов
 
-Status: REQUESTED, not supplied or approved as of 2026-10-25. Do not
+Status: domain approvals still REQUESTED as of 2026-10-25. Local teaching
+materials have been inspected but are not validated source/reference pairs
+or approved reusable assets; see the Field-to-Finish note below. Do not
 replace missing domain decisions with inferred values. Keep real source
 files in an owner-approved private location outside Git and disposable
 synthetic staging. Record provenance and scope of use per object.
@@ -18,6 +20,23 @@ reference for later review. Its original field TXT/CSV is unavailable;
 direct exact XY matching did not recover a point-to-line mapping. It
 does not by itself clear any dataset or training gate. GEOAI-036 is
 accepted as an audit *that reports not ready*.
+
+## Field-to-Finish clarification — 2026-10-25
+
+The full-030 and dependent-031 requests above apply to inference (030B),
+ambiguous objects (031C), and real-survey validation, not as an ML-data
+prerequisite for developing explicit coded rules in 029A/030A/031A/031B.
+Those tasks remain PROPOSED until their profile semantics, provenance,
+asset rights where relevant, acceptance checks and bounded specs are frozen.
+
+Local AutoCAD/Civil 3D archives supply candidate coding instructions,
+conversion tables, figure-prefix XML and teaching SDR/FBK/DWG examples.
+The extracted C3D.SURVEY folder is incomplete; source-to-result pairing,
+reuse permissions, duplicate IDs and missing assets need review. Store any
+authorized candidates through existing 027 provenance/review facilities and
+use 028 for comparison. Inspection does not authorize publication, ML use,
+automatic correction of measurements or transfer of these files to VM110.
+See `029a-031-field-to-finish-plan.md` for the proposed next scope.
 
 For GEOAI-040 only, the owner must separately approve a concrete target,
 DNS/TLS, secrets handling, production backup destination, maintenance
