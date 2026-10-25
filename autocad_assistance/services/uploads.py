@@ -132,10 +132,17 @@ def _validate_kml_content(raw_data: bytes) -> None:
 
 def _validate_upload_content(destination: Path, suffix: str) -> None:
     raw_data = destination.read_bytes()
-    if suffix == ".kml":
+    validate_upload_bytes(raw_data, suffix.removeprefix("."))
+
+
+def validate_upload_bytes(raw_data: bytes, stored_format: str) -> None:
+    """Recheck accepted bytes before preserving a project source snapshot."""
+    if stored_format == "kml":
         _validate_kml_content(raw_data)
-    else:
+    elif stored_format in {"txt", "csv"}:
         _validate_survey_content(raw_data)
+    else:
+        raise UnsupportedUploadFormatError("Unsupported stored upload format")
 
 
 def store_upload(

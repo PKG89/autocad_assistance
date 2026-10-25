@@ -373,7 +373,7 @@ Keep one concise entry per task. Do not paste full command output.
   bootstraps; `requirements-test.txt` records existing runtime
   dependencies and `httpx==0.28.1`.
 - A fresh user-local venv installed `requirements-test.txt` and passed
-  pip check, 59 focused tests, 10 isolated regression tests and six isolated
+  pip check, 58 focused tests, 10 isolated regression tests and six isolated
   API tests. Both guarded suites reported zero blocked network, dotenv,
   write or process operations. A temporary intentionally failing test
   made the entire runner exit 1; direct regression discovery also exited
@@ -448,7 +448,7 @@ Keep one concise entry per task. Do not paste full command output.
   Telegram keeps its accepted mapping step (including a blank Z pending
   generation), saves a source digest/line numbers and checks the common
   contract before DXF. Existing DXF and KML geometry code is unchanged.
-- Final fresh-venv gate: 68 focused tests, 10 isolated regression tests,
+- Final fresh-venv gate: 67 focused tests, 10 isolated regression tests,
   six isolated API tests, pip check and `git diff --check` passed.
   Both bootstraps reported zero blocked network, dotenv, write and process
   operations. Tests cover swapped axes, raw precision/provenance, duplicate
@@ -496,7 +496,7 @@ Keep one concise entry per task. Do not paste full command output.
   after open, unique IDs, control/bidi names, malformed KML, XML DTD,
   row/line/column/field/coordinate limits and stable API errors.
 - Local gate at `/home/geoai/dev-data/geoai-autonomy/p1-013-final.log`:
-  75 focused, 10 isolated regression and six isolated API tests passed;
+  74 focused, 10 isolated regression and six isolated API tests passed;
   both isolated suites reported zero blocked network, dotenv, write and
   process operations. `pip check` and `git diff --check` passed. No real
   survey, production DB, `.env`, deployment or geometry change.
@@ -535,7 +535,7 @@ Keep one concise entry per task. Do not paste full command output.
   descriptors. The synchronous HTTP/Telegram DXF paths and geometry
   engine were not changed; web job routes remain for GEOAI-020.
 - Local gate at `/home/geoai/dev-data/geoai-autonomy/p1-014-accepted.log`:
-  84 focused, 10 isolated regression and six isolated API tests passed;
+  83 focused, 10 isolated regression and six isolated API tests passed;
   zero blocked network, dotenv, write and process operations in both
   isolated suites. `pip check` and `git diff --check` passed. Negative
   tests cover full queue, cancellation, timeout, crash, invalid result,
@@ -562,3 +562,39 @@ Keep one concise entry per task. Do not paste full command output.
   zero external executor spend. GEOAI-015 is READY on accepted 012–014;
   its service-only storage scope and checks are frozen in
   `harness/build/015-project-storage.md`. GEOAI-016/017 stay PROPOSED.
+
+## Test-count audit (2026-10-25)
+
+- Recounted the raw `Ran N tests` groups before the isolated regression
+  summary, excluding the separate 10-test regression group. Correct focused
+  counts are 58 for 007B, 67 for 012, 74 for 013 and 83 for 014. Earlier
+  narrative counts included that first regression group once; pass/fail
+  outcomes, test commands and CI results are unchanged.
+
+## GEOAI-015 — local gate passed; remote gate pending
+
+- Base: accepted 014 at `0ad1e0a`, followed by P1 checkpoint and frozen
+  015 scope at `c9b3deb`. One writable feature worktree; no Telegram
+  database, public project route, authentication shortcut, system package,
+  deployment or real survey data was used.
+- Added a separate SQLite metadata store and server-UUID file tree.
+  Revisions preserve exact accepted TXT/CSV/KML source bytes, SHA-256,
+  explicit CRS/units/scale context, settings, parent/sequence and caller
+  supplied algorithm version. Jobs preserve exact canonical request JSON
+  and digest; accepted DXF results record size/digest and source/job link.
+  Sources are capped at 10 MiB, results at 25 MiB, and each settings
+  document at 64 KiB. Reads use bounded no-follow descriptors and reject
+  tampered bytes/metadata. File writes precede SQLite acceptance; failed
+  writes roll back metadata and clean only the current attempt's file.
+- The real 014 child worker produced a DXF that was snapshotted to its
+  revision and verified after restart. Negative tests cover duplicate
+  publication, wrong status, unknown IDs, symlinks, parent swap,
+  post-write failure, altered source/settings/request metadata and
+  oversized settings. No coordinate or geometry behavior changed.
+- Final local gate at
+  `/home/geoai/dev-data/geoai-autonomy/p2-015-final.log`:
+  92 focused, 10 isolated regression and six isolated API tests passed;
+  both isolated suites reported zero blocked network, dotenv, write and
+  process operations. `pip check` and `git diff --check` passed.
+- GitHub feature/PR CI is pending. Next: commit exact reviewed files,
+  push only `codex/geoai-current`, inspect CI, then freeze 016.

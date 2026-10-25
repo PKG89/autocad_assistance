@@ -166,7 +166,7 @@ Use `PLANS.md` for the proposed dependencies and status; use
 `harness/build-log.md` for exact 007A hashes and current Git state.
 
 Current P0 handoff: 007B is accepted at `49dea8a`. A clean venv passed
-59 focused, 10 isolated regression and six isolated API tests, with zero
+58 focused, 10 isolated regression and six isolated API tests, with zero
 blocked operations. A temporary failing test made the runner fail; direct
 regression discovery still failed as required. The separate feature/PR
 workflow has read-only contents permission and no production jobs; the
@@ -175,7 +175,7 @@ both produced successful CI runs at the exact code SHA. The branch and
 inherited workflow also have verified copies on Windows outside VM109.
 P0 is complete; the next task is GEOAI-012 after a frozen spec.
 
-GEOAI-012 is accepted at `608a8e3`. Its local gate passed: 68 focused,
+GEOAI-012 is accepted at `608a8e3`. Its local gate passed: 67 focused,
 10 isolated regression and six isolated API tests, plus pip/diff checks.
 The new shared model preserves raw XYZ, source provenance and explicit
 unknown unit/CRS context; HTTP and Telegram DXF paths use it. No coordinate
@@ -188,7 +188,7 @@ GEOAI-013 is accepted at `66b8dcc` on the feature worktree. Uploads now
 reject binary/disguised content and bound rows, lines, columns, fields,
 KML elements and coordinate tuples. Preview, mapping and DXF read one
 UUID-named regular file through bounded no-follow descriptors. The final
-local run passed 75 focused, 10 isolated regression and six isolated API
+local run passed 74 focused, 10 isolated regression and six isolated API
 tests with zero blocked operations, plus pip and diff checks. GitHub
 push run 40146687136 and PR run 40146689779 both succeeded. GEOAI-014
 is READY under `harness/build/014-bounded-jobs.md`. The
@@ -200,12 +200,20 @@ Linux-locked compute process, four waiting slots, a 120-second timeout,
 25 MiB result cap, 32 MiB request cap and at most two explicit retries.
 It cancels/terminates child work, records interrupted jobs for explicit
 retry after restart, and publishes results atomically. The final gate
-passed 84 focused, 10 isolated regression and six isolated API tests,
+passed 83 focused, 10 isolated regression and six isolated API tests,
 with zero blocked operations, plus pip and diff checks. GitHub push run
 40147083698 and PR run 40147086595 succeeded. P1 is complete; the
 012–014 checkpoint is in the build log. GEOAI-015 is READY under
 `harness/build/015-project-storage.md`. P2 deadline is
 2026-10-25T04:33:23Z with one worker and zero external executor spend.
+
+GEOAI-015 passed its local gate. A separate SQLite project store preserves
+immutable source revisions, exact settings/job parameters, hashes,
+algorithm labels and verified DXF results under server UUID paths.
+No project HTTP routes or Telegram database changes were made. The final
+local run passed 92 focused, 10 isolated regression and six isolated API
+tests, with zero blocked operations, plus pip and diff checks. GitHub
+feature/PR CI remains pending; 016/017 remain PROPOSED.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
