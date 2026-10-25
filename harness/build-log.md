@@ -1058,3 +1058,17 @@ Keep one concise entry per task. Do not paste full command output.
   `pip check` and `git diff --check`. Both browser scripts passed
   Windows Node 24 syntax checks. Exact feature/PR GitHub CI remains
   before acceptance and GEOAI-024 scope freeze.
+
+## GEOAI-023 — accepted; GEOAI-024 next
+
+- Exact feature HEAD `24dad9cddfb90c9d4f5cad9d1dfed3415bfea534`
+  passed GitHub `GEO AI checks` push run 40153380771 and draft PR #6
+  run 40153383129. Complete branch bundle SHA-256
+  `a923b30576764257606996ef39a4907c183e90f75fad4849632d88df9649a7a4`
+  matched VM and Windows. The feature worktree was clean at that HEAD
+  before this acceptance update; original checkout is untouched.
+- GEOAI-023 is ACCEPTED. One correctness repair, final local gate,
+  browser fixture and separate authenticated HTTPS API evidence are
+  under `harness/build/023-plan-viewer.md`. No production server or
+  real data used. GEOAI-024 is READY from this base under
+  `harness/build/024-line-candidates.md`.

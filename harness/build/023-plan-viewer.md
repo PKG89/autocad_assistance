@@ -1,6 +1,6 @@
 # GEOAI-023 — browser plan viewer
 
-Status: LOCAL VERIFIED; exact GitHub feature/PR CI pending. Base: accepted GEOAI-022 feature commit
+Status: ACCEPTED. Base: accepted GEOAI-022 feature commit
 `211cf1812224c0d77803837f96db8ef60aaaebe1`; all P4 local and
 exact GitHub feature/PR checks passed. P5 run manifest:
 `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`, started
@@ -94,3 +94,13 @@ action. Record HEAD, diff, checks and blocker before pausing.
   passed both browser scripts on Windows Node 24. Exact GitHub feature
   and PR CI remain pending. No schema, Telegram, geodetic algorithm
   or production state change.
+
+## Exact remote acceptance
+
+Feature HEAD `24dad9cddfb90c9d4f5cad9d1dfed3415bfea534` passed
+GitHub `GEO AI checks` push run 40153380771 and draft PR #6 run
+40153383129. Complete branch bundle SHA-256
+`a923b30576764257606996ef39a4907c183e90f75fad4849632d88df9649a7a4`
+matched on VM and Windows. The feature worktree was clean at that
+HEAD before this acceptance update. GEOAI-023 is accepted; next is
+024 from this verified base.

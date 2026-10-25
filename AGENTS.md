@@ -317,6 +317,14 @@ isolated regression and six isolated API tests; exact GitHub
 feature/PR checks are pending. Details and numerical bounds are in
 `harness/build/023-plan-viewer.md`. No production state was touched.
 
+GEOAI-023 is accepted at `24dad9c` after exact GitHub push and draft
+PR #6 checks passed. GEOAI-024 is READY under
+`harness/build/024-line-candidates.md` from that base. It compares
+recorded survey order with the existing nearest-neighbor line builder
+for eligible code groups, returning explicit A/B candidates and
+reasons without accepting either or changing measured XYZ/DXF. P5
+bounds remain in `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

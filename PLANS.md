@@ -89,8 +89,8 @@ mapping and DXF through the shared engine.
 | P3 | 020 | Web jobs, results and download | 014–019 | ACCEPTED at 91aeb53 |
 | P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | ACCEPTED at eecaad8 |
 | P4 | 022 | Reproducible staging, recovery and rollback | 021 | ACCEPTED |
-| P5 | 023 | Browser plan viewer | 015, 020–021 | LOCAL VERIFIED; CI pending |
-| P5 | 024 | A/B line-connection candidates | 012, 023 | PROPOSED |
+| P5 | 023 | Browser plan viewer | 015, 020–021 | ACCEPTED |
+| P5 | 024 | A/B line-connection candidates | 012, 023 | READY |
 | P5 | 025 | Confirmed decisions and review history | 017, 023–024 | PROPOSED |
 | P6 | 026 | Reversible derived-geometry edits | 025 | PROPOSED |
 | P6 | 027 | Reference-object archive | 015, 017, 025 | PROPOSED |
@@ -154,6 +154,14 @@ Owner/API limits and unsupported geometry have focused checks. The
 final local gate passed 127 focused, 10 isolated regression and six
 isolated API tests; exact GitHub feature/PR CI is pending; then
 freeze 024 from the accepted base.
+
+GEOAI-023 is accepted at `24dad9c`: GitHub push run 40153380771
+and draft PR #6 run 40153383129 succeeded at that SHA. Verified
+branch bundle SHA-256:
+`a923b30576764257606996ef39a4907c183e90f75fad4849632d88df9649a7a4`.
+P5 continues with GEOAI-024 READY under
+`harness/build/024-line-candidates.md`; no selected line geometry or
+production data is changed by generating candidates.
 After exact CI acceptance, P4 closes and GEOAI-023 can be frozen from
 the accepted base. No production publication is authorized.
 
