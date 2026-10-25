@@ -1587,3 +1587,26 @@ Keep one concise entry per task. Do not paste full command output.
   approved VPN clients/thresholds, operator/monitoring and release
   sign-off. GEOAI-040 remains BLOCKED. No infrastructure or working
   service was changed.
+
+## GEOAI-039 target VM report — 2026-10-25
+
+- Owner supplied a read-only PVE1 report: VM 110 `GEOAI` is running
+  with autostart; Debian 13.7, hostname `debian13-new`, 2 vCPU,
+  4 GiB RAM, 60 GiB disk, about 56 GiB available and DHCP
+  `192.168.1.162`. SSH/22 is enabled; `geo-admin` uses password/sudo
+  and `openclaw` uses SSH key. Credential location was described as
+  Vaultwarden; no credential was read or copied. Failed systemd units
+  were reported absent. These are owner-reported facts, not a login
+  or direct Proxmox inventory result.
+- Owner reports no swap, nftables firewall, public DNS, reverse proxy,
+  NetBird or Proxmox backup schedule on VM 110. Current DHCP IP is not
+  confirmed stable. Windows read-only TCP probe reached
+  `192.168.1.162:22`; `ssh-keygen -F` found no pinned host key in
+  the local known_hosts, so no SSH login was attempted.
+- Candidate target is now VM 110. Before pilot launch: verify host
+  identity/access, approve private VPN/TLS/client list and stable
+  address, choose off-VM backup location/retention and test restore,
+  measure target load/memory with no swap, and record operator/window
+  and release approval. No VM settings, network rules, secrets,
+  running services, real data or pilot state were changed. GEOAI-039
+  remains PARTIAL and GEOAI-040 BLOCKED.

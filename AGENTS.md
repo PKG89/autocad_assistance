@@ -11,9 +11,12 @@ A separately versioned `pilot_ops/` overlay contains the operational
 ASGI adapter; never describe it as part of the 79528bb product archive.
 The overlay/product/P6 rollback combination passed synthetic loopback
 HTTPS checks, but target Caddy/NetBird and load remain unmeasured.
-A separate Debian 13 VM is proposed; VM109/CT108 were inspected
-read-only and are not selected. `pve1.netbird.cloud` was unreachable
-from available hosts, so VM ID/IP and hypervisor reserve are unknown.
+A separate Debian 13 VM 110 `GEOAI` on PVE1 was created by the owner,
+with reported DHCP IP `192.168.1.162`, 2 vCPU, 4 GiB RAM and 60 GiB
+disk. VM109/CT108 remain separate. VM110 has no NetBird/TLS proxy or
+Proxmox backup schedule; the IP is not confirmed stable. TCP/22 is
+reachable from Windows, but no trusted host key is recorded, so no
+login or independent inventory check was performed.
 New empty pilot state needs no
 production migration. Project SQLite uses user_version 8, auth SQLite
 uses 1; staging manifest schemaVersion 5 is unrelated. The ASGI

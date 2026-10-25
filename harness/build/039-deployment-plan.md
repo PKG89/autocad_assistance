@@ -37,10 +37,14 @@ no-migration decision and operator sequence are in
 `harness/build/039-pilot-preparation.md`. This proposal does not authorize
 launch or a change to the running bot.
 
-The proposed closed-pilot target is a new dedicated Debian 13 VM
-(2 vCPU, 4 GiB RAM, 60 GiB disk), not VM109 or CT108. For its fresh
-empty state, no working-data migration or production backup is needed.
-Its exact VM ID, capacity, address and access still need owner approval.
+The owner reports that dedicated VM 110 `GEOAI` now exists on PVE1:
+Debian 13.7, 2 vCPU, 4 GiB RAM, 60 GiB disk and current DHCP IP
+`192.168.1.162`. This is not VM109 or CT108. The report has not
+been verified by logging in to the VM. No working-data migration is
+needed for fresh empty state. VM 110 has no Proxmox backup schedule,
+swap, nftables firewall, public DNS, reverse proxy or NetBird yet.
+Its private access, stable address, off-VM backup destination/retention
+and target measurements remain gates before any pilot launch.
 Owner chooses the target host/environment, hostname and TLS source,
 operator, access path, production secrets mechanism, data directories,
 backup location/retention, maintenance window, monitoring recipient,

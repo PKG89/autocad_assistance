@@ -25,9 +25,14 @@ The separate `pilot_ops/` overlay now implements a fail-closed ASGI
 launcher, config checks, backup/restore and service/TLS templates.
 Its combination with 79528bb and P6 rollback passed synthetic
 loopback HTTPS checks; it is not part of the 79528bb product archive.
-Proxmox resource/VM ID/address inventory could not be read because
-`pve1.netbird.cloud` has no route from the available hosts. GEOAI-039
-remains PARTIAL for actual target, measured capacity and owner sign-off.
+Proxmox inventory could not be read because `pve1.netbird.cloud`
+has no route from the available hosts. The owner subsequently supplied
+a PVE1 report for running VM 110 `GEOAI` (Debian 13.7, 2 vCPU, 4 GiB,
+60 GiB, DHCP `192.168.1.162`), matching the proposed size. This is
+owner-reported, not independently verified. VM 110 has no NetBird,
+TLS proxy, public DNS or Proxmox backup schedule; IP persistence and
+off-VM backup remain open. GEOAI-039 stays PARTIAL for access,
+measured capacity and owner sign-off.
 
 | Status | Stages | Exact remaining gate |
 | --- | --- | --- |
@@ -38,7 +43,7 @@ remains PARTIAL for actual target, measured capacity and owner sign-off.
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
 | BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
 | BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
-| PARTIAL | P11 039 | Candidate and separate operational overlay passed synthetic combination checks; dedicated VM/private access proposed, no migration for fresh state. Proxmox inventory, target capacity/load, VPN clients, observability owner and release sign-off remain open. |
+| PARTIAL | P11 039 | Candidate and separate overlay passed synthetic checks; owner reports dedicated VM 110 created. No migration for fresh state. VM access, stable IP, VPN/TLS, off-VM backup, target load, VPN clients, operator and sign-off remain open. |
 | BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/migration authorization. No merge or production change now. |
 
 The unified material request is `harness/build/missing-materials.md`.
