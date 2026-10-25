@@ -1533,3 +1533,57 @@ Keep one concise entry per task. Do not paste full command output.
   The pilot ASGI adapter/TLS/unit, target load result, responsible
   operator and final sign-off remain open. GEOAI-039 is PARTIAL and
   GEOAI-040 BLOCKED.
+
+## GEOAI-039 operational overlay technical preparation — 2026-10-25
+
+- User authorized code/tests/docs, local commits, feature push and draft
+  PR update but not VM creation, network changes, real data, merge or
+  pilot launch. Working tree began clean at `0b0eaf070dfa73632ecacc7fe2faf6815b6695b3`.
+  Product archive `79528bb9f6070e458724886a915f9d035cdfd110.tar`
+  remained byte-identical, SHA-256
+  `cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81`.
+- Operational overlay implementation was committed at
+  `aa74a11abe4b26fffc82c659e33237127618d005`; the validated TLS
+  template was committed at final package source
+  `7f5bbecbb05a9f86f9850ed7e045a49fde040b89`, tree
+  `dab84ce2892da719a5eed7c1b1e42ed4eb50b60f`. Its 8-file
+  `git archive` is 40,960 bytes, SHA-256
+  `71c330b1252c54f1d67f488ff0e39aae98a7b521d3fcf074fda4c15a2fb5213c`;
+  independent rebuild matched byte-for-byte. Overlay is not inside the
+  product archive. Full two-component and P6 rollback provenance is in
+  `harness/pilot/combined-manifest.json`.
+- Five focused config tests passed. The exact **packaged** overlay with
+  the exact 79528bb archive passed a disposable synthetic HTTPS flow:
+  upload/preview/revision, three queued/running/succeeded jobs, DXF
+  result 4,287,358 bytes, anonymous 401, foreign-session 401,
+  foreign-Origin 403, restart with unchanged result SHA, active
+  backup/restore refused, offline backup of 27 files/restoration and
+  tampered-backup rejection. The same overlay started accepted P6
+  `1ea061c1...` on restored v8 state and served the same DXF SHA.
+  Evidence file SHA-256
+  `61cae027e5ba87095c23784ac57e4e6448fa1ca59fb8f8e0d13ac8de81da5d97`
+  under `/home/geoai/dev-data/geoai-autonomy/pilot-combination-packaged-v2/`.
+  The verifier independently rebuilt both Git archives and checked
+  individual overlay file SHA values. No product gate was rerun.
+- Independent Windows copies of the 79528bb product tar, final
+  `7f5bbec` overlay tar and P6 rollback tar were saved under
+  `C:/Users/krog0/OneDrive/Документы/ChatGPT/Assistance/geoai-pilot-prep/artifacts/`;
+  all three SHA-256 values matched the combined manifest. These are
+  artifact copies, not a deployment.
+- Read-only VPN survey: CT108 NetBird 0.81.2, IP 100.104.140.204,
+  two connected peers and no Networks. `pve1.netbird.cloud`
+  resolves to 100.104.86.94 but is unreachable from CT108 (SSH/22
+  no route, API/8006 unavailable); Windows has no NetBird route and
+  cannot reach ports 22/8006. VM109 has no NetBird client.
+  Proxmox reserve, free VM ID and address/DHCP inventory remain
+  unverified; no ID/IP was called free. Official Caddy 2.11.7 was
+  downloaded only to dev-data, its Linux tar SHA-512 matched the
+  release checksums, and a synthetic rendering of the final TLS
+  template passed `caddy adapt`/`caddy validate` with a single
+  bound HTTPS listener and no HTTP redirect. Real VPN IP/certificate
+  remain untested. `systemd-analyze verify` parsed the unit
+  but reported the expected absent target Python path.
+- GEOAI-039 remains PARTIAL for designated VM/resources, target load,
+  approved VPN clients/thresholds, operator/monitoring and release
+  sign-off. GEOAI-040 remains BLOCKED. No infrastructure or working
+  service was changed.
