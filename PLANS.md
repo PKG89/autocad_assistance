@@ -8,9 +8,10 @@ matching file under `harness/build/`.
 ### Field-to-Finish roadmap amendment — 2026-10-25
 
 The owner approved adding the researched local Civil 3D/AutoCAD materials
-and external Field-to-Finish examples to this plan. This is a planning-only
-amendment: no implementation task is READY, no queue is started, and no
-third-party code, survey files or symbols are imported by this change.
+and external Field-to-Finish examples to this plan, then separately
+authorized 029A. The roadmap registration itself was planning only;
+029A has since received a frozen, bounded specification and implementation.
+No third-party code, survey files or symbols were imported.
 Detailed proposed scope and acceptance gates are in
 `harness/build/029a-031-field-to-finish-plan.md`.
 
@@ -22,10 +23,11 @@ line/area objects (031B), and inferred composite objects (031C).
 The former blanket dependency of all 031 work on full 030 is superseded by
 the subtask dependencies below, not by a claim that 030 or 031 is accepted.
 
-Proposed order: source/provenance and reuse-rights inventory -> 029A ->
-030A -> 031A/031B -> reviewed source/reference comparison using 027/028.
-031A can follow 029A independently of 030A. Explicit-rule development and
-synthetic contract checks do not require an ML dataset; real-survey quality
+Current sequence: source/provenance inventory -> accepted 029A -> prepare
+030A or 031A specification -> reviewed source/reference comparison using
+027/028 after their own accepted checks. 031A can follow 029A independently
+of 030A. Explicit-rule development and synthetic contract checks do not
+require an ML dataset; real-survey quality
 acceptance still requires approved, correctly paired examples and criteria.
 030B/031C and 037/038 retain their evidence gates.
 
@@ -50,19 +52,19 @@ confirmed **no remarks**. No
 quality claim for arbitrary real surveys or all 100,000-point shapes follows.
 Current exact PR feature and pull-request CI checks completed successfully.
 
-GEOAI-039 stays **PARTIAL**. VM restore to isolated VM111 reconstructed the
-disk but did not boot the OS. The application dump timer and Proxmox VM
-backup jobs are independent; a successful VM task alone cannot prove a
-current successful application copy. Before full sign-off, perform an
-isolated boot/recovery check without the copied NetBird identity or working
-network, and make a missed/failed dump detectable and ineligible for a
-successful coordinated application-backup claim. Pair each VM archive with
-a verified recent dump and record both outcomes; a VM-only archive remains
-labelled VM-only if the dump is absent or invalid. Existing first-run and
-restore evidence is retained. No merge, boot autostart or wider access.
+GEOAI-039 is **ACCEPTED for the bounded synthetic pilot**. VM111 booted
+offline without a NIC or autostart; its copied NetBird state was quarantined.
+The exact product, both SQLite databases, state files and local app health
+passed; VM111 was stopped afterwards. VM110-only backup jobs now have a
+per-job hook that verifies application dumps within 2700 seconds and records
+archive ID, time, integrity, SHA-256 and dump outcome. A real failed pairing
+was labelled VM-only; the corrected run was paired and the Proxmox task was
+OK. Missing/failed/stale dumps never count as coordinated application copies.
+See `harness/build/039-isolated-recovery-and-pairing.md`. No real-survey
+quality claim, merge, boot autostart or wider access follows.
 
-GEOAI-040 remains **BLOCKED** by full 039 sign-off and separate explicit
-publication/operations authorization. Later 040 decisions include release
+GEOAI-040 remains **BLOCKED** by separate explicit publication/operations
+authorization. Later 040 decisions include release
 promotion, whether/when to enable boot autostart, monitoring and response
 ownership, certificate renewal, rollback drill, access and any real-data
 approval/migration. None is implied by the synthetic user acceptance.
@@ -106,8 +108,8 @@ plus separate operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`.
 Both app and TLS services are active but disabled for boot; the old archives,
 config, overlay and primary state remain for rollback. Private HTTPS smoke
 passed login, import, preview, mapping, queue, result view and DXF download.
-GEOAI-039 remains PARTIAL after the owner's bounded synthetic acceptance,
-pending the recovery and backup-pairing gates above. No production
+GEOAI-039 is accepted only for the owner's bounded synthetic pilot scenario
+after the recovery and backup-pairing checks above. No production
 data, public listener, router/DHCP or shared VPN policy change, PR merge or
 permanent monitoring occurred.
 GEOAI-040 production publication remains BLOCKED. Detailed evidence is in
@@ -122,8 +124,8 @@ The corrected product candidate `15374b5c856958fdf67c5efdce68db81e05ac92f`
 adds only the bounded 100k DXF fix. The separate `pilot_ops/` package
 implements the operational ASGI launcher, config checks, backup/restore
 and service/TLS templates; it is not part of either product archive.
-GEOAI-039 remains PARTIAL: the exact synthetic user scenario is accepted,
-while isolated VM boot/recovery and enforced backup-pairing evidence remain.
+GEOAI-039 is accepted for the exact synthetic user scenario and installed
+product/operations pair; isolated VM boot and backup pairing are verified.
 GEOAI-040 has no publication
 authorization. The fresh pilot state needed no production-data migration;
 project SQLite is user_version 8 and auth SQLite is user_version 1.
@@ -133,14 +135,15 @@ The staging manifest's schemaVersion 5 is a separate format.
 | --- | --- | --- |
 | ACCEPTED | 007A/007B/007C, 008–011, P1 012–014, P2 015–017, P3 018–020, P4 021–022, P5 023–025, P6 026–028, P7 029 | Existing feature/PR CI and local acceptance passed; these are the selected release functions. |
 | ACCEPTED as an audit only | P10 036 | Reports `readyForTraining=false` and `readyForEvaluation=false` under current unverified evidence; outside chosen release. No training permission follows from this acceptance. |
-| PROPOSED | P7 029A, 030A, 031A/031B | Versioned profiles, explicit coded tracing and coded objects. Follow the subtask dependencies and freeze specifications before READY; synthetic development does not depend on ML readiness. Real-survey acceptance needs reviewed source/reference pairs. No queue started. |
+| ACCEPTED (bounded parser) | P7 029A | Versioned `drawcode-explicit-v1` profile reports point-code candidates, ambiguous line markers and unknown tokens, preserving raw input. No geometry, third-party assets or real-survey quality claim; absent rights remain unverified. |
+| PROPOSED | P7 030A, 031A/031B | Explicit coded tracing and coded objects need their own frozen specifications before READY. Synthetic development does not depend on ML readiness; real-survey acceptance needs reviewed source/reference pairs. No queue started. |
 | PARTIAL | P7 030 / 030B | Existing synthetic review-only inference candidate measured a class regression; 030B remains blocked for full acceptance by authorized object pairs, independent whole-object splits, correct links/breaks and agreed per-class criteria. New 030A acceptance cannot accept 030B or the whole 030. Keep the deployed generator unchanged. |
 | NOT ACCEPTED | P7 031 | Split by capability: 031A depends on 029A; 031B on 029A/030A and 028; 031C remains blocked by the relevant accepted 030B/class evidence. No blanket full-030 dependency for 031A/031B. |
 | BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
 | BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
 | BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
-| PARTIAL | P11 039 | Exact corrected pair and the owner's synthetic import/preview/mapping/job/DXF/reopen scenario are accepted. VM disk restore was not booted; a missed or failed application dump is not yet coupled to the successful Proxmox VM task. Pair and verify both, then test recovery in isolation before full sign-off. No real-survey quality claim. |
-| BLOCKED | P11 040 | Full 039 sign-off and separate explicit publication/operations authorization. Decide promotion, boot autostart, observation/response, certificate renewal, access and any authorized real-data migration; no merge or production change now. |
+| ACCEPTED (bounded synthetic pilot) | P11 039 | Exact corrected pair and the owner's synthetic import/preview/mapping/job/DXF/reopen scenario passed; isolated VM111 boot/recovery and VM110 dump/VM archive pairing passed. No real-survey quality claim or production authorization. |
+| BLOCKED | P11 040 | Separate explicit publication/operations authorization is needed. Decide promotion, boot autostart, observation/response, certificate renewal, access and any authorized real-data migration; no merge or production change now. |
 
 The unified material request is `harness/build/missing-materials.md`.
 Only independently ready tasks with defined requirements may proceed.

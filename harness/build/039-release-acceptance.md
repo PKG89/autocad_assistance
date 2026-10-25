@@ -1,6 +1,7 @@
 # GEOAI-039 — acceptance of the bounded GEO AI web release
 
-Status: PARTIAL after disposable acceptance. Frozen source HEAD `75b02ebe31322723f87ec3483dab8d70465dc0ed`;
+Status: ACCEPTED for the bounded synthetic pilot (2026-10-25). The historical
+disposable check below used frozen source HEAD `75b02ebe31322723f87ec3483dab8d70465dc0ed`;
 release candidate `79528bb9f6070e458724886a915f9d035cdfd110` is its ancestor.
 Accepted dependencies 018, 021, 022 and selected P0–P6, 029 passed their
 exact feature/PR checks. The candidate precedes the offline 030 experiment
@@ -143,7 +144,7 @@ requires a successful, verified, recent dump matched to that VM run. A
 missed/failed dump must produce an observable failure and cannot be counted
 as a successful coordinated copy even when the VM archive succeeds.
 
-Remaining acceptance checks:
+Remaining acceptance checks at the time of the earlier partial report:
 
 1. In isolation, boot a restored VM with the copied NetBird identity
    removed and no route to the working network; verify app/state start,
@@ -159,3 +160,22 @@ scenario. This does not remove the two technical recovery checks above.
 
 GEOAI-040 remains blocked. PR merge, boot autostart, public or wider VPN
 access, and real-data use are not authorized by this user check.
+
+## Final bounded GEOAI-039 sign-off — 2026-10-25
+
+Both remaining checks above passed. The restored VM111 booted with no NIC
+or autostart; its copied NetBird service/state was quarantined before any
+network attachment. The exact product, SQLite databases, files and local
+app health passed; VM111 was stopped. VM110-only backup jobs now verify
+dump freshness and integrity and write sidecars that distinguish `paired`
+from `vm-only`. A real VM-only negative run and a corrected paired `TASK OK`
+run were observed. The three checker and five hook tests covered missed,
+failed, stale, changed and corrupt cases. Details and exact identifiers are
+in `039-isolated-recovery-and-pairing.md`.
+
+Therefore GEOAI-039 is **ACCEPTED for the named product/operations pair,
+the synthetic technical criteria and the owner's synthetic scenario**.
+This is not a claim for arbitrary real surveys or every 100,000-point
+shape. GEOAI-040 stays blocked pending a separate publication and operations
+decision; no merge, app/TLS boot autostart, broader access or real-data
+deployment is implied.

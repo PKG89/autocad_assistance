@@ -6,24 +6,41 @@ config=/etc/geoai-pilot/config.json
 root=/srv/geoai-pilot/backups
 python=/srv/geoai-pilot/venv/bin/python
 overlay=/srv/geoai-pilot/pilot_ops
+checker=/usr/local/sbin/geoai-pilot-backup-check
+status=/var/lib/geoai-pilot-backup/latest.json
+attempt="dump-$(date -u +%Y%m%d-%H%M%S)-$$"
+backup_name=
 was_active=0
 tls_was_active=0
 if systemctl is-active --quiet geoai-pilot-tls; then
   tls_was_active=1
 fi
+finish() {
+  result=$?
+  trap - EXIT
+  if (( was_active )); then
+    systemctl start geoai-pilot || result=1
+    if (( tls_was_active )); then
+      systemctl start geoai-pilot-tls || result=1
+    fi
+  fi
+  if (( result == 0 )) && [[ -n "$backup_name" ]]; then
+    "$python" "$checker" mark --root "$root" --status "$status" \
+      --attempt "$attempt" --result success --backup "$backup_name" || result=1
+  fi
+  if (( result != 0 )); then
+    "$python" "$checker" mark --root "$root" --status "$status" \
+      --attempt "$attempt" --result failed || true
+  fi
+  exit "$result"
+}
+trap finish EXIT
+"$python" "$checker" mark --root "$root" --status "$status" \
+  --attempt "$attempt" --result running
 if systemctl is-active --quiet geoai-pilot; then
   was_active=1
   systemctl stop geoai-pilot
 fi
-finish() {
-  if (( was_active )); then
-    systemctl start geoai-pilot
-    if (( tls_was_active )); then
-      systemctl start geoai-pilot-tls
-    fi
-  fi
-}
-trap finish EXIT
 name="scheduled-$(date -u +%Y%m%d-%H%M%S)-$$"
 runuser -u geoai-pilot -- env PYTHONPATH="$overlay" "$python" -m geoai_pilot_ops backup --config "$config" --name "$name"
 test -s "$root/$name/manifest.json"
@@ -47,3 +64,4 @@ for old in entries[2:]:
     print(f"pruned local backup: {old.name}")
 print("retained local backups:", ", ".join(p.name for p in entries[:2]))
 PY
+backup_name=$name

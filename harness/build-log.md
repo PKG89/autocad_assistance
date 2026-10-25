@@ -1761,3 +1761,64 @@ Keep one concise entry per task. Do not paste full command output.
 - Added `harness/build/029a-031-field-to-finish-plan.md` with source inventory, licensing/dependency caveats, proposed acceptance, data provenance and immutable-measurement requirements. Updated `PLANS.md`, current `AGENTS.md` handoff and `harness/build/missing-materials.md` consistently. Existing 027/028 will hold/review authorized candidate references; no automatic dataset inclusion or training permission. 032–035 retain terrain/form/numeric gates; 036–040 statuses and selected pilot pair are unchanged.
 - Evidence from read-only Windows inspection: primary drawing programs are compiled FAS/VLX; line/point mappings and Civil 3D XML are readable. C3D.SURVEY.zip passes CRC and has 1,235 files, while 306 are missing from the extracted copy. The 134-record coding example contains duplicate ID 21 and alphanumeric IDs. No third-party binary, survey file, symbol library or credential is included in this commit or transferred to VM110.
 - Validation: documentation-only scope, six unique new registry IDs, relative document links, preserved accepted/release statuses and `git diff --check`. Product tests were not rerun for prose changes. Feature/PR CI after publication must be checked against the actual resulting GitHub HEAD; this entry does not claim a result in advance.
+
+## GEOAI-039 isolated recovery and paired backup — 2026-10-25
+
+- Restored VM111 booted with no NIC or autostart. Its copied NetBird service
+  was disabled and state quarantined on the clone only. Debian 13, exact
+  product `15374b5c856958fdf67c5efdce68db81e05ac92f`, SQLite
+  `quick_check` (auth v1, projects v8), 153 state files, seven source CSVs,
+  52 nonempty DXFs and local app `/health` passed. VM111 was stopped with
+  no network adapter; VM110 identity was unchanged.
+- VM110 guest app-dump helper now records running/success/failure and a
+  manifest/hash/SQLite-verified status. The two VM110-only Proxmox jobs
+  use a per-job hook with a 2700-second age limit. It checks the guest dump
+  before and after each VM archive, tests zstd integrity, records archive
+  ID/time/bytes/SHA-256 and labels the dump `paired` or `vm-only` with a
+  reason. Other VM schedules and backups were not edited.
+- Real negative run `vzdump-qemu-110-2026_10_25-22_39_14.vma.zst` returned
+  Proxmox `OK` but was correctly labelled `vm-only` because the vzdump PATH
+  lacked `qm`. The hook was fixed to absolute binaries (installed SHA-256
+  `73c9435bfc06e047d4a74754dc60860ed56a1b6cdc8ce3a2e3ea174b3dff4b41`).
+  Real run `vzdump-qemu-110-2026_10_25-22_40_59.vma.zst` ended `OK`,
+  `zstd-ok`, SHA-256
+  `efc35e55058d20926a8da72ad46c41f964fced24d38620da17e9aa34429a6b0c`,
+  with app dump `scheduled-20261025-193705-12774` paired at age 230–280 s.
+  Three checker and five hook tests covered missing, failed, stale, changed
+  and corrupt cases. Full details: `harness/build/039-isolated-recovery-and-pairing.md`.
+- GEOAI-039 is accepted for the exact installed pair and owner's bounded
+  synthetic scenario with no remarks. This does not validate real surveys.
+  VM110 app/TLS are active, boot autostart disabled; VM111 is stopped.
+  GEOAI-040 remains blocked by separate publication/operations decisions.
+  Next authorized task: freeze and implement only 029A; no VM110 product
+  deployment, merge, access expansion or model training.
+
+## GEOAI-029A bounded coding profile — 2026-10-25
+
+- Frozen scope and provenance are in `harness/build/029a-profile-spec.md`.
+  Two owner-provided DrawLine/DrawPoint archive hashes and the documentation
+  member hashes are recorded there. Their FAS/DWG/SHX and actual survey
+  rights remain unverified. No binaries, drawable assets or survey data were
+  imported. The profile file SHA-256 is
+  `18cc41fd4711b77ee19cbc58fe96d14f68dfb35e2087095ccdd25483b91396e6`.
+- Self-authored version `drawcode-explicit-v1` extends the existing 029
+  catalog. It reports eleven exact point-code candidates, both documented
+  roles of numeric `0`/`1` as ambiguous, other numbered line-style
+  candidates, unknown tokens, and source spans. The exact raw code is
+  returned unchanged. Authenticated profile GET and CSRF-protected parse
+  POST are additive, with a 4096-byte body bound. No geometry, database
+  migration, DXF output or pilot deployment changed.
+- Focused 029A and 029 catalog tests passed 8/8. The isolated full
+  `scripts/geoai-ci-checks.sh` gate passed all focused tests, protected
+  regressions 10/10, API bootstrap 6/6 and `pip check`. After tightening
+  control-character rejection, focused tests passed again 8/8; exact
+  GitHub PR-head CI remains to be checked after publication.
+  `git diff --check` passed. Implementation commit
+  `9548fa5d465f052c314dd00740091baa36534561` follows 039 commit
+  `71bd62c158b72e694eef2160b9864d7721b64d57` in the VM109 feature
+  checkout. The current local branch has not been deployed to VM110.
+- GEOAI-029A is accepted for this synthetic parser contract, subject to
+  exact PR-head CI. It does not establish field interpretation of real
+  surveys, block placement, line tracing, or reuse rights. Next: prepare
+  one bounded 030A or 031A specification; neither is READY or authorized
+  to auto-run in this package. 030B/031C and 037–038 blockers remain.

@@ -133,6 +133,13 @@ def create_app(
             error_code="REFERENCE_TOO_LARGE",
             subject="Reference upload request",
         )
+        app.add_middleware(
+            RequestBodyLimitMiddleware,
+            path="/api/v1/object-catalog/parse",
+            max_body_bytes=4096,
+            error_code="CODE_BODY_TOO_LARGE",
+            subject="Field-code parse request",
+        )
         if jobs_root is not None:
             app.add_middleware(
                 RequestBodyLimitMiddleware,

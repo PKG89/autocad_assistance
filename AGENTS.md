@@ -2,14 +2,16 @@
 
 ## Field-to-Finish planning handoff (2026-10-25)
 
-The owner requested a roadmap amendment, not implementation or queue startup.
+The owner first requested a roadmap amendment, then separately authorized
+the bounded 039/029A package. GEOAI-029A now has a frozen profile contract
+and passing local checks; see `harness/build/029a-profile-spec.md`.
 Read the current `PLANS.md` subtask registry and
 `harness/build/029a-031-field-to-finish-plan.md` before later P7 work.
-029 remains accepted; 029A, 030A and 031A/031B are PROPOSED. 030B carries
+029 and 029A are accepted; 030A and 031A/031B remain PROPOSED. 030B carries
 the prior synthetic inference experiment and remains blocked for full
 acceptance; 031C depends on its relevant accepted capability and class evidence.
 The new capability-specific dependencies supersede historical statements
-that all 031 work requires full 030. No new task is READY or dispatched.
+that all 031 work requires full 030. No task after 029A is READY or dispatched.
 Keep source data/codes immutable and reuse the existing catalog, decisions,
 reference archive, comparison and DXF service. Local teaching files are
 unverified reference candidates, not approved ML data or freely licensed assets.
@@ -25,15 +27,16 @@ reopening the project. The owner later clarified that there were no remarks.
 This is user acceptance of that
 exact pair and scenario only, not of arbitrary real surveys.
 
-GEOAI-039 remains PARTIAL. The restored VM111 disk was checked offline
-without booting its OS, and the guest application dump and Proxmox VM backup
-run independently. A `TASK OK` VM archive is a VM-level backup only unless
-the matching recent successful application dump is independently verified.
-Missing/failed dumps must be visible and must not be reported as a completed
-coordinated application backup. Finish an isolated boot/recovery check with
-the copied NetBird identity removed, and enforce/verify this backup pairing
-before full 039 sign-off. Current feature/PR CI has passed; see
-`harness/build/039-release-acceptance.md`. GEOAI-040 stays BLOCKED.
+GEOAI-039 is accepted for the bounded synthetic pilot pair and owner scenario.
+VM111 booted offline with no NIC or autostart, its copied NetBird service/state
+was quarantined, and SQLite, state files, exact product and local app health
+passed. VM111 was stopped afterwards. The VM110-only Proxmox jobs now run a
+per-job hook that pairs each verified VM archive with a successful application
+dump no older than 2700 seconds; missing/failed dumps are labelled VM-only.
+The first actual negative archive and the subsequent paired archive were
+recorded. See `harness/build/039-isolated-recovery-and-pairing.md` and
+`harness/build/039-release-acceptance.md`. This acceptance does not cover
+real surveys or GEOAI-040. GEOAI-040 stays BLOCKED.
 Do not merge PR #6, enable app/TLS boot autostart or expand access.
 
 ## VM110 user-pilot handoff (2026-10-25)
