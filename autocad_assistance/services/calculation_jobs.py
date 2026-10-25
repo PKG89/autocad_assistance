@@ -296,6 +296,14 @@ class CalculationJobManager:
             process.kill()
             process.wait()
 
+    @staticmethod
+    def _remove_transient_dirs(job_dir: Path) -> None:
+        for transient in job_dir.glob("dxf-job-*"):
+            if transient.is_symlink() or transient.is_file():
+                transient.unlink()
+            elif transient.is_dir():
+                shutil.rmtree(transient)
+
     def _run_one(self, job_id: str) -> None:
         job_dir = self._directory(job_id)
         candidate = job_dir / "result.candidate"
@@ -327,30 +335,32 @@ class CalculationJobManager:
                         process.wait(timeout=0.05)
                     except subprocess.TimeoutExpired:
                         pass
+                self._remove_transient_dirs(job_dir)
                 with self._condition:
                     self._active_process = None
                     if terminal_error == "CANCELLED" or self._records[job_id].status == "cancelling":
+                        candidate.unlink(missing_ok=True)
                         self._set_state(job_id, "cancelled", "CANCELLED")
                     elif terminal_error is not None:
+                        candidate.unlink(missing_ok=True)
                         self._set_state(job_id, "failed", terminal_error)
                     elif process.returncode != 0:
+                        candidate.unlink(missing_ok=True)
                         self._set_state(job_id, "failed", "WORKER_FAILED")
                     elif candidate.is_symlink() or not candidate.is_file() or not 0 < candidate.stat().st_size <= self.max_output_bytes:
+                        candidate.unlink(missing_ok=True)
                         self._set_state(job_id, "failed", "INVALID_RESULT")
                     else:
                         os.replace(candidate, job_dir / "result.dxf")
                         self._set_state(job_id, "succeeded")
         except (OSError, ValueError):
+            candidate.unlink(missing_ok=True)
+            self._remove_transient_dirs(job_dir)
             with self._condition:
                 self._active_process = None
                 self._set_state(job_id, "failed", "WORKER_FAILED")
         finally:
             candidate.unlink(missing_ok=True)
-            for transient in job_dir.glob("dxf-job-*"):
-                if transient.is_symlink() or transient.is_file():
-                    transient.unlink()
-                elif transient.is_dir():
-                    shutil.rmtree(transient)
 
     def close(self) -> None:
         with self._condition:

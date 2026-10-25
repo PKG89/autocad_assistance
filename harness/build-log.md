@@ -598,3 +598,22 @@ Keep one concise entry per task. Do not paste full command output.
   process operations. `pip check` and `git diff --check` passed.
 - GitHub feature/PR CI is pending. Next: commit exact reviewed files,
   push only `codex/geoai-current`, inspect CI, then freeze 016.
+
+## GEOAI-015 — first remote CI repair
+
+- Product/storage commit `cab810546ad069909a65c34b5416621a43000efd`
+  was pushed only to `codex/geoai-current`. Its draft PR run
+  40147551712 succeeded, but push run 40147546493 failed in the existing
+  014 cancellation test. The test observed `cancelled` before the worker
+  thread removed a transient renderer directory; VM timing had hidden
+  the race. No storage test or isolated regression/API test failed.
+- Changed the 014 coordinator to remove transient directories and discard
+  any candidate result before publishing a terminal cancellation/failure
+  state. The targeted cancellation test passed ten consecutive VM runs;
+  the full clean-venv gate passed again with 92 focused, 10 isolated
+  regression and six isolated API tests, zero blocked operations, pip and
+  diff checks. Evidence:
+  `/home/geoai/dev-data/geoai-autonomy/p2-015-repair1.log`.
+- One of two allowed 015 repair cycles is used. Next: commit the reviewed
+  race fix and journal, push the exact new feature HEAD, require both
+  GitHub push and PR runs to pass before accepting 015.
