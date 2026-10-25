@@ -1215,3 +1215,23 @@ Keep one concise entry per task. Do not paste full command output.
   `c019a3e0c02f805ada39f249b996d11253f0996eb92c407e64a7333fb93ac607`
   matched VM/Windows. Worktree clean at this HEAD. GEOAI-027 ACCEPTED.
   GEOAI-028 READY under `harness/build/028-dxf-comparison.md`.
+
+## GEOAI-028 — local gate passed; CI pending
+
+- Accepted 027 base `f618613`; scope frozen by `83b627f`.
+  Read-only, authenticated comparison binds one archived reference to
+  one successful job of the same immutable revision. Exact inventory
+  handles points, lines, straight polylines, 3DFACE, blocks and labels;
+  unsupported entities and unexpanded block contents are counted and
+  mark the report incomplete. No geodetic tolerance, pass/fail
+  judgement, data export or training is introduced.
+- Five synthetic focused tests detect deliberately wrong block name,
+  rotation, line geometry/layer, label, missing/extra point, invalid
+  and oversized DXF, complexity limit, foreign owner, unrelated
+  revision, tampered result and bounded examples. The final gate
+  `p6-028/accepted-gate.log` passed 149 focused, 10 isolated
+  regression and six API tests, `pip check`, zero blocked operations
+  and diff check. Disposable verified localhost HTTPS compared the
+  synthetic archive and job, reporting exactly one wrong line, layer
+  and label; unauthenticated access was 401. No real data or
+  production action. Exact feature/PR CI pending.

@@ -374,6 +374,13 @@ HTTPS synthetic upload/download and exact push/PR CI
 were supplied. GEOAI-028 is READY with a bounded exact diagnostic
 comparison under `harness/build/028-dxf-comparison.md`.
 
+GEOAI-028 local gate passed: owner-only, read-only comparison of a
+saved job DXF against a separately supplied archive reference. It
+reports exact discrepancies and unsupported entities, without an
+invented geodetic tolerance. Five focused comparison tests, 149 total
+focused + 10 regression + six API, and verified HTTPS passed. Exact
+feature/PR CI is pending; P6 checkpoint follows acceptance.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

@@ -1,6 +1,6 @@
 # GEOAI-028 — bounded DXF inventory and reference comparison
 
-Status: READY; exact GEOAI-027 feature and PR CI passed. Accepted
+Status: LOCAL GATE PASSED; exact feature/PR CI pending. GEOAI-027 accepted
 base `f618613a5d832756671a47db3351c9e2f3f7397e`.
 P6 manifest deadline 2026-10-25T06:33:23Z; task ceiling 90 minutes,
 one initial attempt plus at most two repairs, one writable worktree,
@@ -54,3 +54,18 @@ workflow deployment, or real data.
 Stop on exhausted budget, missing accepted 027 dependency, unexpected
 edits, lost isolation, real data rights question or production action.
 Record exact HEAD, diff, checks and blocker in shared memory.
+
+## Local verification (2026-10-25)
+
+The read-only owner-scoped endpoint compares an archived reference with
+a successful job result from the same immutable revision. Exact
+inventory covers the supported model-space subset, reports
+unsupported types including unexpanded block contents, and bounds
+examples. Five synthetic comparison tests passed deliberate wrong
+block/rotation/line/layer/label, missing/extra point, invalid/limit,
+foreign owner, unrelated revision and tampered result checks. The
+final gate passed 149 focused, 10 isolated regression, six isolated
+API, `pip check`, zero blocked operations and `git diff --check`.
+Verified localhost HTTPS showed the exact three introduced errors and
+rejected an unauthenticated read. No real data or production action.
+Await exact feature/PR CI before accepting GEOAI-028.

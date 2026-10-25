@@ -194,6 +194,8 @@ GEOAI-027 passed local tests, synthetic HTTPS and exact feature/PR CI
 at `f618613` (40156949699/40156952551). GEOAI-028 is READY under
 `harness/build/028-dxf-comparison.md` with exact diagnostics and no
 invented geodetic tolerance.
+GEOAI-028 passed the local full gate and synthetic HTTPS comparison;
+exact feature/PR CI is pending. Complete the P6 checkpoint after CI.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus
