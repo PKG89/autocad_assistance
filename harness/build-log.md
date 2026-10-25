@@ -1660,3 +1660,29 @@ Keep one concise entry per task. Do not paste full command output.
   record was created. A manual Reg.ru DNS-01 challenge or separately
   reviewed API method is required for a public certificate. The earlier
   Cloudflare-token request is obsolete.
+
+## GEOAI-039 VM110 NetBird enrollment — 2026-10-25
+
+- Owner provided a root-only one-use NetBird setup key on VM110. File mode
+  and owner were checked without reading it into logs; `netbird up` connected
+  to the existing managed control plane. The local setup-key file was then
+  deleted. VM110 FQDN is `geoai.netbird.cloud`, NetBird IP
+  `100.104.46.7/16`, interface `wt0` and UDP port 51820. Initially the
+  only visible peer was `desktop-l4bb2vp.netbird.cloud`; the selected
+  `openclawagent` peer was absent, so both-client access is unverified.
+- The owner was given A-record fields `geoai` -> `100.104.46.7` for the
+  Reg.ru zone. No record was changed by Codex. The exact Caddy template was
+  rendered for `geoai.froglight.ru` and VPN IP `100.104.46.7`;
+  `caddy adapt` passed. Certificate is not issued and both pilot services
+  remain inactive. No public listener or global VPN policy was changed.
+
+## GEOAI-039 Reg.ru DNS and pending ACME challenge — 2026-10-25
+
+- The owner created A `geoai.froglight.ru` -> `100.104.46.7`. Both
+  `ns1.reg.ru` and `ns2.reg.ru` returned that exact A record.
+- Certbot 4.0.0 registered the ACME account with the owner-provided contact
+  email and requested a manual DNS-01 TXT value for
+  `_acme-challenge.geoai.froglight.ru`. The value was sent to the owner for
+  entry in Reg.ru. The owner reported it entered, but the authoritative
+  servers have not returned it yet. Certbot remains waiting; no ACME
+  validation or certificate issuance has been attempted.

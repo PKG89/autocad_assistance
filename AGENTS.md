@@ -7,20 +7,21 @@ The owner authorised a limited synthetic closed pilot of the exact product
 `7f5bbecbb05a9f86f9850ed7e045a49fde040b89` operational package.
 Direct SSH access to VM110 is `ssh geoai-pilot`. Read
 `harness/build/039-vm110-pilot-execution.md` for verified target changes,
-current services and remaining private-access/off-VM-backup gates. The VM110
+current services and remaining private-access/backup-storage gates. The VM110
 product and P6 rollback archives, overlay, Python lock, systemd templates and
 an empty pilot state are prepared; both application services remain stopped.
-VM110 NetBird is installed but needs login; no pilot HTTPS listener exists.
+VM110 NetBird is enrolled at `100.104.46.7`; the one-use key was deleted.
+The Caddyfile is rendered for the VPN IP, but no pilot HTTPS listener exists.
 The owner selected two NetBird client peers, changed the pilot hostname to
 `geoai.froglight.ru` in the Reg.ru DNS zone, and selected Proxmox storage
 names. The VM110 config has been updated and passed `check` again. The
-Cloudflare-token request is obsolete. A one-use NetBird setup key must be
-supplied through a root-only file, never chat or Git. Public TLS now requires
-a DNS-01 TXT challenge in Reg.ru. Do not alter
+Cloudflare-token request is obsolete. Only the desktop NetBird peer was
+visible initially; the second selected peer still needs policy verification.
+Public TLS now requires a DNS-01 TXT challenge in Reg.ru. Do not alter
 shared VPN policies or Proxmox schedules without a separate concrete approval.
 A synthetic off-VM restore passed on VM109; the selected Proxmox backup
 storages and retention are not yet configured. Do not start the pilot until
-private access is verified.
+the ACME TXT/TLS and both selected client access paths are verified.
 
 ## Closed-pilot preparation handoff (2026-10-25)
 
