@@ -404,9 +404,17 @@ GEOAI-030 synthetic local gate passed with a review-only 2-opt
 uncrossing candidate: one held-out object improved 2/4 → 4/4 exact
 edges and a valid crossing regressed 5/5 → 3/5. The candidate never
 changes jobs or DXF. Three focused tests, 156 total focused, 10
-regression and six API passed; exact feature/PR CI is pending. Full 030 and 031
+regression and six API plus exact push/PR CI
+40158735797/40158740954 passed. Full 030 and 031
 remain blocked until authorized real objects and per-class criteria
 are supplied. Continue only independent dependency-ready work.
+P7 checkpoint recorded; 029 and the bounded 030 experiment are
+accepted, while full 030/031 are blocked on domain evidence.
+P10 manifest is active for independently ready GEOAI-036 with one
+task, 90 minutes, at most two repairs and deadline
+2026-10-25T07:37:48Z. Its read-only dataset-readiness report must
+never treat user-asserted permission as independently verified or
+export archive contents. GEOAI-037/038 require a passing later audit.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

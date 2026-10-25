@@ -1,6 +1,6 @@
 # GEOAI-030 — offline tracing experiment; domain validation remains open
 
-Status: SYNTHETIC LOCAL GATE PASSED; exact feature/PR CI pending. Full
+Status: SYNTHETIC EXPERIMENT ACCEPTED; exact feature/PR CI passed. Full
 GEOAI-030 remains domain blocked after accepted
 GEOAI-029 at `79528bb9f6070e458724886a915f9d035cdfd110`.
 Full GEOAI-030 production acceptance is blocked by absent authorized
@@ -66,6 +66,7 @@ The full gate passed 156 focused, 10 isolated regression and six API
 tests, `pip check`, zero blocked operations and diff check. Repeatable
 synthetic report SHA-256:
 `24582b7cb5dccaaee70491ca3a33071b644aeac5acfeabfd4cdf42ada92de188`.
-No product API, project state or DXF generator was changed. Exact CI
-for this experimental commit remains pending; full GEOAI-030 cannot
+No product API, project state or DXF generator was changed. Exact HEAD
+`8e30d74e3ba31505b0f8f1a9e065cb1e43cdfd2c` passed push CI
+40158735797 and draft PR CI 40158740954. Full GEOAI-030 cannot
 be accepted without authorized independent objects and class criteria.

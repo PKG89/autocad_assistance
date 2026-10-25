@@ -1327,3 +1327,31 @@ Keep one concise entry per task. Do not paste full command output.
 - Full GEOAI-030 and dependent 031 cannot be accepted without
   authorized, independent real reference objects and agreed class
   regression criteria. No production action or real data was used.
+
+## P7 checkpoint — experimental 030 accepted; full 030/031 blocked
+
+- Exact experimental HEAD `8e30d74e3ba31505b0f8f1a9e065cb1e43cdfd2c`
+  passed GitHub push CI 40158735797 and draft PR CI 40158740954.
+  Bundle SHA-256
+  `d220e62975df89cdcad4846249bce7fe471d2757e4ef2a4d82772d36e70c1f5c`
+  matched VM/Windows. Feature worktree clean at this HEAD.
+- P7 029 and the synthetic-only 030 experiment are accepted. Full
+  GEOAI-030 is blocked by absent authorized independent real objects
+  and per-class regression criteria; GEOAI-031 depends on it and is
+  blocked. No implementation was started for 031. Proceed only with
+  independently ready tasks such as GEOAI-036.
+
+## P10 preflight — GEOAI-036 ready
+
+- Accepted 025/027/028 satisfy the structural dependencies. P7
+  030/031 remain blocked on real held-out objects and class criteria.
+  P10 manifest `/home/geoai/dev-data/geoai-autonomy/p10-run-manifest.json`
+  sets deadline 2026-10-25T07:37:48Z, one task/worker/worktree,
+  90 minutes/task, two repair cycles and $0 external spend.
+- GEOAI-036 READY under `harness/build/036-dataset-readiness.md`:
+  a read-only owner-scoped audit of archive metadata with concrete
+  blockers. GEOAI-027 permission is an unverified user assertion;
+  there are no approved real examples, independent object-family IDs,
+  reviewed labels or class-level acceptance criteria in-session.
+  The audit cannot export data or start training. 037/038 are blocked
+  until actual readiness is demonstrated.

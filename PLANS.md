@@ -96,15 +96,15 @@ mapping and DXF through the shared engine.
 | P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
 | P6 | 028 | DXF comparison and quality measures | 027 | ACCEPTED at 1ea061c |
 | P7 | 029 | Versioned object-code rules | 012, 028 | ACCEPTED at 79528bb |
-| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | SYNTHETIC LOCAL PASS; real validation blocked |
-| P7 | 031 | Contours and composite situation objects | 028–030 | PROPOSED |
+| P7 | 030 | Measured line-tracing improvement | 024–025, 028–029 | SYNTHETIC EXPERIMENT ACCEPTED; real validation blocked |
+| P7 | 031 | Contours and composite situation objects | 028–030 | BLOCKED by full 030/domain data |
 | P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | PROPOSED |
 | P8 | 033 | Terrain contours and elevation checks | 032 | PROPOSED |
 | P9 | 034 | Report data model and templates | 012, 015 | PROPOSED |
 | P9 | 035 | Versioned deliverable package | 034; 033 if terrain included | PROPOSED |
-| P10 | 036 | Verified dataset readiness | 025, 027–028 | PROPOSED |
-| P10 | 037 | Small offline recommendation model | 036 | PROPOSED |
-| P10 | 038 | Reviewable model suggestions | 025, 037 | PROPOSED |
+| P10 | 036 | Verified dataset readiness | 025, 027–028 | READY |
+| P10 | 037 | Small offline recommendation model | 036 | BLOCKED by actual data readiness |
+| P10 | 038 | Reviewable model suggestions | 025, 037 | BLOCKED by 037 |
 | P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | PROPOSED |
 | P11 | 040 | Authorized publication and operations | 039, release authorization | PROPOSED |
 
@@ -216,8 +216,17 @@ generator or count as full 030 acceptance without real held-out data.
 The 030 synthetic experiment passed local tests and full gate. It
 measured one class gain (2/4 → 4/4 exact edges) and one class regression
 (5/5 → 3/5); the candidate remains review-only. Exact feature/PR CI
-is pending; full 030 and dependent 031 remain blocked by missing
+passed at `8e30d74` (40158735797/40158740954); full 030 and dependent 031 remain blocked by missing
 authorized real references and agreed class criteria.
+P7 checkpoint: 029 accepted, 030 synthetic experiment accepted with a
+measured regression, full 030/031 blocked. Continue independent 036
+dataset-readiness work from accepted 025/027/028.
+P10 manifest is bounded to 2026-10-25T07:37:48Z, one task 036,
+90 minutes, at most two repairs, one worktree/compute worker and $0
+external executor. GEOAI-036 is READY under
+`harness/build/036-dataset-readiness.md`. It may accept a precise
+not-ready report; 037/038 remain blocked until real data and rights
+meet the audit.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus
