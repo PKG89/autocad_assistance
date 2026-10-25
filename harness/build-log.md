@@ -1010,3 +1010,23 @@ Keep one concise entry per task. Do not paste full command output.
   focused, 10 isolated regression and six isolated API tests, zero
   blocked operations, `pip check` and `git diff --check`. Exact
   feature/PR GitHub CI remains before acceptance and the P4 checkpoint.
+
+## GEOAI-022 — accepted; P4 checkpoint and P5 start
+
+- Exact feature/documentation HEAD
+  `211cf1812224c0d77803837f96db8ef60aaaebe1` passed GitHub
+  `GEO AI checks` push run 40152510544 and draft PR #6 run
+  40152513257. The complete branch bundle SHA-256
+  `e8e51c8406db43e016e0e48775a835965ce8dc81d39cc77560605858f8fbd69f`
+  matched on VM and Windows. The feature worktree was clean at that
+  HEAD before this checkpoint; the original checkout/inherited CI edit
+  remain untouched.
+- P4 tasks 021–022 are accepted inside its deadline, with one repair
+  cycle in 022. Final local gate, code rollback, backup/restore,
+  corruption refusal and HTTPS result verification are recorded above
+  and in `harness/build/022-staging-recovery.md`. No staging service
+  remains running; no real data, production service or deployment.
+- P5 finite manifest is `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`.
+  GEOAI-023 is READY from this accepted base under
+  `harness/build/023-plan-viewer.md`; next step is bounded DXF plan
+  extraction plus owner-scoped API and browser inspection.

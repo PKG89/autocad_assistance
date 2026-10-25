@@ -301,6 +301,13 @@ See `harness/build/022-staging-recovery.md`; on acceptance,
 close P4 and freeze GEOAI-023 from the accepted base. No production
 deployment or real-data operation is authorized.
 
+GEOAI-022 is accepted at `211cf18` after exact GitHub feature and
+draft PR #6 checks passed. P4 is complete. GEOAI-023 is READY under
+`harness/build/023-plan-viewer.md`; its P5 manifest is in
+`/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`. Preserve
+owner-scoped result integrity and measured local XYZ while adding the
+browser plan viewer. No production publication is authorized.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

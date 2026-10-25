@@ -88,8 +88,8 @@ mapping and DXF through the shared engine.
 | P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–018 | ACCEPTED at 897cf60 |
 | P3 | 020 | Web jobs, results and download | 014–019 | ACCEPTED at 91aeb53 |
 | P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | ACCEPTED at eecaad8 |
-| P4 | 022 | Reproducible staging, recovery and rollback | 021 | LOCAL VERIFIED; CI pending |
-| P5 | 023 | Browser plan viewer | 015, 020–021 | PROPOSED |
+| P4 | 022 | Reproducible staging, recovery and rollback | 021 | ACCEPTED |
+| P5 | 023 | Browser plan viewer | 015, 020–021 | READY |
 | P5 | 024 | A/B line-connection candidates | 012, 023 | PROPOSED |
 | P5 | 025 | Confirmed decisions and review history | 017, 023–024 | PROPOSED |
 | P6 | 026 | Reversible derived-geometry edits | 025 | PROPOSED |
@@ -137,6 +137,14 @@ Source and DXF checksums survived rollback and recovery; corrupted
 backup was refused before target creation. The disposable server is
 stopped. The repaired-commit gate passed 124 focused, 10 isolated
 regression and six isolated API tests. GitHub feature/PR CI is next.
+
+GEOAI-022 is accepted at `211cf18` after GitHub push run 40152510544
+and draft PR #6 run 40152513257 passed at that SHA. The verified branch
+bundle SHA-256 is `e8e51c8406db43e016e0e48775a835965ce8dc81d39cc77560605858f8fbd69f`.
+P4 is complete. P5 has a finite manifest at
+`/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`; GEOAI-023
+is READY from this accepted base under
+`harness/build/023-plan-viewer.md`. No publication or deployment.
 After exact CI acceptance, P4 closes and GEOAI-023 can be frozen from
 the accepted base. No production publication is authorized.
 

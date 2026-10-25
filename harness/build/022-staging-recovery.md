@@ -1,6 +1,6 @@
 # GEOAI-022 — reproducible disposable staging, recovery and rollback
 
-Status: LOCAL VERIFIED; exact GitHub feature/PR CI pending. Base: accepted GEOAI-021 feature commit
+Status: ACCEPTED. Base: accepted GEOAI-021 feature commit
 `eecaad8e7ccef59a609a8d2ad3929071efb1de7e`; all P1–P3 and
 021 dependencies passed local and exact GitHub feature/PR CI. P4
 deadline: 2026-10-25T05:35:44Z.
@@ -101,3 +101,12 @@ Record HEAD, diff, checks and exact blocker before pausing.
   `p4-022/final-gate-repaired.log`. Exact feature/PR CI is pending.
   No Docker,
   system service, production secret, real survey or deployment was used.
+
+## Exact remote acceptance
+
+Feature/documentation HEAD `211cf1812224c0d77803837f96db8ef60aaaebe1`
+passed GitHub `GEO AI checks` push run 40152510544 and draft PR #6 run
+40152513257. Verified VM/Windows branch bundle SHA-256:
+`e8e51c8406db43e016e0e48775a835965ce8dc81d39cc77560605858f8fbd69f`.
+The worktree was clean at that HEAD before this acceptance update.
+GEOAI-022 and P4 are accepted; no production publication occurred.
