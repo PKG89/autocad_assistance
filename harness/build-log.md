@@ -711,3 +711,35 @@ Keep one concise entry per task. Do not paste full command output.
   push only `codex/geoai-current`, inspect both runs and record their
   results before accepting 017. No real owner provisioning, deployment
   or production migration occurred.
+
+## GEOAI-017 — remote gate passed; P2 checkpoint
+
+- Exact reviewed product/documentation commit
+  `f3bee9c22daeacc4217b21286338f5ee48058bdd` was pushed only to
+  `codex/geoai-current`. GitHub `GEO AI checks` push run 40148828172
+  and draft PR #6 run 40148831218 both succeeded at that SHA. No
+  production workflow or deployment ran.
+- Verified full branch bundle SHA-256 on VM and Windows:
+  `2a2a03c078ef31e7972901fe8fb8d90c7a52be8f051bf0e5dc8c658683e3d3fb`.
+  The VM worktree is clean at `f3bee9c`; its `origin` remains the local
+  bare store. The original checkout and inherited workflow edit remain
+  untouched. GEOAI-017 is ACCEPTED without a repair cycle.
+- Three-task checkpoint: 015, 016 and 017 are accepted with local and
+  GitHub feature/PR gates. P2 is COMPLETE before its
+  2026-10-25T04:33:23Z deadline. No production data or real owner was
+  migrated/provisioned. Next: freeze GEOAI-018 from this accepted base
+  with a new P3 manifest, then implement 018–020 by dependencies.
+
+## P3 preparation — GEOAI-018 ready
+
+- Accepted base is `f3bee9c`; the P2 manifest is marked complete.
+  New P3 manifest starts 2026-10-25T01:01:04Z and ends no later than
+  2026-10-25T05:01:04Z with the same one-worker and zero external-spend
+  bounds. No second executor was started.
+- GEOAI-018 scope and acceptance are frozen in
+  `harness/build/018-resource-limits.md`. Opt-in retention and explicit
+  dry-run/apply maintenance avoid choosing a production deletion policy.
+  Project revisions/results are excluded from cleanup. Dependencies
+  014–017 are accepted; 018 is READY. Next: implement 018 in the same
+  feature worktree, run the focused and full isolated gates, then push
+  only the reviewed feature commit and inspect both CI events.

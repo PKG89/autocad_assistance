@@ -1,6 +1,6 @@
 # GEOAI-017 — project, job and file ownership checks
 
-Status: READY. Base: accepted GEOAI-016 feature commit
+Status: ACCEPTED at `f3bee9c` after local and GitHub push/PR CI. Base: accepted GEOAI-016 feature commit
 `04522becb613dc06d4b19e4b579318315cac6775`. Dependencies 015–016
 passed local and GitHub push/PR checks.
 
