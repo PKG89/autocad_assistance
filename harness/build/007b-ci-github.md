@@ -1,7 +1,8 @@
 # GEOAI-007B — isolated CI and GitHub handoff
 
-Status: LOCALLY VERIFIED; remote feature CI pending under the owner's
-2026-10-25 continuous-roadmap authorization.
+Status: ACCEPTED at `49dea8abd8d1a6705a842bdcf80e7672a9135c91`.
+GitHub push run 40145553092 and draft PR #6 run 40145565460 succeeded at
+that exact SHA under the owner's 2026-10-25 authorization.
 Scoped CI edits, tested feature push and draft PR are authorized. Production
 publication and deployment remain excluded.
 

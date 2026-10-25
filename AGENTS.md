@@ -78,7 +78,11 @@ Do not install new skills without explicit approval.
 
 ## Shared project memory and current handoff
 
-Execution checkout: Linux VM109, `/home/geoai/projects/autocad_assistance`.
+Active accepted-code checkout: Linux VM109,
+`/home/geoai/dev-data/geoai-autonomy/workspaces/handoff-final`, branch
+`codex/geoai-current`. The original
+`/home/geoai/projects/autocad_assistance` checkout stays on
+`codex/geo-ai-start` and retains the inherited CI edit.
 Keep shared rules/context here, phase status and sequence in `PLANS.md`, and
 verified results, Git state, limitations, and the next step in
 `harness/build-log.md`. Read all three before continuing; update them after a
@@ -161,13 +165,15 @@ remain separate.
 Use `PLANS.md` for the proposed dependencies and status; use
 `harness/build-log.md` for exact 007A hashes and current Git state.
 
-Current 007B handoff: local clean-venv checks pass (59 focused, 10 isolated
-regression, six isolated API), with zero blocked operations. A temporary
-failing test made the CI runner fail; direct regression discovery still
-failed as required. The new feature/PR workflow has read-only contents
-permission and no production secrets or jobs; the existing production
-workflow is unchanged. Remote push/PR/CI verification is pending, so 007B
-is not yet complete.
+Current P0 handoff: 007B is accepted at `49dea8a`. A clean venv passed
+59 focused, 10 isolated regression and six isolated API tests, with zero
+blocked operations. A temporary failing test made the runner fail; direct
+regression discovery still failed as required. The separate feature/PR
+workflow has read-only contents permission and no production jobs; the
+existing production workflow is unchanged. GitHub push and draft PR #6
+both produced successful CI runs at the exact code SHA. The branch and
+inherited workflow also have verified copies on Windows outside VM109.
+P0 is complete; the next task is GEOAI-012 after a frozen spec.
 
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 

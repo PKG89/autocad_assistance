@@ -1,6 +1,6 @@
 # GEOAI-007A — reconcile the local record
 
-Status: LOCAL COMPLETE on 2026-10-25 (Europe/Moscow). This is an evidence
+Status: COMPLETE on 2026-10-25 (Europe/Moscow). This is an evidence
 reconciliation, not a replay of accepted product commits.
 
 ## Base, dependencies and scope
@@ -38,6 +38,9 @@ gates in `harness/build-log.md`; they were not rerun for this audit.
 Read-only/reconciliation task, completed within the proposed 90-minute
 ceiling; no Cursor attempts or repair returns. Stop if an accepted commit,
 bundle head or hash disagrees, or the inherited edit changes unexpectedly.
-An independent off-VM backup destination is not established, so that copy
-is still unconfirmed. See the 007A build-log entry for exact hashes and
-Git state.
+An off-VM copy was subsequently made on the owner's Windows workspace:
+the inherited workflow SHA-256 matches
+`204ea3260ff123aa118b704cf8d468c70222f9a4f9a41ad5a928992d927b4808`;
+the final P0 branch bundle SHA-256 matches
+`24f2085d85717549c2d7d3af0482c440132819d6a7937f9e37967754bb099cbd`.
+See the 007A/007B build-log entries for exact Git state.

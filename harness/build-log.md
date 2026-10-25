@@ -391,3 +391,31 @@ Keep one concise entry per task. Do not paste full command output.
   `PKG89/autocad_assistance`, create a draft PR, inspect real CI, and
   repair up to two times within the P0 budget. Do not mark 007B complete
   before a successful remote run.
+
+## GEOAI-007B — remote gate passed; P0 complete
+
+- Exact reviewed local CI commit `49dea8abd8d1a6705a842bdcf80e7672a9135c91`
+  was pushed only to GitHub `PKG89/autocad_assistance` feature ref
+  `codex/geoai-current`. The VM code worktree's `origin` remains its
+  separate local bare store and was not replaced. GitHub authentication
+  was unavailable to VM Git; no token was copied there. A branch bundle
+  was moved to Windows, combined with the public GitHub base history in
+  a temporary bare repository, and pushed using the existing Windows
+  `gh` authorization. No commits were recreated. Bundle SHA-256:
+  `24f2085d85717549c2d7d3af0482c440132819d6a7937f9e37967754bb099cbd`.
+- Draft PR #6: `https://github.com/PKG89/autocad_assistance/pull/6`,
+  head `49dea8a`, base `main`. GitHub Actions push run 40145553092
+  and pull_request run 40145565460 both completed successfully at the
+  exact head SHA. Only `GEO AI checks` ran; the production workflow
+  did not run. GitHub branch metadata reported `main protected=false`
+  and the active branch-rules query returned no rules. No branch rules
+  were changed.
+- Independent Windows copies now exist for both the accepted P0 bundle
+  (SHA above) and inherited uncommitted workflow (SHA-256
+  `204ea3260ff123aa118b704cf8d468c70222f9a4f9a41ad5a928992d927b4808`).
+  The workflow's VM copy has the same hash. GEOAI-007A is fully accounted
+  for locally and off VM. No production, real survey data, main push,
+  force-push, merge or deployment occurred.
+- P0 is accepted after the successful remote CI gate. Next: freeze
+  GEOAI-012 scope and tests in `harness/build/`, move it from PROPOSED
+  to READY, then implement it on the accepted feature branch.

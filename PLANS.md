@@ -23,33 +23,37 @@ matching file under `harness/build/`.
   `b78b1f591244f04c6652c9fe857b93d282f134ec`; its Issue is closed.
   Both Telegram and API use the isolated shared DXF service. The protected
   package 008–011 is complete; the dispatcher and broker are stopped.
-- P0 is authorized and in progress. GEOAI-007A local evidence reconciliation
-  is complete (see `harness/build/007a-local-record.md`); the independent
-  off-VM copy is not confirmed. GEOAI-007B is specified but not started.
-  No new Issue is eligible for the stopped 008–011 queue.
+- P0 is complete. GEOAI-007A evidence and an independent Windows copy of the
+  accepted branch bundle plus inherited CI edit are verified. GEOAI-007B is
+  accepted at `49dea8a` after successful push and PR checks in GitHub.
+  The old 008–011 Symphony queue remains stopped.
 - The inherited CI edit is preserved separately. It uses direct unittest
   discovery, and the isolation bootstraps contain VM-specific output paths.
   Local baseline success is not CI/deployment readiness.
 
 ## P0 — local record and CI preparation
 
-- GEOAI-007A: LOCAL COMPLETE on 2026-10-25. Accepted product commits 008–011
+- GEOAI-007A: COMPLETE on 2026-10-25. Accepted product commits 008–011
   are ancestors of final local code/documentation HEAD
   `bbf6f660985db3e519b06deec52e7ef39b9678a3`. The final bundle passed
   verification. The difference from product commit `b78b1f5` is a
-  documentation commit. The inherited uncommitted CI workflow has a separate
-  copy and SHA-256 under `/home/geoai/dev-data/geoai-autonomy/p0-007a/`.
-- GEOAI-007B: LOCALLY VERIFIED; remote CI pending. The separate feature/PR
-  checks, portable bootstrap roots, clean-venv install and positive/negative
-  local gates passed. The production workflow was unchanged. GitHub reports
-  `main` as unprotected; no rules were changed. Full completion needs a
-  successful GitHub run for an authorized feature push.
+  documentation commit. The inherited uncommitted CI workflow has matching
+  SHA-256 copies on VM109 and Windows; the final P0 branch bundle is also
+  verified on Windows.
+- GEOAI-007B: ACCEPTED at `49dea8abd8d1a6705a842bdcf80e7672a9135c91`.
+  Separate feature/PR checks, portable bootstrap roots, clean-venv install
+  and positive/negative local gates passed. GitHub push run 40145553092
+  and draft PR #6 run 40145565460 succeeded at that SHA. The production
+  workflow was unchanged. GitHub reports `main` unprotected and no active
+  branch rules; no rules were changed.
   Scope and checks are in `harness/build/007b-ci-github.md`.
 - The owner now authorizes the scoped CI edit, exact origin, feature push and
   draft PR for 007B; branch-rule changes and deployment remain excluded.
   The prior 30-minute/task and two-hour/package controller settings applied
   only to 008–011. The current P0 run manifest is under
   `/home/geoai/dev-data/geoai-autonomy/p0-run-manifest.json`.
+- Next: freeze GEOAI-012 from the accepted 011/007A baseline, then execute
+  P1 by dependencies. No production deployment is authorized.
 
 ## Proposed product roadmap — not queued
 
