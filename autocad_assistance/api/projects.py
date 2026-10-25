@@ -11,7 +11,7 @@ from uuid import UUID
 from fastapi import APIRouter, Query, Request, status
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from autocad_assistance.services.column_mapping import MappingValidationError
 from autocad_assistance.services.project_store import (
@@ -26,6 +26,10 @@ from autocad_assistance.services.uploads import UploadTooLargeError
 from autocad_assistance.services.line_candidates import (
     LineCandidateInvalidError, LineCandidateLimitError, build_line_candidates,
 )
+from autocad_assistance.services.line_decisions import (
+    LineDecisionInvalidError, history as line_decision_history, record_decision,
+)
+from autocad_assistance.services.project_store import LineDecisionConflictError
 
 
 ALGORITHM_VERSION = "geoai-dxf-v1"
@@ -89,6 +93,16 @@ class ImportResponse(BaseModel):
     revision: RevisionResponse
     rowCount: int
     warnings: list[ImportWarning]
+
+
+class LineDecisionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    requestId: UUID
+    expectedVersion: int = Field(ge=0)
+    action: str = Field(pattern="^(A|B|skip|manual)$")
+    sourceSha256: str = Field(pattern="^[0-9a-f]{64}$")
+    settingsSha256: str = Field(pattern="^[0-9a-f]{64}$")
+    candidateVersion: str = Field(min_length=1, max_length=100)
 
 
 def _error(status_code: int, code: str, message: str) -> JSONResponse:
@@ -227,5 +241,46 @@ def create_project_router(store: ProjectStore, upload_root: str | Path) -> APIRo
         except (LineCandidateInvalidError, ProjectIntegrityError, ProjectStoreError):
             return _error(422, "CANDIDATES_UNAVAILABLE", "Line comparison cannot be displayed")
         return JSONResponse(content=comparison, headers={"Cache-Control": "no-store"})
+
+    @router.get("/{project_id}/revisions/{revision_id}/line-decisions")
+    async def line_decisions(project_id: UUID, revision_id: UUID, request: Request,
+                             page: Annotated[int, Query(ge=1)] = 1,
+                             pageSize: Annotated[int, Query(ge=1, le=50)] = 50):
+        try:
+            result = await run_in_threadpool(
+                line_decision_history, store, request.scope["geoai.owner_id"],
+                str(project_id), str(revision_id), page=page, page_size=pageSize,
+            )
+        except ProjectNotFoundError:
+            return _error(404, "RESOURCE_NOT_FOUND", "Resource not found")
+        return JSONResponse(content=result, headers={"Cache-Control": "no-store"})
+
+    @router.post("/{project_id}/revisions/{revision_id}/line-decisions/{group_code}")
+    async def save_line_decision(
+        project_id: UUID, revision_id: UUID, group_code: str,
+        request: Request, payload: LineDecisionRequest,
+    ):
+        try:
+            result = await run_in_threadpool(
+                record_decision, store, request.scope["geoai.owner_id"],
+                str(project_id), str(revision_id), group_code,
+                expected_version=payload.expectedVersion,
+                request_id=str(payload.requestId), action=payload.action,
+                source_sha256=payload.sourceSha256,
+                settings_sha256=payload.settingsSha256,
+                candidate_version=payload.candidateVersion,
+            )
+        except ProjectNotFoundError:
+            return _error(404, "RESOURCE_NOT_FOUND", "Resource not found")
+        except LineDecisionConflictError:
+            return _error(409, "DECISION_CONFLICT", "Decision changed; reload comparison")
+        except LineCandidateLimitError:
+            return _error(413, "CANDIDATES_TOO_LARGE", "Line comparison exceeds viewer limits")
+        except ResourceQuotaExceededError:
+            return _error(429, "QUOTA_EXCEEDED", "Decision history limit exceeded")
+        except (LineDecisionInvalidError, LineCandidateInvalidError,
+                ProjectIntegrityError, ProjectStoreError):
+            return _error(422, "INVALID_DECISION", "Line decision cannot be saved")
+        return JSONResponse(content=result, headers={"Cache-Control": "no-store"})
 
     return router

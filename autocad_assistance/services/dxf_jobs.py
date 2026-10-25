@@ -69,6 +69,7 @@ def render_dxf_bytes(
     scale_factor: float = 1.0,
     tin_settings: dict | None = None,
     jobs_root: str | Path | None = None,
+    line_orders: dict[str, list[int]] | None = None,
 ) -> bytes:
     """Render DXF bytes through the existing geometry engine in an isolated job."""
     frame = _to_generator_frame(final_data)
@@ -87,6 +88,7 @@ def render_dxf_bytes(
             str(output_path),
             scale_factor,
             tin_settings=tin_settings,
+            **({"line_orders": line_orders} if line_orders else {}),
         )
         return output_path.read_bytes()
     finally:

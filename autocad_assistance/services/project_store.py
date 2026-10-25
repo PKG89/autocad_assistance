@@ -24,6 +24,8 @@ from autocad_assistance.services.uploads import (
 MAX_SOURCE_BYTES = 10 * 1024 * 1024
 MAX_RESULT_BYTES = 25 * 1024 * 1024
 MAX_SETTINGS_BYTES = 64 * 1024
+MAX_DECISION_BYTES = 1024 * 1024
+MAX_DECISION_EVENTS_PER_REVISION = 2_000
 JOB_STATUSES = frozenset({"queued", "running", "cancelling", "cancelled", "failed", "succeeded"})
 
 
@@ -53,6 +55,10 @@ class DuplicateSubmissionError(ProjectStoreError):
     def __init__(self, job_id: str) -> None:
         super().__init__("Submission already accepted")
         self.job_id = job_id
+
+
+class LineDecisionConflictError(ProjectStoreError):
+    """A stale version or reused request key conflicts with saved history."""
 
 
 @dataclass(frozen=True)
@@ -136,6 +142,19 @@ class ProjectJobRecord:
     retry_of: str | None
 
 
+@dataclass(frozen=True)
+class LineDecisionRecord:
+    event_id: str
+    revision_id: str
+    group_code: str
+    version: int
+    request_id: str
+    action: str
+    snapshot_json: str
+    author_id: str
+    created_at: str
+
+
 def _uuid(value: str) -> str:
     try:
         normalized = str(UUID(value))
@@ -193,7 +212,7 @@ class ProjectStore:
         self.db_path = self.root / "projects.sqlite3"
         with self._db() as db:
             current = db.execute("PRAGMA user_version").fetchone()[0]
-            if current not in (0, 1, 2, 3, 4, 5):
+            if current not in (0, 1, 2, 3, 4, 5, 6):
                 raise ProjectStoreError(f"Unsupported project schema version: {current}")
             if current == 0:
                 db.executescript(
@@ -255,7 +274,22 @@ class ProjectStore:
                     job_id TEXT NOT NULL UNIQUE REFERENCES jobs(job_id),
                     created_at INTEGER NOT NULL
                 );
-                PRAGMA user_version = 5;
+                CREATE TABLE IF NOT EXISTS line_decision_events (
+                    event_id TEXT PRIMARY KEY,
+                    revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+                    group_code TEXT NOT NULL,
+                    version INTEGER NOT NULL,
+                    request_id TEXT NOT NULL UNIQUE,
+                    request_sha256 TEXT NOT NULL,
+                    action TEXT NOT NULL CHECK(action IN ('A','B','skip','manual')),
+                    snapshot_json TEXT NOT NULL,
+                    author_id TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(revision_id, group_code, version)
+                );
+                CREATE INDEX IF NOT EXISTS line_decision_revision_group
+                    ON line_decision_events(revision_id, group_code, version);
+                PRAGMA user_version = 6;
                 """
                 )
             elif current == 1:
@@ -323,6 +357,30 @@ class ProjectStore:
                             created_at INTEGER NOT NULL
                         )""")
                     db.execute("PRAGMA user_version = 5")
+                    db.execute("COMMIT")
+                    current = 5
+                except Exception:
+                    db.execute("ROLLBACK")
+                    raise
+            if current == 5:
+                db.execute("BEGIN IMMEDIATE")
+                try:
+                    db.execute("""CREATE TABLE line_decision_events (
+                        event_id TEXT PRIMARY KEY,
+                        revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+                        group_code TEXT NOT NULL,
+                        version INTEGER NOT NULL,
+                        request_id TEXT NOT NULL UNIQUE,
+                        request_sha256 TEXT NOT NULL,
+                        action TEXT NOT NULL CHECK(action IN ('A','B','skip','manual')),
+                        snapshot_json TEXT NOT NULL,
+                        author_id TEXT NOT NULL,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        UNIQUE(revision_id, group_code, version)
+                    )""")
+                    db.execute("""CREATE INDEX line_decision_revision_group
+                        ON line_decision_events(revision_id, group_code, version)""")
+                    db.execute("PRAGMA user_version = 6")
                     db.execute("COMMIT")
                 except Exception:
                     db.execute("ROLLBACK")
@@ -782,6 +840,116 @@ class ProjectStore:
         if revision.project_id != project_id:
             raise ProjectNotFoundError(revision_id)
         return self.read_source(revision_id)
+
+    @staticmethod
+    def _line_decision(row: sqlite3.Row) -> LineDecisionRecord:
+        return LineDecisionRecord(**{field: row[field] for field in LineDecisionRecord.__dataclass_fields__})
+
+    def list_line_decisions_for(
+        self, owner_id: str, revision_id: str, group_code: str | None = None,
+        *, offset: int = 0, limit: int | None = None,
+    ) -> tuple[LineDecisionRecord, ...]:
+        owner_id, revision_id = _uuid(owner_id), _uuid(revision_id)
+        self.assert_revision_owner(owner_id, revision_id)
+        query = """SELECT event_id,revision_id,group_code,version,request_id,action,
+            snapshot_json,author_id,created_at FROM line_decision_events
+            WHERE revision_id=?"""
+        params: tuple[object, ...] = (revision_id,)
+        if group_code is not None:
+            query += " AND group_code=?"
+            params += (group_code,)
+        query += " ORDER BY group_code,version"
+        if limit is not None:
+            if not 1 <= limit <= 50 or offset < 0:
+                raise ProjectStoreError("Decision page is invalid")
+            query += " LIMIT ? OFFSET ?"
+            params += (limit, offset)
+        with self._db() as db:
+            return tuple(self._line_decision(row) for row in db.execute(query, params))
+
+    def latest_line_decisions_for(
+        self, owner_id: str, revision_id: str,
+    ) -> tuple[LineDecisionRecord, ...]:
+        owner_id, revision_id = _uuid(owner_id), _uuid(revision_id)
+        self.assert_revision_owner(owner_id, revision_id)
+        with self._db() as db:
+            rows = db.execute("""SELECT e.event_id,e.revision_id,e.group_code,e.version,
+                e.request_id,e.action,e.snapshot_json,e.author_id,e.created_at
+                FROM line_decision_events e WHERE e.revision_id=? AND e.version=(
+                    SELECT MAX(i.version) FROM line_decision_events i
+                    WHERE i.revision_id=e.revision_id AND i.group_code=e.group_code)
+                ORDER BY e.group_code""", (revision_id,))
+            return tuple(self._line_decision(row) for row in rows)
+
+    def count_line_decisions_for(self, owner_id: str, revision_id: str) -> int:
+        owner_id, revision_id = _uuid(owner_id), _uuid(revision_id)
+        self.assert_revision_owner(owner_id, revision_id)
+        with self._db() as db:
+            return db.execute("SELECT COUNT(*) FROM line_decision_events WHERE revision_id=?",
+                              (revision_id,)).fetchone()[0]
+
+    def record_line_decision_for(
+        self, owner_id: str, revision_id: str, group_code: str,
+        *, expected_version: int, request_id: str, action: str,
+        snapshot: Mapping[str, object],
+    ) -> LineDecisionRecord:
+        owner_id, revision_id, request_id = _uuid(owner_id), _uuid(revision_id), _uuid(request_id)
+        if not isinstance(group_code, str) or not 1 <= len(group_code) <= 64 or "/" in group_code:
+            raise ProjectStoreError("Line group code is invalid")
+        if action not in {"A", "B", "skip", "manual"} or type(expected_version) is not int or expected_version < 0:
+            raise ProjectStoreError("Line decision request is invalid")
+        try:
+            snapshot_json = json.dumps(snapshot, sort_keys=True, separators=(",", ":"),
+                                       ensure_ascii=False, allow_nan=False)
+            request_json = json.dumps({"revisionId": revision_id, "groupCode": group_code,
+                                       "expectedVersion": expected_version, "action": action,
+                                       "snapshot": snapshot}, sort_keys=True,
+                                      separators=(",", ":"), ensure_ascii=False, allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise ProjectStoreError("Line decision snapshot is invalid") from exc
+        if len(snapshot_json.encode("utf-8")) > MAX_DECISION_BYTES:
+            raise ProjectStoreError("Line decision snapshot is too large")
+        request_hash = _digest(request_json.encode("utf-8"))
+        fields = "event_id,revision_id,group_code,version,request_id,action,snapshot_json,author_id,created_at"
+        with self._db() as db:
+            db.execute("BEGIN IMMEDIATE")
+            try:
+                owned = db.execute("""SELECT 1 FROM revisions r JOIN projects p
+                    ON p.project_id=r.project_id WHERE r.revision_id=? AND p.owner_id=?""",
+                    (revision_id, owner_id)).fetchone()
+                if owned is None:
+                    raise ProjectNotFoundError(revision_id)
+                existing = db.execute(f"SELECT {fields},request_sha256 FROM line_decision_events WHERE request_id=?",
+                                      (request_id,)).fetchone()
+                if existing is not None:
+                    if (existing["revision_id"], existing["author_id"], existing["request_sha256"]) != (
+                        revision_id, owner_id, request_hash,
+                    ):
+                        raise LineDecisionConflictError("Decision request key was reused")
+                    db.execute("COMMIT")
+                    return self._line_decision(existing)
+                current = db.execute(f"""SELECT {fields} FROM line_decision_events
+                    WHERE revision_id=? AND group_code=? ORDER BY version DESC LIMIT 1""",
+                    (revision_id, group_code)).fetchone()
+                version = current["version"] if current is not None else 0
+                if version != expected_version:
+                    raise LineDecisionConflictError("Decision version changed; reload candidates")
+                count = db.execute("SELECT COUNT(*) FROM line_decision_events WHERE revision_id=?",
+                                   (revision_id,)).fetchone()[0]
+                if count >= MAX_DECISION_EVENTS_PER_REVISION:
+                    raise ResourceQuotaExceededError("Revision decision history limit exceeded")
+                event_id = str(uuid4())
+                db.execute("""INSERT INTO line_decision_events
+                    (event_id,revision_id,group_code,version,request_id,request_sha256,action,snapshot_json,author_id)
+                    VALUES (?,?,?,?,?,?,?,?,?)""", (event_id, revision_id, group_code, version + 1,
+                    request_id, request_hash, action, snapshot_json, owner_id))
+                row = db.execute(f"SELECT {fields} FROM line_decision_events WHERE event_id=?",
+                                 (event_id,)).fetchone()
+                db.execute("COMMIT")
+                return self._line_decision(row)
+            except Exception:
+                db.execute("ROLLBACK")
+                raise
 
     def register_job(
         self,

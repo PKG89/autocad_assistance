@@ -17,6 +17,7 @@ from autocad_assistance.services.project_store import (
 from autocad_assistance.services.survey_contract import (
     SurveyContext, build_survey_dataset, drawing_factor_for_plan_denominator,
 )
+from autocad_assistance.services.line_decisions import decision_snapshot_for_job
 
 
 @dataclass(frozen=True)
@@ -54,6 +55,9 @@ class ProjectJobBridge:
             scale_factor=settings["scaleFactor"],
         )
         dataset = build_survey_dataset(raw, mapping, context=context)
+        line_orders, decision_versions = decision_snapshot_for_job(
+            self.store, owner_id, revision.project_id, revision_id,
+        )
         request_settings = {
             "revisionId": revision_id,
             "sourceSha256": revision.source_sha256,
@@ -61,6 +65,8 @@ class ProjectJobBridge:
             "mapping": mapping,
             "scaleFactor": str(context.scale_factor),
             "tinSettings": dict(tin_settings),
+            "lineOrders": line_orders,
+            "lineDecisions": decision_versions,
         }
         existing_id = self.store.lookup_job_submission_for(
             owner_id, revision_id, request_id, request_settings=request_settings,
@@ -79,6 +85,7 @@ class ProjectJobBridge:
                 dataset.mapped_rows,
                 scale_factor=drawing_factor_for_plan_denominator(context.scale_factor),
                 tin_settings=tin_settings,
+                line_orders=line_orders,
                 on_admit=admit,
             )
         except DuplicateSubmissionError as duplicate:

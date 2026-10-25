@@ -81,32 +81,50 @@ def order_polyline_pairs(points: Sequence[tuple[int, tuple]]) -> list[tuple[int,
     return ordered
 
 
-def _order_polyline_points(points: Sequence[Tuple[int, Tuple[float, float, float, str]]]) -> List[Tuple[float, float, float, str]]:
-    return [item[1] for item in order_polyline_pairs(points)]
+def _order_polyline_points(
+    points: Sequence[Tuple[int, Tuple[float, float, float, str]]],
+    source_order: Sequence[int] | None = None,
+) -> List[Tuple[float, float, float, str]]:
+    if source_order is None:
+        return [item[1] for item in order_polyline_pairs(points)]
+    # Mapped job rows use a zero-based DataFrame index; immutable candidate
+    # row indexes are one-based. Reject stale or malformed overrides.
+    expected = {index + 1 for index, _ in points}
+    if (len(source_order) != len(points) or any(type(index) is not int for index in source_order)
+            or set(source_order) != expected):
+        raise ValueError("Accepted line order does not match source rows")
+    by_row = {index + 1: point for index, point in points}
+    return [by_row[index] for index in source_order]
 
 
-def extract_structural_breaklines(final_data) -> List[List[Tuple[float, float, float]]]:
+def extract_structural_breaklines(final_data, line_orders: dict[str, list[int]] | None = None) -> List[List[Tuple[float, float, float]]]:
     """Return ordered sequences of 3D points usable as structural breaklines."""
     breaklines: List[List[Tuple[float, float, float]]] = []
-    for points in _collect_polyline_groups(final_data).values():
-        ordered = _order_polyline_points(points)
+    groups = _collect_polyline_groups(final_data)
+    if line_orders and not set(line_orders).issubset(groups):
+        raise ValueError("Accepted line group is absent from source")
+    for code, points in groups.items():
+        ordered = _order_polyline_points(points, (line_orders or {}).get(code))
         if len(ordered) < 2:
             continue
         breaklines.append([(x, y, z) for x, y, z, _ in ordered])
     return breaklines
 
 
-def build_polyline_by_code(final_data, msp, doc=None, scale_factor: float = 1.0, text_scale: float = 1.6) -> List[List[Tuple[float, float, float]]]:
+def build_polyline_by_code(final_data, msp, doc=None, scale_factor: float = 1.0, text_scale: float = 1.6,
+                           line_orders: dict[str, list[int]] | None = None) -> List[List[Tuple[float, float, float]]]:
     """Create LWPOLYLINE entities grouped by controller code and return ordered 3D breaklines."""
     line_text_height = 1.6 * scale_factor
     breaklines: List[List[Tuple[float, float, float]]] = []
 
     groups = _collect_polyline_groups(final_data)
+    if line_orders and not set(line_orders).issubset(groups):
+        raise ValueError("Accepted line group is absent from source")
     for group_key, points in groups.items():
         if len(points) < 2:
             continue
 
-        ordered_points = _order_polyline_points(points)
+        ordered_points = _order_polyline_points(points, (line_orders or {}).get(group_key))
         if len(ordered_points) < 2:
             continue
         breaklines.append([(x, y, z) for x, y, z, _ in ordered_points])

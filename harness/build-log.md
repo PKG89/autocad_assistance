@@ -1100,3 +1100,25 @@ Keep one concise entry per task. Do not paste full command output.
   `091ca2cb2383cacda8919130bda6a503a8f0ca2092680a67224ca62c05f3cf8c`.
   GEOAI-024 ACCEPTED; GEOAI-025 READY from that base under
   `harness/build/025-decisions.md`. Original checkout untouched.
+
+## GEOAI-025 — local verification passed; CI pending
+
+- Accepted 024 base `cbcd0f3`; 025 scope frozen at `cc752e3`. Schema
+  v6 migrates v5 without losing existing project data. Decisions are
+  append-only, owner-scoped, idempotent by request UUID and protected
+  by expected group version. A/B require eligible candidates; skip
+  and manual do not apply a new order. History is paged and bounded.
+- New job requests snapshot decision versions and A/B row indexes;
+  worker/generator validate each accepted group against mapped source
+  rows. Existing jobs retain their original request and result.
+  Focused tests verified stale tab 409, foreign 404, bad provenance
+  422, tampered snapshot 422, version migration, manual fallback and
+  exact DXF A/B order. Source bytes remained unchanged.
+- Final gate `p5-025/final-gate.log`: 133 focused, 10 isolated
+  regression, six isolated API, zero blocked operations, `pip check`,
+  `git diff --check`. Browser static synthetic controls showed A
+  version 1 and manual version 2 with zero console errors. Separate
+  authenticated HTTPS smoke with certificate verification showed
+  A X=`0,100,1,2`, B X=`0,1,2,100`, source SHA-256
+  `1092bb2deb3ffb67d333746ea393699e77850926f6b7d8251873c211d56cc8d0`.
+  Temporary servers/tab stopped. Exact feature/PR CI pending.

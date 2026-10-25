@@ -1,6 +1,6 @@
 # GEOAI-025 — versioned decisions on line candidates
 
-Status: READY after exact GEOAI-024 feature and PR CI passed. Base:
+Status: LOCAL VERIFIED; exact feature/PR CI pending. Base:
 `cbcd0f39174b8b25afc6771a2f6f5643c02dcee5`. P5 manifest:
 `/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`; package deadline
 2026-10-25T05:58:12Z; task ceiling 90 minutes, one initial attempt and at
@@ -55,3 +55,33 @@ geodetic tolerance.
 Stop on exhausted time/repair budget, unexpected edits, lost isolation,
 missing domain decision or production action. Record HEAD, diff, checks
 and exact blocker in shared memory.
+
+## Local implementation and evidence (2026-10-25)
+
+- Project schema v6 adds append-only, owner-scoped decision events with
+  per-group version, request UUID, action, candidate/source snapshot,
+  owner and UTC time. Existing v5 data migrates in place. The immutable
+  revision retains the source bytes; the decision records its SHA-256,
+  settings SHA-256, candidate version and full group A/B candidate
+  snapshot. History is paged at 50 events and latest state is explicit.
+  A 2,000-event/revision quota bounds history growth.
+- A/B is accepted only for eligible candidate groups. Same request UUID
+  and payload returns the original event; conflicting reuse and stale
+  expected versions return 409. Foreign revision access returns 404.
+  Skip/manual events have no chosen order. The browser displays the
+  saved action/version/author/time and offers A/B/skip/manual controls.
+- Each new job stores its current decision versions and chosen row order
+  in both the project request fingerprint and durable worker request.
+  The generator checks row membership before drawing. Existing jobs
+  retain their request/result across later decisions. Legacy Telegram
+  and direct upload DXF callers use the unchanged default order.
+- The final gate `p5-025/final-gate.log` passed 133 focused, 10 isolated
+  regression and six isolated API tests, zero blocked operations,
+  `pip check` and `git diff --check`. Browser static synthetic control
+  showed A then manual version 2, author/time and zero console errors.
+  A separate authenticated localhost HTTPS smoke with certificate
+  verification produced LWPOLYLINE X sequences A `0,100,1,2` and B
+  `0,1,2,100`; source bytes stayed byte-identical at SHA-256
+  `1092bb2deb3ffb67d333746ea393699e77850926f6b7d8251873c211d56cc8d0`.
+  Temporary HTTP/HTTPS servers and browser tab were closed. Exact
+  GitHub feature/PR CI remains pending.

@@ -336,6 +336,15 @@ READY from this base under `harness/build/025-decisions.md`: versioned,
 owner-scoped decisions and immutable DXF-job snapshots. No production
 data changed.
 
+GEOAI-025 is locally verified from accepted 024: owner-scoped,
+append-only line decisions (A/B/skip/manual), safe repeated requests,
+version conflicts and page-limited history; new project jobs snapshot
+accepted A/B row orders, while prior jobs and original measurements
+remain unchanged. Synthetic HTTPS API/DXF and browser control checks
+passed; final gate passed 133 focused + 10 isolated regression + six
+API tests. Exact feature/PR CI is pending. Details and bounds are in
+`harness/build/025-decisions.md`. No production migration or deploy.
+
 ## Continuous roadmap authorization (2026-10-25, Europe/Moscow)
 
 The owner authorized sequential P0, P1–P4 and later dependency-ready local

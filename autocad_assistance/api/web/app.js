@@ -302,16 +302,35 @@ $("job-revision").addEventListener("change", () => {
   window.GeoaiLineCandidates.hide();
 });
 
-$("candidate-load").addEventListener("click", (event) => busy(event.currentTarget, async () => {
+async function loadCandidateReview() {
   const projectId = $("project-select").value;
   const revisionId = $("job-revision").value;
   if (!projectId || !revisionId) throw new Error("Выберите проект и версию съёмки");
-  const comparison = await api(`/api/v1/projects/${projectId}/revisions/${revisionId}/line-candidates`);
+  const root = `/api/v1/projects/${projectId}/revisions/${revisionId}`;
+  const [comparison, history] = await Promise.all([
+    api(`${root}/line-candidates`), api(`${root}/line-decisions`),
+  ]);
   if ($("project-select").value === projectId && $("job-revision").value === revisionId) {
-    window.GeoaiLineCandidates.show(comparison);
+    window.GeoaiLineCandidates.show(comparison, history, async (groupCode, version, action) => {
+      try {
+        await api(`${root}/line-decisions/${encodeURIComponent(groupCode)}`, {
+          method: "POST", body: JSON.stringify({ requestId: crypto.randomUUID(),
+            expectedVersion: version, action, sourceSha256: comparison.sourceSha256,
+            settingsSha256: comparison.settingsSha256,
+            candidateVersion: comparison.candidateVersion }),
+        });
+        await loadCandidateReview();
+        message(`Решение для ${groupCode} сохранено. Новое задание DXF учтёт его.`);
+      } catch (error) {
+        if (error.status === 409) await loadCandidateReview();
+        message(error.message || "Не удалось сохранить решение", true);
+      }
+    });
     $("candidate-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
-}));
+}
+
+$("candidate-load").addEventListener("click", (event) => busy(event.currentTarget, loadCandidateReview));
 
 $("job-submit").addEventListener("click", (event) => busy(event.currentTarget, async () => {
   const revisionId = $("job-revision").value;

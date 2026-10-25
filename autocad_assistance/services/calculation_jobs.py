@@ -185,6 +185,7 @@ class CalculationJobManager:
         *,
         scale_factor: float = 1.0,
         tin_settings: Mapping[str, object] | None = None,
+        line_orders: Mapping[str, Sequence[int]] | None = None,
         on_admit: Callable[[str], None] | None = None,
     ) -> JobSnapshot:
         if not 0 < len(mapped_rows) <= 100_000:
@@ -208,11 +209,21 @@ class CalculationJobManager:
                     raise ValueError(f"Row {index} has a nonfinite {axis} coordinate")
                 if numeric != 0 and as_float == 0:
                     raise ValueError(f"Row {index} has an underflowing {axis} coordinate")
+        if line_orders:
+            if len(line_orders) > 200 or sum(len(order) for order in line_orders.values()) > 5_000:
+                raise ValueError("Accepted line orders exceed limits")
+            for code, order in line_orders.items():
+                if (not isinstance(code, str) or not 1 <= len(code) <= 64
+                        or not isinstance(order, (list, tuple)) or not 2 <= len(order) <= 500
+                        or any(type(index) is not int or not 1 <= index <= len(mapped_rows) for index in order)
+                        or len(set(order)) != len(order)):
+                    raise ValueError("Accepted line order is invalid")
         request = {
             "version": 1,
             "rows": [dict(row) for row in mapped_rows],
             "scale_factor": scale_factor,
             "tin_settings": dict(tin_settings or {}),
+            "line_orders": {code: list(order) for code, order in (line_orders or {}).items()},
         }
         # Encode before queue admission so malformed request objects never
         # consume a slot or leave a half-created job directory.

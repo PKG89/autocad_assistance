@@ -30,7 +30,8 @@ def get_text_scale(scale_factor: float) -> float:
     return 1.6 * scale_factor
 
 
-def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_settings: dict | None = None) -> None:
+def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_settings: dict | None = None,
+                       line_orders: dict[str, list[int]] | None = None) -> None:
     """Generate a DXF file from prepared survey data."""
     # Validate before creating a drawing instead of silently dropping points.
     for row_number, (_, row) in enumerate(final_data.iterrows(), start=1):
@@ -248,9 +249,9 @@ def generate_dxf_ezdxf(final_data, output_dxf, scale_factor: float = 1.0, tin_se
     # Добавляем полилинии и собираем структурные линии
     breaklines = []
     if settings.get("show_polylines", True):
-        breaklines = build_polyline_by_code(final_data, msp, doc, scale_factor, text_scale)
+        breaklines = build_polyline_by_code(final_data, msp, doc, scale_factor, text_scale, line_orders=line_orders)
     else:
-        breaklines = extract_structural_breaklines(final_data)
+        breaklines = extract_structural_breaklines(final_data, line_orders=line_orders)
 
     if selected_tin_codes:
         try:
