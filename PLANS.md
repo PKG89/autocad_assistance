@@ -204,6 +204,8 @@ task, at most two repairs, one worktree/compute worker and $0
 external executor. GEOAI-029 is READY under
 `harness/build/029-object-catalog.md`; preserve ambiguous and
 unmapped codes without making up semantics.
+GEOAI-029 passed local full gate and verified HTTPS; exact feature/PR
+CI is pending. GEOAI-030 depends on its acceptance.
 
 Proposed future execution bounds: one implementation agent and one compute
 worker, at most three prepared tasks per package, one initial attempt plus

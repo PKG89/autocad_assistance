@@ -1,6 +1,6 @@
 # GEOAI-029 — versioned catalog of existing object-code rules
 
-Status: READY from accepted GEOAI-028 at
+Status: LOCAL GATE PASSED; exact feature/PR CI pending from accepted GEOAI-028 at
 `1ea061c1afb4b75b0aba06ae67d402b0a3e815a6`.
 P7 manifest deadline 2026-10-25T07:20:40Z; task ceiling 90 minutes,
 one initial attempt plus at most two repairs, one writable worktree,
@@ -51,3 +51,17 @@ production action, new domain taxonomy or external data.
 Stop on exhausted budget, source mapping ambiguity requiring domain
 judgement, unexpected edits, lost isolation or production action.
 Record HEAD, diff, checks and exact blocker in shared memory.
+
+## Local verification (2026-10-25)
+
+Immutable `object-code-v1` snapshot includes 75 SinoKOD rows, exact
+source hashes, all explicit block aliases, line prefixes/overrides and
+special support/tower settings. Parser uses Python AST literal fields;
+it never imports/executes `config.py` or reads `.env`. Unmapped and
+ambiguous codes remain visible. Four focused catalog tests passed
+source parity, deterministic bytes, lookup, conflict, safe rejection
+of executable syntax and authenticated pagination. Final isolated
+gate passed 153 focused, 10 regression and six API tests, `pip check`,
+zero blocked operations and diff check. Verified localhost HTTPS
+showed 401 without login and mapped/line/dynamic lookups after login.
+No real data or production action. Exact feature/PR CI pending.

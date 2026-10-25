@@ -1,0 +1,1552 @@
+{
+  "blockMappings": [
+    {
+      "aliases": [
+        "moln",
+        "МОЛН"
+      ],
+      "blockName": "109a",
+      "label": "Moln",
+      "sourceLine": 87
+    },
+    {
+      "aliases": [
+        "fonar",
+        "фонар"
+      ],
+      "blockName": "110",
+      "label": "Fonar",
+      "sourceLine": 93
+    },
+    {
+      "aliases": [
+        "GazZn",
+        "TrZn",
+        "gazzn",
+        "trzn",
+        "ТрЗн",
+        "уккм",
+        "укнефть"
+      ],
+      "blockName": "206-1",
+      "label": "TrZn",
+      "sourceLine": 99
+    },
+    {
+      "aliases": [
+        "KIK",
+        "KIP",
+        "kik",
+        "kip",
+        "skip",
+        "КИК",
+        "КИП",
+        "Кип",
+        "кик"
+      ],
+      "blockName": "129-1",
+      "label": "KIP",
+      "sourceLine": 105
+    },
+    {
+      "aliases": [
+        "Anshlag",
+        "anshlag",
+        "Аншлаг",
+        "аншлаг"
+      ],
+      "blockName": "аншлаг",
+      "label": "Аншлаг",
+      "sourceLine": 111
+    },
+    {
+      "aliases": [
+        "EST",
+        "Est",
+        "est",
+        "st est",
+        "st est aroch",
+        "мтэст"
+      ],
+      "blockName": "107-1",
+      "label": "Est",
+      "sourceLine": 116
+    },
+    {
+      "aliases": [
+        "KABZNM",
+        "KabZnm",
+        "kabznM",
+        "КабЗНМ",
+        "кабзнм",
+        "укмет"
+      ],
+      "blockName": "206-3",
+      "label": "KabZNM",
+      "sourceLine": 121
+    },
+    {
+      "aliases": [
+        "KABZNB",
+        "KabZnb",
+        "kabznB",
+        "КабЗНБ",
+        "кабзнб"
+      ],
+      "blockName": "119",
+      "label": "KabZNB",
+      "sourceLine": 126
+    },
+    {
+      "aliases": [
+        "Zadv",
+        "zad",
+        "zadv",
+        "Задв",
+        "зад",
+        "задв"
+      ],
+      "blockName": "26l",
+      "label": "Zadv",
+      "sourceLine": 131
+    },
+    {
+      "aliases": [
+        "rod",
+        "rodnik",
+        "родник"
+      ],
+      "blockName": "311",
+      "label": "Rodnik",
+      "sourceLine": 136
+    },
+    {
+      "aliases": [
+        "svech",
+        "svecha",
+        "Свеча",
+        "Свч",
+        "свеча",
+        "свч"
+      ],
+      "blockName": "091-2",
+      "label": "Svecha",
+      "sourceLine": 141
+    },
+    {
+      "aliases": [
+        "SOD",
+        "Sod",
+        "СОД",
+        "Сод",
+        "сод"
+      ],
+      "blockName": "Zavod",
+      "label": "SOD",
+      "sourceLine": 146
+    },
+    {
+      "aliases": [
+        "STB",
+        "Stb",
+        "stb",
+        "стб"
+      ],
+      "blockName": "1 stb",
+      "label": "СТБ",
+      "sourceLine": 151
+    },
+    {
+      "aliases": [
+        "KolV",
+        "Водопровод",
+        "КолВод"
+      ],
+      "blockName": "117-2",
+      "label": "Колодец Водопровод",
+      "sourceLine": 156
+    },
+    {
+      "aliases": [
+        "KolK",
+        "Канализация",
+        "КолКан"
+      ],
+      "blockName": "117-3",
+      "label": "Колодец Канализационные сети",
+      "sourceLine": 161
+    },
+    {
+      "aliases": [
+        "KolLiv",
+        "КолЛив",
+        "Ливневка"
+      ],
+      "blockName": "117-4",
+      "label": "Колодец Канализационные сети ливневые",
+      "sourceLine": 166
+    },
+    {
+      "aliases": [
+        "Дренаж",
+        "КолДр",
+        "дренаж",
+        "дренажные трубопроводы"
+      ],
+      "blockName": "117-5",
+      "label": "Колодец Дренажные трубопроводы",
+      "sourceLine": 171
+    },
+    {
+      "aliases": [
+        "KolGAZ",
+        "KolGaz",
+        "КолГаз"
+      ],
+      "blockName": "117-6",
+      "label": "Колодец Газопроводы",
+      "sourceLine": 176
+    },
+    {
+      "aliases": [
+        "Vantuz",
+        "Вантуз",
+        "вантуз"
+      ],
+      "blockName": "117-7",
+      "label": "Колодец Нефтепроводы",
+      "sourceLine": 181
+    },
+    {
+      "aliases": [
+        "KolT",
+        "КолТ",
+        "КолТеп"
+      ],
+      "blockName": "117-8",
+      "label": "Колодец Теплотрассы",
+      "sourceLine": 186
+    },
+    {
+      "aliases": [
+        "KolEl",
+        "КолЭл"
+      ],
+      "blockName": "117-9",
+      "label": "Колодец Электрокабели",
+      "sourceLine": 191
+    },
+    {
+      "aliases": [
+        "KolSV",
+        "КолСВ",
+        "КолСв"
+      ],
+      "blockName": "117-10",
+      "label": "Колодец Кабели связи",
+      "sourceLine": 196
+    },
+    {
+      "aliases": [
+        "KolVozd",
+        "КолВозд"
+      ],
+      "blockName": "117-11",
+      "label": "Колодец Воздухопроводы",
+      "sourceLine": 201
+    },
+    {
+      "aliases": [
+        "KolMaz",
+        "КолМаз"
+      ],
+      "blockName": "117-12",
+      "label": "Колодец Мазутопроводы",
+      "sourceLine": 206
+    },
+    {
+      "aliases": [
+        "KolBenz",
+        "КолБенз"
+      ],
+      "blockName": "117-13",
+      "label": "Колодец Бензопроводы",
+      "sourceLine": 211
+    },
+    {
+      "aliases": [
+        "KolZol",
+        "КолЗол"
+      ],
+      "blockName": "117-14",
+      "label": "Колодец Золопроводы",
+      "sourceLine": 216
+    },
+    {
+      "aliases": [
+        "OpyskTr",
+        "Trvzem",
+        "ОпускТр",
+        "Трвзем"
+      ],
+      "blockName": "126",
+      "label": "Выход трубы на поверхность",
+      "sourceLine": 221
+    },
+    {
+      "aliases": [
+        "Transform",
+        "Трансформатор",
+        "трансформ"
+      ],
+      "blockName": "113b-2",
+      "label": "Трансформаторы на столбах и постаментах ",
+      "sourceLine": 226
+    },
+    {
+      "aliases": [
+        "Shkaf",
+        "shkaf",
+        "шкаф"
+      ],
+      "blockName": "140-2",
+      "label": "Шкаф",
+      "sourceLine": 231
+    },
+    {
+      "aliases": [
+        "Der",
+        "Derevo",
+        "Дерево",
+        "дер",
+        "дерево"
+      ],
+      "blockName": "390-1",
+      "label": "Дерево",
+      "sourceLine": 236
+    },
+    {
+      "aliases": [
+        "vlDER",
+        "ВлДер"
+      ],
+      "blockName": "115-7c",
+      "label": "VL деревянная",
+      "sourceLine": 241
+    },
+    {
+      "aliases": [
+        "vlMET",
+        "ВЛМЕТ",
+        "влМЕТ"
+      ],
+      "blockName": "115-7a",
+      "label": "VL металлическая",
+      "sourceLine": 246
+    }
+  ],
+  "catalogVersion": "object-code-v1",
+  "contentSha256": "9be67c4b437ef56459611694d97f6f639fa50271143c9c60491ab0f4b5ef4f4a",
+  "entries": [
+    {
+      "blockCandidates": [
+        {
+          "blockName": "109a",
+          "label": "Moln",
+          "sourceLine": 87
+        }
+      ],
+      "code": "moln",
+      "color": "#000A96",
+      "description": "109a",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 2,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "110",
+          "label": "Fonar",
+          "sourceLine": 93
+        }
+      ],
+      "code": "fonar",
+      "color": "#000A96",
+      "description": "110",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 3,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "206-1",
+          "label": "TrZn",
+          "sourceLine": 99
+        }
+      ],
+      "code": "TrZn",
+      "color": "#000A96",
+      "description": "206-1",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 4,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "129-1",
+          "label": "KIP",
+          "sourceLine": 105
+        }
+      ],
+      "code": "KIP",
+      "color": "#000A96",
+      "description": "129-1",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 5,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "аншлаг",
+          "label": "Аншлаг",
+          "sourceLine": 111
+        }
+      ],
+      "code": "аншлаг",
+      "color": "#000A96",
+      "description": "аншлаг",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 6,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "107-1",
+          "label": "Est",
+          "sourceLine": 116
+        }
+      ],
+      "code": "est",
+      "color": "#000A96",
+      "description": "107-1",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 7,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "206-3",
+          "label": "KabZNM",
+          "sourceLine": 121
+        }
+      ],
+      "code": "KabZnm",
+      "color": "#000A96",
+      "description": "206-3",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 8,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "119",
+          "label": "KabZNB",
+          "sourceLine": 126
+        }
+      ],
+      "code": "KabZnb",
+      "color": "#000A96",
+      "description": "KabZNB",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 9,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "26l",
+          "label": "Zadv",
+          "sourceLine": 131
+        }
+      ],
+      "code": "Zadv",
+      "color": "#000A96",
+      "description": "26l",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 10,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "311",
+          "label": "Rodnik",
+          "sourceLine": 136
+        }
+      ],
+      "code": "родник",
+      "color": "#000A96",
+      "description": "311",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 11,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "091-2",
+          "label": "Svecha",
+          "sourceLine": 141
+        }
+      ],
+      "code": "свеча",
+      "color": "#000A96",
+      "description": "Svecha",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 12,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "Zavod",
+          "label": "SOD",
+          "sourceLine": 146
+        }
+      ],
+      "code": "СОД",
+      "color": "#000A96",
+      "description": "Zavod",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 13,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "1 stb",
+          "label": "СТБ",
+          "sourceLine": 151
+        }
+      ],
+      "code": "стб",
+      "color": "#000A96",
+      "description": "1 stb",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 14,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-2",
+          "label": "Колодец Водопровод",
+          "sourceLine": 156
+        }
+      ],
+      "code": "КолВод",
+      "color": "#000A96",
+      "description": "Колодец Водопровод",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 15,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-3",
+          "label": "Колодец Канализационные сети",
+          "sourceLine": 161
+        }
+      ],
+      "code": "КолКан",
+      "color": "#000A96",
+      "description": "Колодец Канализационные сети",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 16,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-4",
+          "label": "Колодец Канализационные сети ливневые",
+          "sourceLine": 166
+        }
+      ],
+      "code": "KolLiv",
+      "color": "#000A96",
+      "description": "117-4",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 17,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-5",
+          "label": "Колодец Дренажные трубопроводы",
+          "sourceLine": 171
+        }
+      ],
+      "code": "КолДр",
+      "color": "#000A96",
+      "description": "117-5",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 18,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-6",
+          "label": "Колодец Газопроводы",
+          "sourceLine": 176
+        }
+      ],
+      "code": "КолГаз",
+      "color": "#000A96",
+      "description": "117-6",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 19,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-7",
+          "label": "Колодец Нефтепроводы",
+          "sourceLine": 181
+        }
+      ],
+      "code": "Вантуз",
+      "color": "#000A96",
+      "description": "117-7",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 20,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-8",
+          "label": "Колодец Теплотрассы",
+          "sourceLine": 186
+        }
+      ],
+      "code": "KolT",
+      "color": "#000A96",
+      "description": "117-8",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 21,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-9",
+          "label": "Колодец Электрокабели",
+          "sourceLine": 191
+        }
+      ],
+      "code": "KolEl",
+      "color": "#000A96",
+      "description": "117-9",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 22,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-10",
+          "label": "Колодец Кабели связи",
+          "sourceLine": 196
+        }
+      ],
+      "code": "KolSV",
+      "color": "#000A96",
+      "description": "117-10",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 23,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-11",
+          "label": "Колодец Воздухопроводы",
+          "sourceLine": 201
+        }
+      ],
+      "code": "КолВозд",
+      "color": "#000A96",
+      "description": "117-11",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 24,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-12",
+          "label": "Колодец Мазутопроводы",
+          "sourceLine": 206
+        }
+      ],
+      "code": "KolMaz",
+      "color": "#000A96",
+      "description": "117-12",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 25,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-13",
+          "label": "Колодец Бензопроводы",
+          "sourceLine": 211
+        }
+      ],
+      "code": "КолБенз",
+      "color": "#000A96",
+      "description": "117-13",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 26,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "117-14",
+          "label": "Колодец Золопроводы",
+          "sourceLine": 216
+        }
+      ],
+      "code": "KolZol",
+      "color": "#000A96",
+      "description": "117-14",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 27,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "126",
+          "label": "Выход трубы на поверхность",
+          "sourceLine": 221
+        }
+      ],
+      "code": "ОпускТр",
+      "color": "#000A96",
+      "description": "126",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 28,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "113b-2",
+          "label": "Трансформаторы на столбах и постаментах ",
+          "sourceLine": 226
+        }
+      ],
+      "code": "Трансформатор",
+      "color": "#000A96",
+      "description": "113b-2",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 29,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "140-2",
+          "label": "Шкаф",
+          "sourceLine": 231
+        }
+      ],
+      "code": "шкаф",
+      "color": "#000A96",
+      "description": "140-2",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 30,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "390-1",
+          "label": "Дерево",
+          "sourceLine": 236
+        }
+      ],
+      "code": "дерево",
+      "color": "#000A96",
+      "description": "390-1",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 31,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "115-7c",
+          "label": "VL деревянная",
+          "sourceLine": 241
+        }
+      ],
+      "code": "vlDER",
+      "color": "#000A96",
+      "description": "115-7c",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 32,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "115-7a",
+          "label": "VL металлическая",
+          "sourceLine": 246
+        }
+      ],
+      "code": "vlMET",
+      "color": "#000A96",
+      "description": "115-7a",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 33,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "асф",
+      "color": "#000A96",
+      "description": "асф",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 34,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "бетпл",
+      "color": "#000A96",
+      "description": "бетпл",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 35,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "борд",
+      "color": "#000A96",
+      "description": "борд",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 36,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "брВ",
+      "color": "#000A96",
+      "description": "брВ",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 37,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "брН",
+      "color": "#000A96",
+      "description": "брН",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 38,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "115-7a",
+          "label": "VL металлическая",
+          "sourceLine": 246
+        }
+      ],
+      "code": "влМЕТ",
+      "color": "#000A96",
+      "description": "влМЕТ",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 39,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "движзаб",
+      "color": "#000A96",
+      "description": "движзаб",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 40,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "движм",
+      "color": "#000A96",
+      "description": "движм",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 41,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "доргр",
+      "color": "#000A96",
+      "description": "доргр",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 42,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "заб",
+      "color": "#000A96",
+      "description": "заб",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 43,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "26l",
+          "label": "Zadv",
+          "sourceLine": 131
+        }
+      ],
+      "code": "задв",
+      "color": "#000A96",
+      "description": "задв",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 44,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "к",
+      "color": "#000A96",
+      "description": "к",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 45,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "камзаб",
+      "color": "#000A96",
+      "description": "камзаб",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 46,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "каммет",
+      "color": "#000A96",
+      "description": "каммет",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 47,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "квых",
+      "color": "#000A96",
+      "description": "квых",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 48,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "колод",
+      "color": "#000A96",
+      "description": "колод",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 49,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "констр",
+      "color": "#000A96",
+      "description": "констр",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 50,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "контур",
+      "color": "#000A96",
+      "description": "контур",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 51,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "куст",
+      "color": "#000A96",
+      "description": "куст",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 52,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "лест",
+      "color": "#000A96",
+      "description": "лест",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 53,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "мачта",
+      "color": "#000A96",
+      "description": "мачта",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 54,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "меттр",
+      "color": "#000A96",
+      "description": "меттр",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 55,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "107-1",
+          "label": "Est",
+          "sourceLine": 116
+        }
+      ],
+      "code": "мтэст",
+      "color": "#000A96",
+      "description": "мтэст",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 56,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "рельс",
+      "color": "#000A96",
+      "description": "рельс",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 57,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "стелла",
+      "color": "#000A96",
+      "description": "стелла",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 58,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "113b-2",
+          "label": "Трансформаторы на столбах и постаментах ",
+          "sourceLine": 226
+        }
+      ],
+      "code": "трансформ",
+      "color": "#000A96",
+      "description": "трансформ",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 59,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "трпер",
+      "color": "#000A96",
+      "description": "трпер",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 60,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "угкн",
+      "color": "#000A96",
+      "description": "угкн",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 61,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "угм",
+      "color": "#000A96",
+      "description": "угм",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 62,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "укбет",
+      "color": "#000A96",
+      "description": "укбет",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 63,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "206-1",
+          "label": "TrZn",
+          "sourceLine": 99
+        }
+      ],
+      "code": "уккм",
+      "color": "#000A96",
+      "description": "уккм",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 64,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "206-3",
+          "label": "KabZNM",
+          "sourceLine": 121
+        }
+      ],
+      "code": "укмет",
+      "color": "#000A96",
+      "description": "укмет",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 65,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [
+        {
+          "blockName": "206-1",
+          "label": "TrZn",
+          "sourceLine": 99
+        }
+      ],
+      "code": "укнефть",
+      "color": "#000A96",
+      "description": "укнефть",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 66,
+      "status": "mapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "урез",
+      "color": "#000A96",
+      "description": "урез",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 67,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "фонмет",
+      "color": "#000A96",
+      "description": "фонмет",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 68,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "фонзаб",
+      "color": "#000A96",
+      "description": "фонзаб",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 69,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "цем",
+      "color": "#000A96",
+      "description": "цем",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 70,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "цемпл",
+      "color": "#000A96",
+      "description": "цемпл",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 71,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "шурф",
+      "color": "#000A96",
+      "description": "шурф",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 72,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "щеб",
+      "color": "#000A96",
+      "description": "щеб",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 73,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "perp",
+      "color": "#000A96",
+      "description": "perp",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 74,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "vlGB",
+      "color": "#000A96",
+      "description": "vlGB",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 75,
+      "status": "dynamic_support",
+      "style": "1",
+      "type": "point"
+    },
+    {
+      "blockCandidates": [],
+      "code": "vlPODP",
+      "color": "#000A96",
+      "description": "vlPODP",
+      "group": "Нет группы",
+      "size": "5",
+      "sourceLine": 76,
+      "status": "unmapped",
+      "style": "1",
+      "type": "point"
+    }
+  ],
+  "lineLayerOverrides": {
+    "gaz": "(036) Газопроводы",
+    "neft": "(014) Нефтепроводы магистральные",
+    "voda": "(017) ВодоснаБжение"
+  },
+  "linePrefixes": [
+    "Elkab",
+    "Notk",
+    "Tr",
+    "Votk",
+    "brN",
+    "brV",
+    "elkab",
+    "gaz",
+    "k",
+    "kabsv",
+    "neft",
+    "pod",
+    "voda",
+    "zab"
+  ],
+  "sources": {
+    "SinoKOD.txt": "7f9a9bbd2c178b5807b7b78fbff0e8eb6c6865842eb9541dfbf850fee1d41d41",
+    "config.py": "ff0c9fcf98e22c9f35d46a13213a8b6fbbb8de9178acf1ca4ccda048378e958b"
+  },
+  "specialRules": {
+    "tower_config": {
+      "base_height": 1.0,
+      "base_width": 1.0,
+      "block_name": "Tower",
+      "codes": [
+        "tower",
+        "вышка"
+      ],
+      "group_size": 4,
+      "layer": "Tower",
+      "max_span": 25.0,
+      "min_points": 3,
+      "min_scale": 0.01,
+      "prefixes": [
+        "tower",
+        "вышка"
+      ],
+      "right_angle_tolerance": 0.05,
+      "zscale": 1.0
+    },
+    "vl_support": {
+      "blocks": {
+        "0": "115-9",
+        "1": "115-10",
+        "2": "115-10-2"
+      },
+      "bracing_codes": [
+        "OP",
+        "vlPODP",
+        "оп"
+      ],
+      "codes": [
+        "VL",
+        "vlGB",
+        "ВЛ",
+        "вл"
+      ],
+      "distance_threshold": 5.0
+    }
+  }
+}

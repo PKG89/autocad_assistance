@@ -1263,3 +1263,20 @@ Keep one concise entry per task. Do not paste full command output.
   expose only existing mappings, preserving unresolved/conflicts.
   `harness/build/029-object-catalog.md` is READY. No real data,
   new taxonomy or production action.
+
+## GEOAI-029 — local gate passed; exact CI pending
+
+- Accepted P6 base `1ea061c`; P7 scope frozen at `7ffeeeb`.
+  `object-code-v1` snapshot preserves all 75 SinoKOD point rows,
+  source-line and SHA-256 provenance, explicit block aliases, line
+  prefixes/layer overrides and special support/tower settings. AST
+  parser reads literal fields only; no `config.py` execution, `.env`
+  read, DB migration or generator behavior change. Unmapped and
+  competing mappings are recorded without invented precedence.
+- Four focused tests passed deterministic source parity, conflict,
+  lookup, malicious expression rejection and authenticated API.
+  `p7-029/full-gate.log` passed 153 focused, 10 isolated regression,
+  six API tests, `pip check`, zero blocked operations and diff check.
+  Verified localhost HTTPS passed 401 without login and exact
+  `moln`, `gaz1`, `tower1` lookups. No real data or production action.
+  Exact feature/PR CI pending; GEOAI-030 waits for acceptance.

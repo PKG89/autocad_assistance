@@ -23,6 +23,7 @@ from .jobs import create_job_router
 from .projects import create_project_router
 from .reference_archives import create_reference_archive_router
 from .dxf_comparisons import create_dxf_comparison_router
+from .object_catalog import create_object_catalog_router
 from .uploads import create_upload_router
 from autocad_assistance.services.auth_store import AuthStore
 from autocad_assistance.services.project_store import (
@@ -151,6 +152,7 @@ def create_app(
         app.include_router(create_project_router(project_store, resolved_upload_root))
         app.include_router(create_reference_archive_router(project_store))
         app.include_router(create_dxf_comparison_router(project_store))
+        app.include_router(create_object_catalog_router())
         if jobs_root is not None:
             app.include_router(create_job_router(app.state.project_job_bridge))
 
