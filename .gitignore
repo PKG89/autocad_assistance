@@ -59,3 +59,8 @@ htmlcov/
 # Environment variables
 .env
 .env.local
+
+# Versioned phase specifications (ordinary build output remains ignored)
+!/harness/build/
+/harness/build/*
+!/harness/build/*.md

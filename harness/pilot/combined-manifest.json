@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "status": "synthetic_combination_and_Caddy_template_verified; target deployment/VPN unverified",
+  "product": {
+    "git_commit": "79528bb9f6070e458724886a915f9d035cdfd110",
+    "archive_name": "79528bb9f6070e458724886a915f9d035cdfd110.tar",
+    "archive_format": "git archive --format=tar <commit>",
+    "archive_bytes": 8570880,
+    "archive_sha256": "cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81",
+    "tracked_files": 144,
+    "scope": "accepted P0-P6 and GEOAI-029 only"
+  },
+  "operational_overlay": {
+    "package_version": "0.1.1",
+    "source_commit": "7f5bbecbb05a9f86f9850ed7e045a49fde040b89",
+    "source_tree": "dab84ce2892da719a5eed7c1b1e42ed4eb50b60f",
+    "archive_name": "pilot-ops-7f5bbecbb05a9f86f9850ed7e045a49fde040b89.tar",
+    "archive_format": "git archive --format=tar <source_commit> pilot_ops",
+    "archive_bytes": 40960,
+    "archive_sha256": "71c330b1252c54f1d67f488ff0e39aae98a7b521d3fcf074fda4c15a2fb5213c",
+    "files_sha256": {
+      "pilot_ops/README.md": "3628de4f6586abdaa19dd9f580f3e3d7448f46c45a7066eda32739657e91c90f",
+      "pilot_ops/config.example.json": "8c5abd6c768decf5cb99ac23fb51276909cf9f02e4f40dbdab279324b26b24e7",
+      "pilot_ops/geoai_pilot_ops/__init__.py": "32f2f61a094945e3f5865592c2c581abea77259c1bc4070c9ba590b1870f59ed",
+      "pilot_ops/geoai_pilot_ops/__main__.py": "c36d66076e21775400098f9848dd82d56d80733e41884ea2c74ac7972dbbf8dc",
+      "pilot_ops/geoai_pilot_ops/runtime.py": "0f62f68e8f5af437511532856461700c7e4ade6c22869577ffad29d369dbb792",
+      "pilot_ops/systemd/geoai-pilot.service": "a88ac8e20f5b5f9c1b53813601affffb8068764abe440208524106cec6ae80f6",
+      "pilot_ops/systemd/geoai-pilot-tls.service": "f759452b9e83dc168f48db432a3b91da76a78373f30ac16173c2eb48daa6ade6",
+      "pilot_ops/tls/Caddyfile.example": "2c8d0e07f571b69d46c39a3d1a2ebb8e32728c5332c74199d76b1e3ad514f05b"
+    }
+  },
+  "rollback_product": {
+    "git_commit": "1ea061c1afb4b75b0aba06ae67d402b0a3e815a6",
+    "archive_bytes": 8509440,
+    "archive_sha256": "9e3858aeec823b64ae7bfa61c69890a93acd1f0f2e29c687ee149afd34229c8f",
+    "compatibility": "project SQLite user_version 8; P6 omits GEOAI-029 catalog"
+  },
+  "dependencies": {
+    "python": "3.13.5",
+    "requirements_lock": "harness/staging/requirements.lock",
+    "requirements_lock_sha256": "d8d2cf3756f29f64246f133f694ee61aa9711f8eb8e95c4fd2039734d381c351",
+    "requirements_count": 33,
+    "python_wheel_hashes": "not pinned in the lock",
+    "tls_proxy": {
+      "version": "Caddy 2.11.7",
+      "source": "https://github.com/caddyserver/caddy/releases/tag/v2.11.7",
+      "linux_amd64_archive_sha256": "727b91701a392de6ebc5027509f548bf39979e5216340d0faed8fa5e69c84f8b",
+      "linux_amd64_archive_sha512": "a7a433a1b133efc3c8d10eb0b99d52a24b5ef5c322dc77f5282182b1c0402139ab83f3a99f0c52409df77d20123fb0b523edad8a66d8f5e49136197bf61ef0e7",
+      "template_validation": "caddy adapt and caddy validate passed with synthetic loopback substitution; target VPN listener and private-CA certificate remain unverified"
+    },
+    "runtime_service": "systemd on the proposed dedicated Debian 13 VM"
+  },
+  "installation_after_separate_approval": [
+    "Compare full Git SHAs, tar sizes and SHA-256 values with this manifest.",
+    "Extract the product tar only to /srv/geoai-pilot/releases/<product commit>/.",
+    "Extract the overlay tar at /srv/geoai-pilot/, yielding /srv/geoai-pilot/pilot_ops/.",
+    "Create a Python 3.13.5 venv from an approved wheel source; install exactly the product requirements lock and run pip check.",
+    "Render the overlay config, systemd units and VPN-only Caddyfile with a real private FQDN, IP and trusted TLS certificate.",
+    "Initialize a new marked state root; run geoai_pilot_ops check before any service start. Starting the pilot requires separate authorization."
+  ],
+  "synthetic_combination_evidence": {
+    "workspace": "/home/geoai/dev-data/geoai-autonomy/pilot-combination-packaged-v2",
+    "evidence_sha256": "61cae027e5ba87095c23784ac57e4e6448fa1ca59fb8f8e0d13ac8de81da5d97",
+    "https": true,
+    "queued_running_succeeded": true,
+    "jobs": 3,
+    "result_bytes": 4287358,
+    "result_sha256": "7918b185a083913f2967e1d413bc2457cf1fd949e7096eef7b807f174b592763",
+    "state_after_restart": "passed",
+    "foreign_session": "401",
+    "foreign_origin": "403",
+    "offline_backup_restore": "passed",
+    "active_backup_restore": "refused",
+    "tampered_backup": "refused",
+    "rollback_code": "passed with same extracted operational overlay"
+  }
+}

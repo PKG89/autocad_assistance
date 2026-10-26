@@ -1,0 +1,30 @@
+[Unit]
+Description=GEO AI exact-release closed pilot ASGI service
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/etc/geoai-pilot/config.json
+
+[Service]
+Type=simple
+User=geoai-pilot
+Group=geoai-pilot
+WorkingDirectory=/srv/geoai-pilot/pilot_ops
+Environment=PYTHONPATH=/srv/geoai-pilot/pilot_ops
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=OMP_NUM_THREADS=1
+Environment=OPENBLAS_NUM_THREADS=1
+ExecStartPre=/srv/geoai-pilot/venv/bin/python -m geoai_pilot_ops check --config /etc/geoai-pilot/config.json
+ExecStart=/srv/geoai-pilot/venv/bin/python -m geoai_pilot_ops serve --config /etc/geoai-pilot/config.json
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=130
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/srv/geoai-pilot/states /srv/geoai-pilot/logs
+MemoryMax=2560M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

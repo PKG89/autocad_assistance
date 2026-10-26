@@ -1,0 +1,17 @@
+{
+  "mode": "pilot",
+  "installation_root": "/srv/geoai-pilot",
+  "release_commit": "79528bb9f6070e458724886a915f9d035cdfd110",
+  "archive_path": "/srv/geoai-pilot/archives/79528bb9f6070e458724886a915f9d035cdfd110.tar",
+  "release_root": "/srv/geoai-pilot/releases/79528bb9f6070e458724886a915f9d035cdfd110",
+  "state_root": "/srv/geoai-pilot/states/primary",
+  "auth_root": "/srv/geoai-pilot/states/primary/auth",
+  "project_root": "/srv/geoai-pilot/states/primary/projects",
+  "upload_root": "/srv/geoai-pilot/states/primary/uploads",
+  "jobs_root": "/srv/geoai-pilot/states/primary/jobs",
+  "backup_root": "/srv/geoai-pilot/backups",
+  "log_root": "/srv/geoai-pilot/logs",
+  "auth_origin": "https://__PILOT_FQDN__",
+  "bind_host": "127.0.0.1",
+  "bind_port": 18460
+}

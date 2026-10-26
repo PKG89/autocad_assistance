@@ -1,0 +1,456 @@
+# GEO AI roadmap
+
+This file holds the phase sequence. Detailed acceptance criteria live in the
+matching file under `harness/build/`.
+
+## Current phase and execution order
+
+### Field-to-Finish roadmap amendment — 2026-10-25
+
+The owner approved adding the researched local Civil 3D/AutoCAD materials
+and external Field-to-Finish examples to this plan, then separately
+authorized 029A. The roadmap registration itself was planning only;
+029A has since received a frozen, bounded specification and implementation.
+No third-party code, survey files or symbols were imported.
+Detailed proposed scope and acceptance gates are in
+`harness/build/029a-031-field-to-finish-plan.md`.
+
+Preserve accepted 027, 028 and 029. Add 029A for explicit versioned coding
+profiles; divide 030 into deterministic coded tracing (030A) and ambiguous
+connection inference (030B); divide 031 into point symbols (031A), coded
+line/area objects (031B), and inferred composite objects (031C).
+030B retains the existing review-only experiment and its measured regression.
+The former blanket dependency of all 031 work on full 030 is superseded by
+the subtask dependencies below, not by a claim that 030 or 031 is accepted.
+
+Current sequence: source/provenance inventory -> accepted 029A -> prepare
+030A or 031A specification -> reviewed source/reference comparison using
+027/028 after their own accepted checks. 031A can follow 029A independently
+of 030A. Explicit-rule development and synthetic contract checks do not
+require an ML dataset; real-survey quality
+acceptance still requires approved, correctly paired examples and criteria.
+030B/031C and 037/038 retain their evidence gates.
+The 030A readiness check is in `harness/build/030a-readiness.md`: the
+available format does not identify an object/string ID or an unambiguous
+action/order for all records. A two-mode, read-only synthetic candidate
+experiment is PARTIAL, as recorded in `harness/build/030a-modes-experiment.md`.
+Product integration remains PROPOSED pending domain evidence; 031A has a
+separate asset/rule gate.
+
+Candidate teaching files belong in the existing 027 archive only after
+authorized ingestion, initially unverified with provenance and use scope.
+Their source/DWG correspondence, rights and independent-family identity
+are not established; do not mark them accepted references or add them to
+036 training/evaluation data automatically. Use 028 for reviewed comparison.
+P8 032/033 can later consume verified terrain/breakline flags; P9 034/035
+can draw on layout ideas. Existing domain, template and numeric-rule gates
+remain in force. The selected pilot and 039/040 operational acceptance
+continue separately; a later feature needs its own tested release.
+
+### GEOAI-039 owner scenario and remaining gates — 2026-10-25
+
+The owner passed the synthetic cabinet scenario on VM110: import, preview,
+mapping, calculation, DXF download and opening, and reopening the project.
+This accepts only that scenario and the installed product
+`15374b5c856958fdf67c5efdce68db81e05ac92f` plus separate operations
+package `71ab84cba999bcf2fd105b69917cdd1e8907671f`. The owner later
+confirmed **no remarks**. No
+quality claim for arbitrary real surveys or all 100,000-point shapes follows.
+Current exact PR feature and pull-request CI checks completed successfully.
+
+GEOAI-039 is **ACCEPTED for the bounded synthetic pilot**. VM111 booted
+offline without a NIC or autostart; its copied NetBird state was quarantined.
+The exact product, both SQLite databases, state files and local app health
+passed; VM111 was stopped afterwards. VM110-only backup jobs now have a
+per-job hook that verifies application dumps within 2700 seconds and records
+archive ID, time, integrity, SHA-256 and dump outcome. A real failed pairing
+was labelled VM-only; the corrected run was paired and the Proxmox task was
+OK. Missing/failed/stale dumps never count as coordinated application copies.
+See `harness/build/039-isolated-recovery-and-pairing.md`. No real-survey
+quality claim, merge, boot autostart or wider access follows.
+
+GEOAI-040 remains **BLOCKED** by separate explicit publication/operations
+authorization. Later 040 decisions include release
+promotion, whether/when to enable boot autostart, monitoring and response
+ownership, certificate renewal, rollback drill, access and any real-data
+approval/migration. None is implied by the synthetic user acceptance.
+
+### VM110 target update — 2026-10-25
+
+The owner authorised VM110 preparation and a bounded synthetic session of
+the exact `79528bb9f6070e458724886a915f9d035cdfd110` product plus the
+separate `7f5bbecbb05a9f86f9850ed7e045a49fde040b89` operational package.
+VM110 has static LAN address `192.168.1.162/24`, NetBird
+`100.104.46.7`, a private Caddy listener, and a default-deny firewall with
+an early guard for only the two selected peers on TCP 22/443. Both peers
+appeared in the VM110 policy; `DESKTOP-L4BB2VP` resolved
+`geoai.froglight.ru` and received HTTPS 200 without a TLS error. The
+Reg.ru DNS-01 certificate is valid until 2027-01-23 and needs manual renewal.
+
+The bounded session passed HTTPS auth/ownership smoke, 100 API requests
+(p95 3.4 ms, zero 5xx), 20/20 small jobs, a ~1 MiB / 10,000-point job
+(5.35 s), restart persistence and a 136-file off-VM synthetic restore on
+VM109. The agreed 100,000-point, 10,000,026-byte input was admitted, but
+its DXF job failed after 23.81 s at the product's 25 MiB output file limit.
+The owner selected a corrected release without narrowing this boundary.
+Product candidate `15374b5c856958fdf67c5efdce68db81e05ac92f`, based
+directly on `79528bb`, and separate operational package
+`71ab84cba999bcf2fd105b69917cdd1e8907671f` passed isolated checks.
+On VM110 the exact saved synthetic fixture completed via HTTPS in 33.34 s:
+78,585,786-byte DXF, 925.7 MiB application cgroup peak, one worker and a
+2.5 GiB service cap. The result survived restart and a 150-file offline
+backup/restore. This is evidence for this fixture, not for arbitrary surveys
+of 100,000 points. The owner then authorized VM110-only backup and user-pilot
+startup. PVE1 now runs separate VM110 jobs: daily 05:30 Moscow time on
+`backup-fast-nfs` with keep-last 7, weekly Monday 01:30 Moscow time on
+`backup-weekly-nfs` with keep-last 4. The guest copies application state at
+02:00 UTC daily and 22:00 UTC Sunday, 30 minutes before each VM job, keeping
+two local successful copies. The first off-VM VM archive succeeded and was
+restored offline as stopped VM111 with its NIC removed and autostart disabled;
+an application-state restore passed SQLite integrity checks.
+
+VM110 now runs the exact corrected product `15374b5c856958fdf67c5efdce68db81e05ac92f`
+plus separate operational package `71ab84cba999bcf2fd105b69917cdd1e8907671f`.
+Both app and TLS services are active but disabled for boot; the old archives,
+config, overlay and primary state remain for rollback. Private HTTPS smoke
+passed login, import, preview, mapping, queue, result view and DXF download.
+GEOAI-039 is accepted only for the owner's bounded synthetic pilot scenario
+after the recovery and backup-pairing checks above. No production
+data, public listener, router/DHCP or shared VPN policy change, PR merge or
+permanent monitoring occurred.
+GEOAI-040 production publication remains BLOCKED. Detailed evidence is in
+`harness/build/039-vm110-pilot-execution.md`.
+
+### Release scope and status snapshot — 2026-10-25
+
+The selected functions remain accepted P0–P6 and 029, preceding the 030
+experiment and 036 audit API. The original product archive is exact commit
+`79528bb9f6070e458724886a915f9d035cdfd110` and remains unchanged.
+The corrected product candidate `15374b5c856958fdf67c5efdce68db81e05ac92f`
+adds only the bounded 100k DXF fix. The separate `pilot_ops/` package
+implements the operational ASGI launcher, config checks, backup/restore
+and service/TLS templates; it is not part of either product archive.
+GEOAI-039 is accepted for the exact synthetic user scenario and installed
+product/operations pair; isolated VM boot and backup pairing are verified.
+GEOAI-040 has no publication
+authorization. The fresh pilot state needed no production-data migration;
+project SQLite is user_version 8 and auth SQLite is user_version 1.
+The staging manifest's schemaVersion 5 is a separate format.
+
+| Status | Stages | Exact remaining gate |
+| --- | --- | --- |
+| ACCEPTED | 007A/007B/007C, 008–011, P1 012–014, P2 015–017, P3 018–020, P4 021–022, P5 023–025, P6 026–028, P7 029 | Existing feature/PR CI and local acceptance passed; these are the selected release functions. |
+| ACCEPTED as an audit only | P10 036 | Reports `readyForTraining=false` and `readyForEvaluation=false` under current unverified evidence; outside chosen release. No training permission follows from this acceptance. |
+| ACCEPTED (bounded parser) | P7 029A | Versioned `drawcode-explicit-v1` profile reports point-code candidates, ambiguous line markers and unknown tokens, preserving raw input. No geometry, third-party assets or real-survey quality claim; absent rights remain unverified. |
+| PARTIAL | P7 030A | Offline explicit-end and no-end synthetic candidates passed focused tests; no project/job/DXF integration. Real object/receiver mapping, reviewed source/reference pairs, rights and class criteria remain open. |
+| PROPOSED | P7 031A/031B | Coded objects need their own frozen specifications before READY. Synthetic development does not depend on ML readiness; real-survey acceptance needs reviewed source/reference pairs. No queue started. |
+| PARTIAL | P7 030 / 030B | Existing synthetic review-only inference candidate measured a class regression; 030B remains blocked for full acceptance by authorized object pairs, independent whole-object splits, correct links/breaks and agreed per-class criteria. New 030A acceptance cannot accept 030B or the whole 030. Keep the deployed generator unchanged. |
+| NOT ACCEPTED | P7 031 | Split by capability: 031A depends on 029A; 031B on 029A/030A and 028; 031C remains blocked by the relevant accepted 030B/class evidence. No blanket full-030 dependency for 031A/031B. |
+| BLOCKED | P8 032–033 | Analytical and approved real surface sites, effective breaklines, boundaries/masks, licensed implementation and specialist geodetic acceptance; 033 follows accepted 032 and contour criteria. |
+| BLOCKED | P9 034–035 | Owner-approved forms, required fields, units, rounding and reviewer; 035 follows accepted 034 and 033 only if terrain is included. |
+| BLOCKED | P10 037–038 | The current 036 schema records only unverified owner assertions and always returns false readiness. Independently reviewed rights, labels, class coverage, leakage-safe whole-object splits and agreed metrics must be recorded in an extended audit and pass it. Then 037 must beat the agreed baseline offline before 038 can propose reviewable suggestions. |
+| ACCEPTED (bounded synthetic pilot) | P11 039 | Exact corrected pair and the owner's synthetic import/preview/mapping/job/DXF/reopen scenario passed; isolated VM111 boot/recovery and VM110 dump/VM archive pairing passed. No real-survey quality claim or production authorization. |
+| BLOCKED | P11 040 | Separate explicit publication/operations authorization is needed. Decide promotion, boot autostart, observation/response, certificate renewal, access and any authorized real-data migration; no merge or production change now. |
+
+The unified material request is `harness/build/missing-materials.md`.
+Only independently ready tasks with defined requirements may proceed.
+029A is accepted for its bounded parser contract. The 030A offline experiment
+is PARTIAL; none of 030A/030B, 031A–031C, 032–035 or 037–038 is currently
+READY for product integration.
+PROPOSED subtask registration is not dispatch.
+The remaining READY statements in the chronological log below describe
+earlier checkpoints; this status snapshot is the current authority.
+
+- Baseline GEOAI-007C is committed at `c33340366ee4016a7e2d2576bb9c46931875db16`
+  on `codex/geo-ai-start` and preserved in a verified bundle and separate
+  bare Git store under `/home/geoai/dev-data/geoai-autonomy/`.
+- Completed: Codex and Cursor both passed real CLI calls. The disposable pilot
+  is `ACCEPTED` at local commit `08bdbad32799ad48cb6f8df3eaad37d562fb7aa9`.
+  GEOAI-008 (#2) is `ACCEPTED` at local commit
+  `aec7fdad107cc1e4382b97f2d3218129e80dbccc`; its Issue is closed.
+- GEOAI-009 (#3) is ACCEPTED at local commit
+  `10cd7ff75cc44eacfd38d2df937605f82f64a688`; its Issue is closed. The
+  protected broker/Symphony handoff, exact review, one repair, independent
+  checks and local preservation completed.
+- GEOAI-010 (#4) is ACCEPTED at local commit
+  `5c5915fbb3e6df07a1a7b2d1d3a73d8a02750564`; its Issue is closed.
+  Explicit mapping and typed API passed protected tests and Codex review.
+- GEOAI-011 (#5) is ACCEPTED at local commit
+  `b78b1f591244f04c6652c9fe857b93d282f134ec`; its Issue is closed.
+  Both Telegram and API use the isolated shared DXF service. The protected
+  package 008–011 is complete; the dispatcher and broker are stopped.
+- P0 is complete. GEOAI-007A evidence and an independent Windows copy of the
+  accepted branch bundle plus inherited CI edit are verified. GEOAI-007B is
+  accepted at `49dea8a` after successful push and PR checks in GitHub.
+  The old 008–011 Symphony queue remains stopped.
+- The inherited CI edit is preserved separately. It uses direct unittest
+  discovery, and the isolation bootstraps contain VM-specific output paths.
+  Local baseline success is not CI/deployment readiness.
+
+## P0 — local record and CI preparation
+
+- GEOAI-007A: COMPLETE on 2026-10-25. Accepted product commits 008–011
+  are ancestors of final local code/documentation HEAD
+  `bbf6f660985db3e519b06deec52e7ef39b9678a3`. The final bundle passed
+  verification. The difference from product commit `b78b1f5` is a
+  documentation commit. The inherited uncommitted CI workflow has matching
+  SHA-256 copies on VM109 and Windows; the final P0 branch bundle is also
+  verified on Windows.
+- GEOAI-007B: ACCEPTED at `49dea8abd8d1a6705a842bdcf80e7672a9135c91`.
+  Separate feature/PR checks, portable bootstrap roots, clean-venv install
+  and positive/negative local gates passed. GitHub push run 40145553092
+  and draft PR #6 run 40145565460 succeeded at that SHA. The production
+  workflow was unchanged. GitHub reports `main` unprotected and no active
+  branch rules; no rules were changed.
+  Scope and checks are in `harness/build/007b-ci-github.md`.
+- The owner now authorizes the scoped CI edit, exact origin, feature push and
+  draft PR for 007B; branch-rule changes and deployment remain excluded.
+  The prior 30-minute/task and two-hour/package controller settings applied
+  only to 008–011. The current P0 run manifest is under
+  `/home/geoai/dev-data/geoai-autonomy/p0-run-manifest.json`.
+- Next: freeze GEOAI-012 from the accepted 011/007A baseline, then execute
+  P1 by dependencies. No production deployment is authorized.
+
+P1 run manifest: `/home/geoai/dev-data/geoai-autonomy/p1-run-manifest.json`.
+GEOAI-012 was accepted after local and remote checks.
+GEOAI-013 is accepted at `66b8dcc` after local and GitHub feature/PR checks.
+Its fixed bounds and safe-read contract are in `harness/build/013-upload-guard.md`.
+GEOAI-014 is accepted at `0ad1e0a` after local and GitHub feature/PR
+checks. P1 is complete. GEOAI-015 is accepted after one CI repair at
+`a0e82bc`; both GitHub feature/PR runs passed. GEOAI-016 is accepted at
+`04522be` after local and GitHub push/PR checks. GEOAI-017 is accepted
+at `f3bee9c` after 107 focused, 10 isolated regression and six isolated
+API tests plus successful GitHub push/PR CI. P2 is complete. GEOAI-018
+is READY under `harness/build/018-resource-limits.md` with P3 bounds in
+`/home/geoai/dev-data/geoai-autonomy/p3-run-manifest.json`.
+
+## Product roadmap and acceptance history
+
+Numbers 012–040 were checked against this plan on 2026-10-25. The table
+below records outcomes reached since that initial proposal. A remaining
+task needs a frozen specification, base HEAD, file scope, tests, budget
+and accepted dependencies before dispatch.
+The first product milestone is a private web cabinet for upload, preview,
+mapping and DXF through the shared engine.
+
+| Package | ID | Outcome | Depends on | Status |
+| --- | --- | --- | --- | --- |
+| P1 | 012 | Survey model, coordinates and provenance | 007A, 008–011 | ACCEPTED at 608a8e3 |
+| P1 | 013 | Safe uploads and file paths | 012 | ACCEPTED at 66b8dcc |
+| P1 | 014 | Bounded calculation jobs | 013 | ACCEPTED at 0ad1e0a |
+| P2 | 015 | Versioned project storage | 012–014 | ACCEPTED at a0e82bc |
+| P2 | 016 | Owner authentication | 015 | ACCEPTED at 04522be |
+| P2 | 017 | Project, job and file ownership checks | 015–016 | ACCEPTED at f3bee9c |
+| P3 | 018 | Quotas, retention and cleanup | 014–017 | ACCEPTED at 8ed5687 |
+| P3 | 019 | Web import, preview and mapping | 009–010, 012–013, 016–018 | ACCEPTED at 897cf60 |
+| P3 | 020 | Web jobs, results and download | 014–019 | ACCEPTED at 91aeb53 |
+| P4 | 021 | End-to-end web MVP acceptance | 018–020, remote 007B CI | ACCEPTED at eecaad8 |
+| P4 | 022 | Reproducible staging, recovery and rollback | 021 | ACCEPTED |
+| P5 | 023 | Browser plan viewer | 015, 020–021 | ACCEPTED |
+| P5 | 024 | A/B line-connection candidates | 012, 023 | ACCEPTED |
+| P5 | 025 | Confirmed decisions and review history | 017, 023–024 | ACCEPTED |
+| P6 | 026 | Reversible derived-geometry edits | 025 | ACCEPTED, correction at 5880fea |
+| P6 | 027 | Reference-object archive | 015, 017, 025 | ACCEPTED at f618613 |
+| P6 | 028 | DXF comparison and quality measures | 027 | ACCEPTED at 1ea061c |
+| P7 | 029 | Versioned object-code rules | 012, 028 | ACCEPTED at 79528bb |
+| P7 | 029A | Versioned field-coding profiles and provenance | 012, accepted 029; source/rights inventory | ACCEPTED for bounded parser at 9548fa5; no drawable assets or geometry |
+| P7 | 030 | Measured line-tracing improvement | 030A and 030B scopes below | PARTIAL: existing inference experiment only; full acceptance not implied by either subtask alone |
+| P7 | 030A | Explainable tracing from explicit field codes | 012, 025–026, 028, 029A | PARTIAL: two offline synthetic candidate modes only; object ID, action/style disambiguation, receiver evidence and real sequence rules remain unapproved; see `harness/build/030a-modes-experiment.md` |
+| P7 | 030B | Inference of connections with insufficient codes | 024–025, 028–029; authorized held-out objects and class criteria | BLOCKED for acceptance; retains prior synthetic experiment and regression |
+| P7 | 031 | Situation outlines and composite objects | Capability-specific 031A/031B/031C dependencies | NOT ACCEPTED; subtask acceptance does not imply whole-stage acceptance |
+| P7 | 031A | Point symbols, multiple objects per point and annotation | 012, 028, 029A; approved symbol assets/rules | PROPOSED; independent of 030B and ML |
+| P7 | 031B | Explicitly coded line and area objects | 028, 029A, 030A; reviewed class geometry | PROPOSED; independent of 030B and ML |
+| P7 | 031C | Ambiguous composite situation objects | Relevant accepted 030B capability, 028, reviewed class examples | BLOCKED by inference/class evidence |
+| P8 | 032 | TIN with effective breaklines and masks | 012, 015, 028 | BLOCKED by domain references, masks and licensed implementation |
+| P8 | 033 | Terrain contours and elevation checks | 032 | BLOCKED by 032 and contour criteria |
+| P9 | 034 | Report data model and templates | 012, 015 | BLOCKED by owner forms and numeric rules |
+| P9 | 035 | Versioned deliverable package | 034; 033 if terrain included | BLOCKED by 034 and chosen contents |
+| P10 | 036 | Dataset-readiness audit | 025, 027–028 | ACCEPTED at e5663fa; reports not ready for training/evaluation |
+| P10 | 037 | Small offline recommendation model | 036 | BLOCKED by actual data readiness |
+| P10 | 038 | Reviewable model suggestions | 025, 037 | BLOCKED by 037 |
+| P11 | 039 | Acceptance of a chosen release | 018, 021–022, chosen features | ACCEPTED for bounded synthetic pilot; VM111 isolated boot and VM110 backup pairing verified |
+| P11 | 040 | Authorized publication and operations | 039, release authorization | BLOCKED by separate explicit authorization; no merge, boot autostart or wider access |
+
+For a first limited site release, P1–P4 plus P11 are the main path. P5–P10
+can follow; the document package can move earlier if it does not depend on
+terrain. Stage 031 must be split by object class. ML needs a verified,
+object-separated dataset and an independent comparison with the old algorithm.
+No automated publication is authorized by this roadmap.
+
+P3 checkpoint: GEOAI-018, 019 and 020 are accepted with exact feature
+and PR checks; package complete. GEOAI-020 is accepted at `91aeb53`
+after 120 focused, 10 isolated regression and six isolated API tests;
+GitHub push run 40151146814 and PR run 40151149754 succeeded.
+P4 run manifest is `/home/geoai/dev-data/geoai-autonomy/p4-run-manifest.json`.
+GEOAI-021 scope and acceptance evidence are under
+`harness/build/021-web-mvp-acceptance.md`.
+
+GEOAI-021 is accepted at `eecaad8` after 121 focused, 10 isolated
+regression and six isolated API tests; GitHub push run 40151771462
+and PR run 40151774538 succeeded. GEOAI-022 is READY under
+`harness/build/022-staging-recovery.md` from this accepted base.
+Docker is absent on VM109, so staging uses the existing verified
+Python environment and isolated synthetic data; no system install.
+
+GEOAI-022 local verification passed on candidate `922dc0d`: exact
+package lock and Git archive checks, loopback HTTPS synthetic owner,
+project, import and DXF result, active-service backup refusal,
+compatible 021 code rollback, offline backup and fresh-root restore.
+Source and DXF checksums survived rollback and recovery; corrupted
+backup was refused before target creation. The disposable server is
+stopped. The repaired-commit gate passed 124 focused, 10 isolated
+regression and six isolated API tests. GitHub feature/PR CI is next.
+
+GEOAI-022 is accepted at `211cf18` after GitHub push run 40152510544
+and draft PR #6 run 40152513257 passed at that SHA. The verified branch
+bundle SHA-256 is `e8e51c8406db43e016e0e48775a835965ce8dc81d39cc77560605858f8fbd69f`.
+P4 is complete. P5 has a finite manifest at
+`/home/geoai/dev-data/geoai-autonomy/p5-run-manifest.json`; GEOAI-023
+is READY from this accepted base under
+`harness/build/023-plan-viewer.md`. No publication or deployment.
+
+GEOAI-023 local candidate adds bounded DXF plan JSON and the cabinet
+viewer. Fixed synthetic HTTPS result returned 25 top-level/46 expanded
+objects on eight layers; browser selection, fit, zoom, pan and layer
+toggles worked, including coordinates shifted by 1–2 million units.
+Owner/API limits and unsupported geometry have focused checks. The
+final local gate passed 127 focused, 10 isolated regression and six
+isolated API tests; exact GitHub feature/PR CI is pending; then
+freeze 024 from the accepted base.
+
+GEOAI-023 is accepted at `24dad9c`: GitHub push run 40153380771
+and draft PR #6 run 40153383129 succeeded at that SHA. Verified
+branch bundle SHA-256:
+`a923b30576764257606996ef39a4907c183e90f75fad4849632d88df9649a7a4`.
+P5 continues with GEOAI-024 READY under
+`harness/build/024-line-candidates.md`; no selected line geometry or
+production data is changed by generating candidates.
+
+GEOAI-024 local candidate compares two explicit line sequences from
+the same immutable revision, returns reasons/provenance and never
+chooses one. The synthetic zigzag gave A=P1,P2,P3,P4 and
+B=P1,P3,P4,P2; direct accepted-023/current DXF line semantics matched.
+The final local gate passed 131 focused, 10 isolated regression and
+six isolated API tests. Exact GitHub feature/PR runs
+40154016183/40154019673 passed at `cbcd0f3`; GEOAI-024 is ACCEPTED.
+GEOAI-025 is READY from this base under `harness/build/025-decisions.md`.
+GEOAI-025 is accepted at `43fe740`: versioned owner decisions and job-bound
+accepted A/B orders passed 133 focused, 10 regression and six API
+checks plus disposable HTTPS DXF and browser controls. Exact GitHub
+feature/PR runs 40154708051/40154711826 passed. P5 checkpoint:
+023–025 accepted, original checkout unchanged, no production action.
+P6 manifest runs to 2026-10-25T06:33:23Z; GEOAI-026 is READY.
+GEOAI-026 is accepted at `6285b1a`: saved line edits reproduce in new DXF,
+preserve source measurements, reject stale/foreign writes and keep
+prior jobs fixed. The final local gate passed 137 focused, 10
+regression and six API tests; synthetic HTTPS/browser checks and exact
+GitHub push/PR runs 40155918471/40155921751 passed. GEOAI-027 is
+READY from this base with only synthetic fixtures in development; real
+examples need explicit provenance and use permission.
+No production publication is authorized.
+GEOAI-026 static-script correction passed the repeat local gate: the
+missing `/app/line-edits.js` route is added and asserted in the
+authenticated app test. GEOAI-027 implementation waits for exact
+feature/PR CI, now successful at `5880fea` (40156349260/40156351787).
+GEOAI-027 is in implementation from this corrected accepted base.
+GEOAI-027 passed local tests, synthetic HTTPS and exact feature/PR CI
+at `f618613` (40156949699/40156952551). GEOAI-028 is READY under
+`harness/build/028-dxf-comparison.md` with exact diagnostics and no
+invented geodetic tolerance.
+GEOAI-028 passed the local full gate, synthetic HTTPS and exact
+feature/PR CI at `1ea061c` (40157505101/40157509671). P6 (026–028)
+is ACCEPTED; checkpoint: clean feature worktree, original checkout
+unchanged, no real data or production action. Next dependency-ready
+candidate is GEOAI-029 from existing SinoKOD and generator mappings.
+P7 run manifest is bounded to 2026-10-25T07:20:40Z, 90 minutes per
+task, at most two repairs, one worktree/compute worker and $0
+external executor. GEOAI-029 is READY under
+`harness/build/029-object-catalog.md`; preserve ambiguous and
+unmapped codes without making up semantics.
+GEOAI-029 passed local full gate, verified HTTPS and exact feature/PR
+CI at `79528bb` (40158200653/40158204850). GEOAI-030 depends on
+its acceptance; an offline experimental subtask can proceed with
+synthetic objects, while real held-out validation needs authorized
+reference objects and agreed class-level criteria.
+The bounded synthetic 030 experiment is READY under
+`harness/build/030-tracing-experiment.md` and frozen fixture
+`harness/fixtures/030-synthetic-objects.json`. It cannot change the
+generator or count as full 030 acceptance without real held-out data.
+The 030 synthetic experiment passed local tests and full gate. It
+measured one class gain (2/4 → 4/4 exact edges) and one class regression
+(5/5 → 3/5); the candidate remains review-only. Exact feature/PR CI
+passed at `8e30d74` (40158735797/40158740954); full 030 and dependent 031 remain blocked by missing
+authorized real references and agreed class criteria.
+P7 checkpoint: 029 accepted, 030 synthetic experiment accepted with a
+measured regression, full 030/031 blocked. Continue independent 036
+dataset-readiness work from accepted 025/027/028.
+P10 manifest is bounded to 2026-10-25T07:37:48Z, one task 036,
+90 minutes, at most two repairs, one worktree/compute worker and $0
+external executor. GEOAI-036 is READY under
+`harness/build/036-dataset-readiness.md`. It may accept a precise
+not-ready report; 037/038 remain blocked until real data and rights
+meet the audit.
+GEOAI-036 local gate and verified HTTPS synthetic smoke passed. The
+report enumerates missing rights review, whole-object family IDs,
+reference review, priority class coverage, independent splits,
+per-class criteria and byte-integrity verification. The API does not
+export reference bytes or permission text. Both training and
+evaluation readiness remain false. Exact feature push and PR CI
+passed at `e5663fa` (40159298332/40159301340), so 036 is
+ACCEPTED. P10 checkpoint: clean feature worktree; 037/038 blocked
+until real rights, labels, independent object-family splits and agreed
+class metrics permit a passing audit. P8 032 is PROPOSED and blocked
+from domain acceptance: current `surface.py` has unconstrained SciPy
+Delaunay and decorative breaklines; library/license, boundary/mask
+rules and analytical/reference sites need agreement. P9 034/035 are
+blocked pending supplied document forms, units and rounding rules.
+Owner supplied a completed real DXF for P7 030; a private, read-only
+inventory passed with matching transfer SHA-256 and no raw data in
+Git. It has 42,718 POINT, 9,268 LWPOLYLINE, 163,447 LINE and
+97,385 3DFACE entities. Original field TXT/CSV is unavailable, and
+class labels, independent object-family splits, use rights and
+regression criteria have not been confirmed. The file supports DXF
+inventory and future reviewed comparisons, not full 030 acceptance or
+training readiness. Continue with 030/031 blocked pending evidence.
+An exact XY diagnostic found just 1 of 38,898 road LINE endpoints
+equal to a DXF POINT coordinate, and 4 of 289,196 ordinary contour
+LWPOLYLINE vertices; no direct point-to-line truth mapping is established.
+
+Proposed future execution bounds: one implementation agent and one compute
+worker, at most three prepared tasks per package, one initial attempt plus
+at most two repairs, up to 90 minutes per task and four hours per package.
+Set an executor spending limit before any run. These are proposals, not
+current Symphony settings. Stop on exhausted limits, unexpected changes,
+lost test isolation, missing data, unaccepted dependencies or work outside
+the package scope; record HEAD, diff, checks and reason.
+
+## Foundation
+
+Preserve the recovered working baseline, isolated regression tests, minimal
+FastAPI health/upload adapters, and evidence under `/home/geoai/dev-data/`.
+
+## GEOAI-008 — survey parser service
+
+Extract safe TXT/CSV parsing from Telegram handlers into a framework-independent
+service. Telegram continues to use the same parser.
+
+## GEOAI-009 — preview API
+
+Return columns, initial rows, detected delimiter and encoding, plus validation
+warnings for an uploaded survey.
+
+## GEOAI-010 — column mapping
+
+Support explicit mapping for Point, X, Y, Z, Code, and Comments.
+
+## GEOAI-011 — DXF generation service
+
+Expose existing DXF generation through one isolated core service shared by web
+and Telegram adapters.
+
+## Architectural notes for later packages
+
+Project storage, authentication and ownership precede the private web
+cabinet. PostGIS is not required merely to store a project list. Preserve
+measured coordinates separately from derived geometry. Introduce ML only
+after a verified dataset of topographer decisions exists.

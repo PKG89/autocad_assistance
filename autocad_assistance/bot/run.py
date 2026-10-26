@@ -1,5 +1,7 @@
 import logging
 import atexit
+import asyncio
+import io
 import signal
 import traceback
 import os
@@ -9,6 +11,11 @@ from pathlib import Path
 from telegram.ext import ApplicationBuilder, CommandHandler
 from autocad_assistance.config import BOT_TOKEN
 from autocad_assistance import db
+from autocad_assistance.services.dxf_jobs import render_dxf_bytes
+from autocad_assistance.services.survey_contract import (
+    SurveyContext,
+    make_survey_dataset,
+)
 from autocad_assistance.bot.start import register_basic_handlers, start, cancel
 from autocad_assistance.bot.file_handlers import (
     handle_file,
@@ -32,6 +39,7 @@ from autocad_assistance.state import (
     STATE_WORKFLOW,
     STATE_KML_PROJECTION,
     STATE_KML_POINTS,
+    reset_workflow_state,
 )
 from telegram.ext import (
     CallbackQueryHandler,
@@ -41,6 +49,37 @@ from telegram.ext import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _telegram_contract_rows(user_data, final_data, scale_factor):
+    """Preserve the established Telegram mapping while recording provenance."""
+    digest = user_data.get("survey_source_sha256")
+    source_frame = user_data.get("data_initial")
+    if not digest or source_frame is None:
+        return final_data, ()
+    source_rows = [
+        list(row.fillna("").astype(str))
+        for _, row in source_frame.iterrows()
+    ]
+    mapped_rows = [
+        {
+            "Point": row["Point"],
+            "X": row["X"],
+            "Y": row["Y"],
+            "Z": row["Z"],
+            "Code": row["Code"],
+            "Comments": row.get("Coments", ""),
+        }
+        for row in final_data.to_dict("records")
+    ]
+    dataset = make_survey_dataset(
+        mapped_rows,
+        source_rows=source_rows,
+        source_sha256=digest,
+        source_line_numbers=user_data.get("survey_source_line_numbers") or (),
+        context=SurveyContext(scale_factor=scale_factor),
+    )
+    return dataset.mapped_rows, dataset.warnings
 
 def _write_termination_log(reason: str) -> None:
     try:
@@ -128,6 +167,7 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler("start", start),
+            MessageHandler(MAIN_MENU_FILTER, process_main_menu_text),
             MessageHandler(filters.Document.ALL, handle_file),
         ],
         states={
@@ -140,7 +180,7 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
             STATE_MAPPING: [
                 CommandHandler("start", start),
                 MessageHandler(MAIN_MENU_FILTER, process_main_menu_text),
-                CallbackQueryHandler(handle_mapping_callback),
+                CallbackQueryHandler(handle_mapping_callback, pattern="^(workflow_mapping|[12])$"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_mapping_text),
             ],
             STATE_SCALE: [
@@ -152,8 +192,8 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
             STATE_WORKFLOW: [
                 CommandHandler("start", start),
                 MessageHandler(MAIN_MENU_FILTER, process_main_menu_text),
-                # Let top-level CallbackQueryHandlers handle workflow button clicks;
-                # removing the no-op handler prevents swallowing the callback.
+                CallbackQueryHandler(handle_mapping_callback, pattern="^workflow_mapping$"),
+                CallbackQueryHandler(handle_scale_callback, pattern="^workflow_scale$"),
                 MessageHandler(filters.Document.ALL, handle_file),
             ],
             STATE_KML_PROJECTION: [
@@ -178,6 +218,11 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
     )
 
     register_basic_handlers(app)
+    auth_root = os.getenv("GEOAI_AUTH_ROOT")
+    if auth_root:
+        from autocad_assistance.bot.owner_link import register_owner_link_handler
+
+        register_owner_link_handler(app, auth_root)
     app.add_handler(conv_handler)
     # Ensure reply-keyboard main menu text and inline callbacks are handled.
     # ReplyKeyboard uses normal text messages, so register a MessageHandler
@@ -193,14 +238,10 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
     # Inline callback handlers for the workflow buttons. These match the
     # callback_data values produced by `keyboard.build_workflow_keyboard`.
     try:
-        # workflow mapping/scale/generate/newfile
-        app.add_handler(CallbackQueryHandler(handle_mapping_callback, pattern="^workflow_mapping$"))
-        app.add_handler(CallbackQueryHandler(handle_scale_callback, pattern="^workflow_scale$"))
+        # TIN callbacks do not leave STATE_WORKFLOW.
         app.add_handler(CallbackQueryHandler(handle_tin_callback, pattern="^workflow_tin$"))
         app.add_handler(CallbackQueryHandler(handle_tin_refine_toggle, pattern="^workflow_refine$"))
-        # For generate and newfile, we provide lightweight handlers that
-        # currently call the no-op placeholder (application logic lives in
-        # other modules like dxf_generator). Keep them logged so clicks are visible.
+        # Geometry generation stays in the generator module.
         async def _workflow_generate(update, context):
             logger.info("workflow_generate pressed: %s", update.callback_query.data)
             await update.callback_query.answer()
@@ -224,44 +265,42 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
                     f"🔄 Генерация DXF запущена (масштаб {scale_label})...",
                     reply_markup=None
                 )
-                
-                # Создаем временный файл для DXF
-                import tempfile
-                import os
-                
-                temp_dir = tempfile.mkdtemp()
+
                 output_filename = f"generated_{context.user_data.get('original_filename', 'drawing')}.dxf"
-                output_path = os.path.join(temp_dir, output_filename)
-                
-                # Импортируем и вызываем генератор DXF
-                from autocad_assistance.dxf_generator import generate_dxf_ezdxf
                 tin_settings = {
                     "codes": list(context.user_data.get("tin_codes") or []),
                     "scale_value": context.user_data.get("scale_value"),
                     "refine": bool(context.user_data.get("tin_refine")),
                 }
-                generate_dxf_ezdxf(final_data, output_path, scale_factor, tin_settings=tin_settings)
-                
-                # Отправляем файл пользователю
-                with open(output_path, 'rb') as dxf_file:
-                    await context.bot.send_document(
-                        chat_id=update.effective_chat.id,
-                        document=dxf_file,
-                        filename=output_filename,
-                        caption=f"✅ DXF файл создан (масштаб {scale_label})\n📊 Обработано точек: {len(final_data)}"
-                    )
+                survey_rows, survey_warnings = await asyncio.to_thread(
+                    _telegram_contract_rows,
+                    context.user_data,
+                    final_data,
+                    scale_factor,
+                )
+                context.user_data["survey_warnings"] = tuple(
+                    warning.code for warning in survey_warnings
+                )
+                dxf_bytes = await asyncio.to_thread(
+                    render_dxf_bytes,
+                    survey_rows,
+                    scale_factor=scale_factor,
+                    tin_settings=tin_settings,
+                )
+                dxf_file = io.BytesIO(dxf_bytes)
+                dxf_file.name = output_filename
+
+                await context.bot.send_document(
+                    chat_id=update.effective_chat.id,
+                    document=dxf_file,
+                    filename=output_filename,
+                    caption=f"✅ DXF файл создан (масштаб {scale_label})\n📊 Обработано точек: {len(final_data)}"
+                )
                 
                 # Показываем меню workflow
                 from autocad_assistance.state import show_workflow_menu
                 await show_workflow_menu(update, context, notice="✅ DXF файл успешно создан и отправлен!")
                 
-                # Очищаем временный файл
-                try:
-                    os.unlink(output_path)
-                    os.rmdir(temp_dir)
-                except Exception:
-                    pass
-                    
             except Exception as exc:
                 logger.exception("Ошибка при генерации DXF: %s", exc)
                 await update.callback_query.edit_message_text(
@@ -272,16 +311,16 @@ def build_app(token: str | None = None, allow_missing_token: bool = False):
         async def _workflow_newfile(update, context):
             logger.info("workflow_newfile pressed: %s", update.callback_query.data)
             await update.callback_query.answer()
+            reset_workflow_state(context)
             await update.callback_query.edit_message_text("Готово. Отправьте новый файл.", reply_markup=None)
+            return STATE_FILE
 
         app.add_handler(CallbackQueryHandler(_workflow_generate, pattern="^workflow_generate$"))
-        app.add_handler(CallbackQueryHandler(_workflow_newfile, pattern="^workflow_newfile$"))
+        conv_handler.states[STATE_WORKFLOW].append(
+            CallbackQueryHandler(_workflow_newfile, pattern="^workflow_newfile$")
+        )
 
-        # Generic handlers: scale selection is handled by handle_scale_callback
-        app.add_handler(CallbackQueryHandler(handle_scale_callback, pattern="^scale_"))
         app.add_handler(CallbackQueryHandler(handle_tin_callback, pattern=r"^tin_(?:toggle|page|done|cancel)"))
-        # Mapping choices from mapping keyboard (callback_data '1' or '2')
-        app.add_handler(CallbackQueryHandler(handle_mapping_callback, pattern="^[12]$"))
     except Exception:
         logger.exception("Failed to register inline callback handlers")
 

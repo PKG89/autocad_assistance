@@ -1,0 +1,37 @@
+name: GEO AI checks
+
+on:
+  push:
+    branches:
+      - codex/geoai-current
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: geoai-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: |
+            autocad_assistance/requirements.txt
+            requirements-test.txt
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-test.txt
+      - name: Focused and isolated regression/API checks
+        env:
+          GEOAI_TEST_REPORT_ROOT: ${{ runner.temp }}/geoai-tests
+        run: bash scripts/geoai-ci-checks.sh

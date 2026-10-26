@@ -1,0 +1,56 @@
+{
+  "status": "technical-candidate-only",
+  "canonicalBuildEnvironment": "Linux VM109 (Debian 13.7), Git 2.47.3; both git archive commands were repeated there with identical SHA-256. Git for Windows 2.55 produced different tar bytes for the same commits and is not the canonical archive builder.",
+  "baseProduct": {
+    "commit": "79528bb9f6070e458724886a915f9d035cdfd110",
+    "archiveSha256": "cada7fb4f2919fe321cffbe74beeec499bc60e833e33f36a94f404560f91ce81"
+  },
+  "productCandidate": {
+    "commit": "15374b5c856958fdf67c5efdce68db81e05ac92f",
+    "parent": "79528bb9f6070e458724886a915f9d035cdfd110",
+    "archiveName": "15374b5c856958fdf67c5efdce68db81e05ac92f.tar",
+    "archiveBytes": 8581120,
+    "archiveSha256": "b6d5ba6ec44554feca4d1e43fb98450fccab13f7d5b003f2c6ddca0e4520df0b",
+    "archiveCommand": "git archive --format=tar 15374b5c856958fdf67c5efdce68db81e05ac92f > 15374b5c856958fdf67c5efdce68db81e05ac92f.tar",
+    "changedPaths": [
+      "autocad_assistance/api/jobs.py",
+      "autocad_assistance/api/web/app.js",
+      "autocad_assistance/services/calculation_jobs.py",
+      "autocad_assistance/services/calculation_worker.py",
+      "autocad_assistance/services/project_store.py",
+      "tests/test_calculation_jobs.py"
+    ],
+    "functions": "Accepted P0-P6 and GEOAI-029 plus bounded DXF result fix; excludes GEOAI-030 experiments and later unfinished functions"
+  },
+  "operationalPackage": {
+    "commit": "71ab84cba999bcf2fd105b69917cdd1e8907671f",
+    "parent": "7f5bbecbb05a9f86f9850ed7e045a49fde040b89",
+    "archiveName": "pilot-ops-71ab84cba999bcf2fd105b69917cdd1e8907671f.tar",
+    "archiveBytes": 40960,
+    "archiveSha256": "7e71d6057d83f5de02a669c5a50ab54b295631c65e42cbaf7f59dc23f46bbd65",
+    "archiveCommand": "git archive --format=tar 71ab84cba999bcf2fd105b69917cdd1e8907671f pilot_ops > pilot-ops-71ab84cba999bcf2fd105b69917cdd1e8907671f.tar",
+    "changedPaths": [
+      "pilot_ops/geoai_pilot_ops/runtime.py",
+      "pilot_ops/systemd/geoai-pilot.service"
+    ],
+    "compatibility": "Allowlisted exact new archive while retaining 79528bb and P6 rollback; MemoryMax=2560M. Existing private TLS template unchanged."
+  },
+  "dependencies": {
+    "python": "3.13.5",
+    "pipFreezeSha256": "d8d2cf3756f29f64246f133f694ee61aa9711f8eb8e95c4fd2039734d381c351",
+    "tlsProxy": "Caddy 2.11.7, unchanged VM110 installation",
+    "stateSchema": "auth SQLite user_version 1; project SQLite user_version 8; no migration"
+  },
+  "limits": {
+    "inputBytes": 10485760,
+    "jobRequestBytes": 33554432,
+    "resultBytes": 100663296,
+    "activeJobSeconds": 120,
+    "workers": 1,
+    "workerAddressSpaceBytes": 1610612736,
+    "serviceMemoryMaxBytes": 2684354560,
+    "ownerTotalBytes": 536870912
+  },
+  "installation": "With both services stopped, verify archive bytes/SHA and Git parent, preserve the old config/unit/overlay and an offline backup, extract the product to its commit-named release directory, install the separately versioned pilot_ops package, point config release_commit/archive_path/release_root to the new commit and an isolated synthetic state, install its service unit, run geoai_pilot_ops check as the service user, then start only for bounded technical acceptance. Keep the existing private Caddy/NetBird/DNS/firewall configuration. Restore the old config/unit/overlay and stop both services after the session.",
+  "rollback": "Original 79528bb tar and 7f5bbec overlay remain unchanged. Keep the original primary state separate because old 25 MiB readers cannot accept new 96 MiB results; do not roll an enlarged result into that state. Restore original config/unit/overlay, verify exact release and leave app/TLS stopped."
+}

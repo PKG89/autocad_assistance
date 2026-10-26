@@ -1,0 +1,18 @@
+{
+  "profileVersion": "drawcode-explicit-v1",
+  "catalogVersion": "object-code-v1",
+  "tokenSeparator": "ASCII space or tab",
+  "caseSensitive": true,
+  "pointCodes": ["KIK", "KM", "OXR", "DER_L", "DER_X", "DER_F", "FNR_O", "FNR_D", "PNT_D", "PNT_V", "RP_V"],
+  "lineActionCandidates": {"1": "start", "0": "end"},
+  "lineStyleCandidates": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "11"],
+  "sourceEvidence": {
+    "DrawLineObjectByCode05a.zip": "4f8d5987b293f022854c130d5bc7904fd8017685942976a844d1e31e2007ac9a",
+    "DrawLineObjectByCode05a.zip/ConversionCodeLine05.txt": "d6cfc6383a770a481025e21a1cd7440f2f270739ee427d02b1659fbf1dfb815b",
+    "DrawLineObjectByCode05a.zip/Read me drawline05a.txt": "5085341c094456b9b49b8f8baebaa14f475aadd243522111b4fc208cd7652003",
+    "DrawPointObjectByCode05.zip": "b864e9dbcf9b30d0c4dc6a72684bbe2ee7ac12953ee50f37eb58f72668706b56",
+    "DrawPointObjectByCode05.zip/ConversionCodePoint05.txt": "19f7eeacc5161f8dd7cda2187a6dceee30bc34cbdb0e3f02b8c7346f793ddb7e",
+    "DrawPointObjectByCode05.zip/Read me drawpoint 05.txt": "9279d5f558e2e2f57d8d62e37f06ff61fa386029d9d48fb49f5cebd696d183db"
+  },
+  "assetRights": "unverified; no third-party drawable assets included"
+}
