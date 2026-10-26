@@ -41,6 +41,16 @@ VM110; provenance and rights beyond owner provision remain unconfirmed.
 It is useful to validate the input format and identify parser ambiguities,
 not to score whether any proposed line connection is correct.
 
+On 2026-10-26 the owner supplied four more same-object Azat TXT exports.
+They are six-field comma-delimited files; the latest contains the earlier
+Azat rows and 183 exact point-ID/XYZ/code records also present in Kirill's
+file. See `030a-private-source-inventory.md` for hashes and counts. These
+overlaps prevent treating the latest filename as row-level receiver identity.
+No real records were transferred or scored. The owner confirmed these files
+do not correspond to the previously supplied completed DXF. A matching
+finished drawing, rights, row-level object identity and correct connections
+remain unverified.
+
 ## Proposed conservative contract for owner decision
 
 Do not connect records from raw `0`/`1` alone. An accepted 030A input would

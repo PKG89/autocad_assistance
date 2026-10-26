@@ -32,6 +32,15 @@ file is a local read-only **format candidate**, not the missing source for
 the earlier completed DXF and not a training or evaluation pair. It was
 not copied to VM109/VM110 or the repository. See `030a-readiness.md`.
 
+The four additional Azat exports supplied on 2026-10-26 are described by the
+owner as the same object as the Kirill file. Their structural overlap and
+hashes are in `030a-private-source-inventory.md`. They supply more source
+points and reveal aggregation across files. The owner confirmed these points
+do not correspond to the earlier completed DXF. A matching finished DXF,
+approved use scope, line-object/receiver annotations
+or reviewed correct links and breaks. They remain private format/provenance
+candidates, not accepted references or 036 training/evaluation data.
+
 ## Field-to-Finish clarification — 2026-10-25
 
 The full-030 and dependent-031 requests above apply to inference (030B),
